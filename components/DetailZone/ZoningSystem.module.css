@@ -1,0 +1,97 @@
+.box {
+  max-width: 1320px;
+  padding: 10px;
+  margin: auto;
+  display: flex;
+}
+
+/* Cột trái (ảnh) */
+.left {
+  flex: 3;
+}
+
+/* Wrapper để đặt SVG lên ảnh */
+.imageWrapper {
+  position: relative; /* Để SVG có thể đặt lên ảnh */
+  width: 100%;
+}
+
+/* Ảnh full kích thước */
+.img {
+  width: 100%;
+  height: auto; /* Có thể thay đổi thành height: 100% nếu cần */
+  object-fit: cover;
+  display: block;
+  z-index: 1; /* Đảm bảo ảnh nằm dưới SVG */
+}
+
+/* SVG overlay */
+.overlaySvg {
+  position: absolute; /* Để đặt SVG ở vị trí chính xác */
+  top: 20px; /* Điều chỉnh vị trí theo nhu cầu */
+  left: 20px; /* Điều chỉnh vị trí theo nhu cầu */
+  z-index: 2; /* Đặt SVG lên trên ảnh */
+  pointer-events: none; /* Ngăn chặn sự kiện chuột trên SVG nếu không cần thiết */
+}
+
+/* Cột phải (text) */
+.right {
+  width: 240px;
+  background-color: #fffaee;
+  justify-content: center;
+  color: #762f0b;
+  font-size: 18px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* 📱 Mobile responsive */
+@media (max-width: 768px) {
+  .box {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left {
+    flex: none;
+    width: 100%;
+    height: 300px;
+  }
+
+  .right {
+    flex: none;
+    width: 100%;
+    padding: 20px;
+    font-size: 16px;
+  }
+
+  .img {
+    height: 100%;
+  }
+
+  .overlaySvg {
+    top: 10px;
+    left: 10px;
+    width: 40px; /* Kích thước SVG */
+    height: 40px; /* Kích thước SVG */
+  }
+}
+
+@media (max-width: 480px) {
+  .left {
+    height: 220px;
+  }
+
+  .right {
+    font-size: 14px;
+    padding: 15px;
+    margin-top: 10px;
+  }
+
+  .overlaySvg {
+    top: 5px;
+    left: 5px;
+    width: 30px; /* Kích thước SVG */
+    height: 30px; /* Kích thước SVG */
+  }
+}

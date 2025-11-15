@@ -1,0 +1,51 @@
+.footer {
+
+  background-color: #FFFAEE;
+  padding: 1px;
+  color: #000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.footerOverlay{
+    max-width: 1300px;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+}
+.logo {
+  flex: 1 1 200px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.company {
+  flex: 2 1 300px;
+  font-size: 3em; /* Thay đổi từ px sang em cho tính linh hoạt */
+  margin-bottom: 20px;
+  color: #762f0b;
+      text-align: center;
+}
+
+@media (max-width: 600px) {
+  .logo {
+    flex: 1 1 100px; /* Giảm kích thước logo */
+    margin-bottom: 10px; /* Giảm khoảng cách dưới */
+  }
+
+  .company {
+    flex: 1 1 150px; /* Giảm kích thước company */
+    font-size: 1em; /* Giảm kích thước chữ */
+    margin-bottom: 10px; /* Giảm khoảng cách dưới */
+  }
+}
+.links {
+  flex: 1 1 200px;
+  font-size: 3px;
+  color: #762f0b;
+}
+
+/* Ẩn phần links trên màn hình nhỏ */
+@media (max-width: 600px) {
+  .links {
+    display: none;
+  }
+}

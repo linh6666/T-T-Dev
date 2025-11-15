@@ -1,0 +1,14 @@
+.userBtn {
+  padding: 4px; /* p-2 */
+  border-radius: 9999px; /* rounded-full */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+
+  /* mobile mặc định */
+      /* background-color: #762f0b; */
+    color: #ffffff;
+}
+
+

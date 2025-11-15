@@ -1,0 +1,111 @@
+.box {
+  max-width: 1320px;
+  padding: 10px;
+  margin: auto;
+  display: flex;
+}
+
+/* Cột trái (ảnh) */
+.left {
+  flex: 3;
+}
+
+/* Wrapper để đặt SVG lên ảnh */
+.imageWrapper {
+  position: relative; /* ✅ để SVG có thể đặt lên ảnh */
+}
+
+/* Ảnh full kích thước */
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  display: block;
+}
+
+
+.overlaySvg {
+  position: absolute;
+  top: 20px; 
+  left: 20px;
+  pointer-events: none; 
+}
+
+/* Cột phải (text) */
+.right {
+  width: 240px;     
+  background-color:#FFFAEE;
+  justify-content: center;
+  color: #762f0b;
+  font-size: 18px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* 📱 Mobile responsive */
+@media (max-width: 768px) {
+  .box {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left {
+    flex: none;
+    width: 100%;
+    height: 300px;
+  }
+
+  .right {
+    flex: none;
+    width: 100%;
+    padding: 20px;
+    font-size: 16px;
+  }
+
+  .img {
+    height: 100%;
+  }
+
+  .overlaySvg {
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .left {
+    height: 220px;
+  }
+
+  .right {
+    font-size: 14px;
+    padding: 15px;
+    margin-top: 10px;
+  }
+
+  .overlaySvg {
+    top: 5px;
+    left: 5px;
+    width: 30px;
+    height: 30px;
+  }
+}
+.imageWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.overlaySvg {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%); /* căn giữa SVG theo điểm top/left */
+}
