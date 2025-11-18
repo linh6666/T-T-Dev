@@ -8,12 +8,12 @@ import {
   Textarea,
   TextInput,
 } from "@mantine/core";
-import { isNotEmpty,  useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { useDisclosure } from "@mantine/hooks";
 import { createUser } from "../../../api/apicreatePermissions"; // 🔁 sửa đường dẫn nếu cần
-
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface CreateViewProps {
   onSearch: () => Promise<void>;
@@ -24,18 +24,14 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
 
   const form = useForm({
     initialValues: {
-     code: "",
+      code: "",
       description_vi: "",
-      // description_en: "",
-     
- 
+      description_en: "",
     },
     validate: {
       code: isNotEmpty("Mã không được để trống"),
-    
       description_vi: isNotEmpty("Mô tả không được để trống"),
-      // description_en: isNotEmpty("Mô tả không được để trống"),
-     
+      description_en: isNotEmpty("Mô tả không được để trống"),
     },
   });
 
@@ -44,16 +40,24 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     try {
       const userData = {
         code: values.code,
-          description_vi: values.description_vi,
-        // description_en: values.description_en,
-       
+        description_vi: values.description_vi,
+        description_en: values.description_en,
       };
       await createUser(userData);
+
+      // Hiển thị thông báo thành công
+      NotificationExtension.Success("Tạo chức năng thành công!");
+
+      // Reload danh sách
       await onSearch();
+
+      // Đóng tất cả modal
       modals.closeAll();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Lỗi khi tạo user:", error);
-      alert("Đã xảy ra lỗi khi tạo người dùng.");
+
+      // Hiển thị thông báo lỗi
+      NotificationExtension.Fails("Đã xảy ra lỗi khi tạo chức năng.");
     } finally {
       close();
     }
@@ -80,28 +84,23 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
         {...form.getInputProps("code")}
       />
 
-      
-<Textarea
-  label="Mô tả "
-  placeholder="Nhập mô tả "
-  autosize
-  minRows={3}
-  mt="md"
-  {...form.getInputProps("description_vi")}
-/>
+      <Textarea
+        label="Mô tả"
+        placeholder="Nhập mô tả"
+        autosize
+        minRows={3}
+        mt="md"
+        {...form.getInputProps("description_vi")}
+      />
 
-{/* <Textarea
-  label="Mô tả (Tiếng Anh)"
-  placeholder="Enter English description"
-  autosize
-  minRows={3}
-  mt="md"
-  {...form.getInputProps("description_en")}
-/> */}
-     
-
-   
-  
+      <Textarea
+        label="Mô tả (Tiếng Anh)"
+        placeholder="Enter English description"
+        autosize
+        minRows={3}
+        mt="md"
+        {...form.getInputProps("description_en")}
+      />
 
       <Group justify="flex-end" mt="lg">
         <Button
@@ -128,3 +127,4 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
 };
 
 export default CreateView;
+

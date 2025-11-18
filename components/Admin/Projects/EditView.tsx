@@ -40,7 +40,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       name: "",
       rank: "",
       description_vi: "",
-      // description_en: "",
+      description_en: "",
     },
     validate: {
       name: (value) => (value ? null : "Tên không được để trống"),
@@ -82,7 +82,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         rank: userData.rank || "",
     
         description_vi: userData.description_vi || "",
-        // description_en: userData.description_en || "",
+        description_en: userData.description_en || "",
       });
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu user:", error);

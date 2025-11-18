@@ -19,7 +19,7 @@ interface DataType {
   id: string; // ✅ thêm id để dùng cho chỉnh sửa
   code: string;
   description_vi: string;
-  // description_en: string;
+  description_en: string;
 }
 
 export default function LargeFixedTable() {
@@ -85,7 +85,7 @@ export default function LargeFixedTable() {
   const columns: ColumnsType<DataType> = [
     { title: "Mã Chức năng", dataIndex: "code", key: "code", width: 90 },
     { title: "Mô Tả", dataIndex: "description_vi", key: "description_vi", width: 100 },
-    // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
+    { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
     {
       title: "Hành Động",
       width: 30,

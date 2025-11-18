@@ -2,9 +2,9 @@ import { api } from "../libray/axios";
 import { API_ROUTE } from "../const/apiRouter"; // ✅ import đúng object chứa hằng số
 
 export interface CreateUserPayload {
-    code: string;
+  
 description_vi: string;
-    // description_en: string;
+    description_en: string;
 }
 
 export const createUser = async (payload: CreateUserPayload) => {

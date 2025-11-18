@@ -9,11 +9,13 @@ interface Project {
   id: string;
   name: string;
   address?: string | null;
-  image_url?: string | null;
+  overview_image?: string | null;
   investor?: string | null;
   project_template_id: string;
   rank?: number;
+  template?: string | null;
   timeout_minutes?: number;
+   rank_name?: string | null;
   type?: string | null;
   link?: string;
 }
@@ -59,11 +61,9 @@ export default function DetailInteractive() {
 
           const link = `${baseLink}?id=${project.id}`;
 
-          let image_url = project.image_url;
-          if (index === 0) image_url = "/image/home_bg.png";
-          else if (index === 1) image_url = "/image/home_bg4.png";
+      
 
-          return { ...project, link, image_url };
+          return { ...project, link, };
         });
 
         setProjects(dataWithLink);
@@ -106,7 +106,7 @@ export default function DetailInteractive() {
                 className={styles.card}
               >
                 <Image
-                  src={project.image_url || "/placeholder.png"}
+                  src={project.overview_image || "/placeholder.png"}
                   height={160}
                   alt={project.name}
                   style={{
@@ -116,12 +116,19 @@ export default function DetailInteractive() {
                 />
                 <Stack gap="xs" p="md" style={{ flexGrow: 1 }}>
                   <Text fw={500}>{project.name}</Text>
-                  <Text size="sm" c="dimmed">
-                    {project.address || "Địa chỉ chưa có"}
+                   <Text size="sm" c="dimmed">
+                    Loại dự án: {project.template || "Thông tin chưa có"}
                   </Text>
                   <Text size="sm" c="dimmed">
-                    {project.type || "Thông tin chưa có"}
+                    Địa chỉ: {project.address || "Địa chỉ chưa có"}
                   </Text>
+                  <Text size="sm" c="dimmed">
+                    Nhà đầu tư: {project.investor || "Thông tin chưa có"}
+                  </Text>
+                      <Text size="sm" c="dimmed">
+                    Rank của bạn trong dự án: {project. rank_name || "Thông tin chưa có"}
+                  </Text>
+                 
                 </Stack>
                 <Button
                   component="a"

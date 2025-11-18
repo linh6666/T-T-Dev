@@ -28,6 +28,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
       name: "",
       rank: "",
       description_vi: "",
+      description_en: "",
     
      
  
@@ -36,6 +37,8 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
       name: isNotEmpty("Tên không được để trống"),
       rank: isNotEmpty("Cấp bậc không được để trống"),
       description_vi: isNotEmpty("Mô tả không được để trống"),
+     
+      description_en: isNotEmpty("Mô tả thoại không được để trống"),
      
      
     },
@@ -116,6 +119,14 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
   mt="md"
   {...form.getInputProps("description_vi")}
 />
+      <Textarea
+        label="Mô tả (Tiếng Anh)"
+        placeholder="Enter English description"
+        autosize
+        minRows={3}
+        mt="md"
+        {...form.getInputProps("description_en")}
+      />
  
 
       <Group justify="flex-end" mt="lg">

@@ -6,44 +6,37 @@ import {
   Group,
   LoadingOverlay,
   Textarea,
-  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { IconCheck,  IconX } from "@tabler/icons-react";
-import { useEffect, useCallback, useRef,  } from "react";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { useEffect, useCallback, useRef } from "react";
 import { API_ROUTE } from "../../../const/apiRouter";
 import { api } from "../../../libray/axios";
 import { CreateUserPayload } from "../../../api/apiEditPermissions";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface EditViewProps {
   onSearch: () => Promise<void>;
   id: string;
 }
 
-// interface SystemOption {
-//   id: number; // hoặc string, tùy thuộc vào API của bạn
-//   name: string;
-// }
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
 const EditView = ({ onSearch, id }: EditViewProps) => {
   const [visible, { open, close }] = useDisclosure(false);
-  // const [systemOptions, setSystemOptions] = useState<
-  //   { value: string; label: string }[]
-  // >([]);
 
   const form = useForm<CreateUserPayload>({
     initialValues: {
-     
-      code: "",
       description_vi: "",
-      // description_en: "",
-    },
-    validate: {
-      code: (value) => (value ? null : "Mã chức năng không được để trống"),
-    
-      description_vi: (value) => (value ? null : "Mô tả không được để trống"),
+      description_en: "",
     },
   });
 
@@ -53,13 +46,17 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const handleSubmit = async (values: CreateUserPayload) => {
     open();
     try {
-      const url = API_ROUTE.  UPDATE_PERMISSION.replace("{Permission_id}", id);
+      const url = API_ROUTE.UPDATE_PERMISSION.replace("{Permission_id}", id);
       await api.put(url, values);
       await onSearch();
+      NotificationExtension.Success("Cập nhật thành công!");
       modals.closeAll();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Lỗi khi cập nhật user:", error);
-      alert("Đã xảy ra lỗi khi cập nhật người dùng.");
+
+      const err = error as ApiError;
+      const message = err?.response?.data?.message || "Đã xảy ra lỗi khi cập nhật người dùng.";
+      NotificationExtension.Fails(message);
     } finally {
       close();
     }
@@ -75,39 +72,25 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       const userData = response.data;
 
       formRef.current.setValues({
-        code: userData.code || "",
-       
         description_vi: userData.description_vi || "",
-        // description_en: userData.description_en || "",
+        description_en: userData.description_en || "",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Lỗi khi lấy dữ liệu user:", error);
-      alert("Không thể tải thông tin người dùng.");
+
+      const err = error as ApiError;
+      const message = err?.response?.data?.message || "Không thể tải thông tin người dùng.";
+      NotificationExtension.Fails(message);
+
       modals.closeAll();
     } finally {
       close();
     }
   }, [id, open, close]);
 
-  /** Lấy danh sách chức vụ hệ thống */
-  const fetchSystemOptions = useCallback(async () => {
-    try {
-      // const res = await api.get(API_ROUTE.GET_LIST_SYSTEM);
-      // const rawData = Array.isArray(res.data) ? res.data : res.data.data;
-      // const options = rawData.map((item: SystemOption) => ({
-      //   value: item.id.toString(),
-      //   label: item.name,
-      // }));
-      // setSystemOptions(options);
-    } catch (error) {
-      console.error("Lỗi khi load system options:", error);
-    }
-  }, []);
-
   useEffect(() => {
     fetchUserDetail();
-    fetchSystemOptions();
-  }, [fetchUserDetail, fetchSystemOptions]);
+  }, [fetchUserDetail]);
 
   return (
     <Box
@@ -122,26 +105,22 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
 
-     
-
-      <TextInput
-        label="Mã Chức Năng"
-        placeholder="Nhập mã chức năng"
-        withAsterisk
+      <Textarea
+        label="Mô tả"
+        placeholder="Nhập mô tả"
+        autosize
+        minRows={3}
         mt="md"
-        {...form.getInputProps("code")}
+        {...form.getInputProps("description_vi")}
       />
-<Textarea
-  label="Mô tả"
-  placeholder="Nhập mô tả"
-  autosize
-  minRows={3}
-  mt="md"
-  {...form.getInputProps("description_vi")}
-/>
-
-
-       
+      <Textarea
+        label="Mô tả(Tiếng Anh)"
+        placeholder="Nhập mô tả (Tiếng Anh)"
+        autosize
+        minRows={3}
+        mt="md"
+        {...form.getInputProps("description_en")}
+      />
 
       <Group justify="flex-end" mt="lg">
         <Button
