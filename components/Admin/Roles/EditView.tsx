@@ -45,10 +45,10 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       description_en: "",
     },
     validate: {
-      name: (value) => (value ? null : "Tên không được để trống"),
-      rank: (value) => (value ? null : "Cấp bậckhông được để trống"),
-      description_en: (value) => (value ? null : "Mô tả thoại không được để trống"),
-      description_vi: (value) => (value ? null : "Mô tả không được để trống"),
+      // name: (value) => (value ? null : "Tên không được để trống"),
+      // rank: (value) => (value ? null : "Cấp bậckhông được để trống"),
+      // description_en: (value) => (value ? null : "Mô tả thoại không được để trống"),
+      // description_vi: (value) => (value ? null : "Mô tả không được để trống"),
     },
   });
 

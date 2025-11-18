@@ -4,10 +4,10 @@ import { API_ROUTE } from "../const/apiRouter"; // ✅ import đúng object ch�
 export interface CreateUserPayload {
   
   name: string;
-  type: string;
+  template: string;
   address: string;
   investor: string;
-  image_url: string;
+  overview_image: string;
   rank: string;
     
 }

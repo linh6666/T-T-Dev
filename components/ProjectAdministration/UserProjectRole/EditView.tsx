@@ -36,19 +36,19 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const form = useForm<CreateUserPayload>({
     initialValues: {
       name: "",
-  type: "",
+  template: "",
   address: "",
   investor: "",
-  image_url: "",
+  overview_image: "",
   rank: "",
     },
     validate: {
-      name: (value) => (value ? null : "Tên không được để trống"),
-      rank: (value) => (value ? null : "Cấp bậckhông được để trống"),
-      type: (value) => (value ? null : "Loại không được để trống"),
-      address: (value) => (value ? null : "Địa chỉ không được để trống"),
-      investor: (value) => (value ? null : "Chủ đầu tư không được để trống"),
-      image_url: (value) => (value ? null : "Hình ảnh không được để trống"),
+      // name: (value) => (value ? null : "Tên không được để trống"),
+      // rank: (value) => (value ? null : "Cấp bậckhông được để trống"),
+      // type: (value) => (value ? null : "Loại không được để trống"),
+      // address: (value) => (value ? null : "Địa chỉ không được để trống"),
+      // investor: (value) => (value ? null : "Chủ đầu tư không được để trống"),
+      // image_url: (value) => (value ? null : "Hình ảnh không được để trống"),
      
       
     },
@@ -84,10 +84,10 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       formRef.current.setValues({
         name: userData.name || "",
         rank: userData.rank || "",
-  type: userData.type || "",
+  template: userData.template|| "",
   address: userData.address || "",
   investor: userData.investor || "",
-  image_url: userData.image_url || "",
+  overview_image: userData.overview_image || "",
  
        
     
@@ -156,7 +156,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     placeholder="Nhập loại dự án"
     withAsterisk
     mt="md"
-    {...form.getInputProps("type")}
+    {...form.getInputProps("template")}
   />
 
   <TextInput
@@ -177,7 +177,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     label="Đường dẫn hình ảnh"
     placeholder="Nhập URL hình ảnh"
     mt="md"
-    {...form.getInputProps("image_url")}
+    {...form.getInputProps("overview_image")}
   />
 
   <Group justify="flex-end" mt="lg">
