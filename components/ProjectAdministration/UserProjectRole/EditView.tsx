@@ -85,7 +85,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         name: userData.name || "",
         rank: userData.rank || "",
   template: userData.template|| "",
-  address: userData.address || "",
+  address: userData.address_vi || "",
   investor: userData.investor || "",
   overview_image: userData.overview_image || "",
  
@@ -163,7 +163,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     label="Địa chỉ"
     placeholder="Nhập địa chỉ"
     mt="md"
-    {...form.getInputProps("address")}
+    {...form.getInputProps("address_vi")}
   />
 
   <TextInput

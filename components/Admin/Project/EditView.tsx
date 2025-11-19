@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Group,
+  Image,
   LoadingOverlay,
 
   TextInput,
@@ -134,13 +135,13 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     zIndex={1000}
     overlayProps={{ radius: "sm", blur: 2 }}
   />
-  <TextInput
+  {/* <TextInput
   label="Tên loại dự án"
   placeholder="Nhập loại dự án"
 
   mt="md"
   {...form.getInputProps("project_template_id")}
-/>
+/> */}
 
   <TextInput
     label="Tên dự án"
@@ -186,6 +187,20 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     mt="md"
     {...form.getInputProps("overview_image")}
   />
+   {form.values.overview_image && (
+        <Image
+          src={form.values.overview_image}
+          alt="Preview"
+          width={200} // Thay đổi giá trị này theo kích thước bạn cần
+          height={150} // Thay đổi giá trị này theo kích thước bạn cần
+          style={{
+            marginTop: "10px",
+            maxWidth: "200px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+          }}
+        />
+      )}
 
   <Group justify="flex-end" mt="lg">
     <Button

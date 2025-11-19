@@ -19,6 +19,7 @@ import { getListProjectTemplates } from "../../../api/apiProjectTemplates"; // â
 
 interface CreateViewProps {
   onSearch: () => Promise<void>;
+
 }
 
 interface Option {

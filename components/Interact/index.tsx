@@ -125,9 +125,9 @@ export default function DetailInteractive() {
                   <Text size="sm" c="dimmed">
                     Nhà đầu tư: {project.investor || "Thông tin chưa có"}
                   </Text>
-                      <Text size="sm" c="dimmed">
+                      {/* <Text size="sm" c="dimmed">
                     Rank của bạn trong dự án: {project. rank_name || "Thông tin chưa có"}
-                  </Text>
+                  </Text> */}
                  
                 </Stack>
                 <Button

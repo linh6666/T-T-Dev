@@ -6,7 +6,7 @@ export interface CreateUserPayload {
   id:string;
  name_vi:string;
 timeout_minutes:string;
-  project_template_id:string;
+  
 
 
  

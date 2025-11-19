@@ -25,7 +25,7 @@ export default function LargeFixedTable() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [language, setLanguage] = useState<"vi" | "en">("vi");
+
 
   const token = localStorage.getItem("access_token") || "YOUR_TOKEN_HERE";
 
@@ -47,7 +47,7 @@ export default function LargeFixedTable() {
         token,
         skip: 0,
         limit: 100,
-        lang: language, // ⬅️ thêm lang vào API
+     // ⬅️ thêm lang vào API
       });
 
       const users = result.data.map((user: DataType) => ({
@@ -67,7 +67,7 @@ export default function LargeFixedTable() {
     } finally {
       setLoading(false);
     }
-  }, [token, language]); // ⬅️ tự động load lại khi đổi language
+  }, [token]); // ⬅️ tự động load lại khi đổi language
 
   useEffect(() => {
     fetchData();
@@ -78,15 +78,15 @@ export default function LargeFixedTable() {
   // ===========================
 const openEditUserModal = (role: DataType) => {
   modals.openConfirmModal({
-    title: (
+    title: 
       <div style={{ fontWeight: 600, fontSize: 18 }}>
-        {language === "vi" ? "Chỉnh sửa dự án" : "Edit Project"}
+        Chỉnh sửa dự án
       </div>
-    ),
+    ,
     children: (
       <EditView
         id={role.id}
-        lang={language}        // ⬅️ TRUYỀN LANG VÀO EDITVIEW
+         // ⬅️ TRUYỀN LANG VÀO EDITVIEW
         onSearch={fetchData}
       />
     ),
@@ -100,15 +100,15 @@ const openEditUserModal = (role: DataType) => {
   // ===========================
 const openDeleteUserModal = (role: DataType) => {
   modals.openConfirmModal({
-    title: (
+    title: 
       <div style={{ fontWeight: 600, fontSize: 18 }}>
-        {language === "vi" ? "Xóa dự án" : "Delete Project"}
+       Xóa dự án
       </div>
-    ),
+    ,
     children: (
       <DeleteView
         idItem={[role.id]}
-        lang={language}        // ⬅️ TRUYỀN LANG VÀO DELETEVIEW
+              // ⬅️ TRUYỀN LANG VÀO DELETEVIEW
         onSearch={fetchData}
       />
     ),
@@ -123,32 +123,32 @@ const openDeleteUserModal = (role: DataType) => {
   // ===========================
   const columns: ColumnsType<DataType> = [
     {
-      title: language === "vi" ? "Tên dự án" : "Project Name",
+      title:  "Tên dự án" ,
       dataIndex: "name",
       key: "name",
       width: 5,
       fixed: "left",
     },
     {
-      title: language === "vi" ? "Loại dự án" : "Template",
+      title:  "Loại dự án" ,
       dataIndex: "template",
       key: "template",
       width: 10,
     },
     {
-      title: language === "vi" ? "Địa chỉ" : "Address",
+      title:  "Địa chỉ" ,
       dataIndex: "address",
       key: "address",
       width: 10,
     },
     {
-      title: language === "vi" ? "Chủ đầu tư" : "Investor",
+      title:  "Chủ đầu tư" ,
       dataIndex: "investor",
       key: "investor",
       width: 10,
     },
     {
-      title: language === "vi" ? "Hình ảnh" : "Image",
+      title:  "Hình ảnh" ,
       dataIndex: "overview_image",
       key: "overview_image",
       width: 10,
@@ -161,13 +161,13 @@ const openDeleteUserModal = (role: DataType) => {
       ),
     },
     {
-      title: language === "vi" ? "Cấp bậc" : "Rank",
+      title:  "Cấp bậc" ,
       dataIndex: "rank",
       key: "rank",
       width: 5,
     },
     {
-      title: language === "vi" ? "Hành động" : "Action",
+      title:  "Hành động" ,
       width: 5,
       fixed: "right",
       render: (user: DataType) => (
@@ -202,7 +202,7 @@ const openDeleteUserModal = (role: DataType) => {
 
         {/* 🔥 SELECT LANG */}
         <div style={{ marginBottom: 12 }}>
-          <label htmlFor="language-select" style={{ marginRight: 8 }}>
+          {/* <label htmlFor="language-select" style={{ marginRight: 8 }}>
             {language === "vi" ? "Chọn ngôn ngữ:" : "Select Language:"}
           </label>
           <select
@@ -212,7 +212,7 @@ const openDeleteUserModal = (role: DataType) => {
           >
             <option value="vi">Tiếng Việt</option>
             <option value="en">English</option>
-          </select>
+          </select> */}
         </div>
       </Group>
 

@@ -7,39 +7,32 @@ import { deleteUserManagement } from "../../../api/apideleteproject";
 type DeleteProductProps = {
   idItem: string[]; // UUID dưới dạng chuỗi
   onSearch: () => void;
-  lang: "vi" | "en"; // ⬅️ thêm prop lang
 };
 
-const DeleteView = ({ idItem, onSearch, lang }: DeleteProductProps) => {
+const DeleteView = ({ idItem, onSearch }: DeleteProductProps) => {
   const handleDeleteUsers = async () => {
     try {
       for (const userId of idItem) {
-        await deleteUserManagement(userId); // Gọi API xóa từng dự án
+        await deleteUserManagement(userId); // Gọi API xóa từng người dùng
       }
 
-      // Hiển thị thông báo thành công
+      // Hiển thị thông báo thành côngs
       notifications.show({
-        title: lang === "vi" ? "Thành công" : "Success",
-        message:
-          lang === "vi"
-            ? `${idItem.length} dự án đã xóa thành công.`
-            : `${idItem.length} project(s) deleted successfully.`,
+        title: "Thành công",
+        message: `${idItem.length} Dự án đã xóa thành công.`,
         color: "green",
         icon: <IconCheck size={20} />,
       });
 
-      // Xoá thành công, đóng modal và gọi lại onSearch
+      // Xoá thành công, đóng modal và gọi lại fetchUsers
       modals.closeAll();
       onSearch();
     } catch (error) {
-      console.error("Lỗi xoá dự án:", error);
+      console.error("Lỗi xoá người dùng:", error);
 
       notifications.show({
-        title: lang === "vi" ? "Lỗi" : "Error",
-        message:
-          lang === "vi"
-            ? "Đã xảy ra lỗi khi xóa dự án."
-            : "An error occurred while deleting project(s).",
+        title: "Lỗi",
+        message: "Đã xảy ra lỗi khi xoá người dùng.",
         color: "red",
         icon: <IconX size={20} />,
       });
@@ -49,9 +42,7 @@ const DeleteView = ({ idItem, onSearch, lang }: DeleteProductProps) => {
   return (
     <div>
       <Text size="lg" fw={500} mb="md">
-        {lang === "vi"
-          ? `Bạn có chắc chắn muốn xóa ${idItem.length} dự án đã chọn?`
-          : `Are you sure you want to delete ${idItem.length} selected project(s)?`}
+        Bạn có chắc chắn muốn xóa {idItem.length} dự án đã chọn?
       </Text>
 
       <Group justify="center" mt="lg">
@@ -60,7 +51,7 @@ const DeleteView = ({ idItem, onSearch, lang }: DeleteProductProps) => {
           onClick={handleDeleteUsers}
           leftSection={<IconCheck size={18} />}
         >
-          {lang === "vi" ? "Xác nhận xóa" : "Confirm Delete"}
+          Xác nhận xoá
         </Button>
 
         <Button
@@ -68,7 +59,7 @@ const DeleteView = ({ idItem, onSearch, lang }: DeleteProductProps) => {
           onClick={() => modals.closeAll()}
           leftSection={<IconX size={18} />}
         >
-          {lang === "vi" ? "Hủy" : "Cancel"}
+          Hủy
         </Button>
       </Group>
     </div>

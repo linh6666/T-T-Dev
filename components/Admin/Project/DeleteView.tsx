@@ -7,6 +7,7 @@ import { deleteUserManagement } from "../../../api/apideleteproject";
 type DeleteProductProps = {
   idItem: string[]; // UUID dưới dạng chuỗi
   onSearch: () => void;
+ 
 };
 
 const DeleteView = ({ idItem, onSearch }: DeleteProductProps) => {
@@ -67,4 +68,3 @@ const DeleteView = ({ idItem, onSearch }: DeleteProductProps) => {
 };
 
 export default DeleteView;
-
