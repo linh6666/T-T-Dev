@@ -70,33 +70,33 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
   /** Lấy dữ liệu chi tiết user */
   const fetchUserDetail = useCallback(async () => {
-    if (!id) return;
-    open();
-    try {
-      const url = API_ROUTE. UPDATE_PROJECTS.replace("{project_id}", id);
-      const response = await api.get(url);
-      const userData = response.data;
+  if (!id) return;
+  open();
+  try {
+    // Lấy URL và thêm lang=vi vào
+    let url = API_ROUTE.UPDATE_PROJECTS.replace("{project_id}", id);
+    url += url.includes("?") ? "&lang=vi" : "?lang=vi";
 
-      formRef.current.setValues({
-        name: userData.name || "",
-        rank: userData.rank || "",
-  template: userData.template || "",
-  address: userData.address || "",
-  investor: userData.investor || "",
-  overview_image: userData.overview_image|| "",
- 
-       
-    
-      
-      });
-    } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu user:", error);
-      alert("Không thể tải thông tin người dùng.");
-      modals.closeAll();
-    } finally {
-      close();
-    }
-  }, [id, open, close]);
+    const response = await api.get(url);
+    const userData = response.data;
+
+    formRef.current.setValues({
+      name: userData.name || "",
+      rank: userData.rank || "",
+      template: userData.template || "",
+      address: userData.address || "",
+      investor: userData.investor || "",
+      overview_image: userData.overview_image || "",
+    });
+  } catch (error) {
+    console.error("Lỗi khi lấy dữ liệu user:", error);
+    alert("Không thể tải thông tin người dùng.");
+    modals.closeAll();
+  } finally {
+    close();
+  }
+}, [id, open, close]);
+
 
   /** Lấy danh sách chức vụ hệ thống */
   const fetchSystemOptions = useCallback(async () => {

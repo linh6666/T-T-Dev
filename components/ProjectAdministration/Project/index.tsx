@@ -126,26 +126,26 @@ const openDeleteUserModal = (role: DataType) => {
       title:  "Tên dự án" ,
       dataIndex: "name",
       key: "name",
-      width: 5,
+      width: 7,
       fixed: "left",
     },
     {
       title:  "Loại dự án" ,
       dataIndex: "template",
       key: "template",
-      width: 10,
+      width: 7,
     },
     {
       title:  "Địa chỉ" ,
       dataIndex: "address",
       key: "address",
-      width: 10,
+      width: 7,
     },
     {
       title:  "Chủ đầu tư" ,
       dataIndex: "investor",
       key: "investor",
-      width: 10,
+      width: 7,
     },
     {
       title:  "Hình ảnh" ,
@@ -168,8 +168,8 @@ const openDeleteUserModal = (role: DataType) => {
     },
     {
       title:  "Hành động" ,
-      width: 5,
-      fixed: "right",
+      width: 7,
+        fixed: "right",
       render: (user: DataType) => (
         <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
           <EuiFlexItem grow={false}>
@@ -221,7 +221,7 @@ const openDeleteUserModal = (role: DataType) => {
         columns={columns}
         dataSource={data}
         loading={loading}
-        scroll={{ x: 2000 }}
+        scroll={{ x: 1300 }}
         pagination={false}
         bordered
         rowKey="id"
