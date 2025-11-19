@@ -1,34 +1,168 @@
-'use client';
-import Link from "next/link";
-import { Button, Container, Group, Text, Title } from '@mantine/core';
-import classes from './NotFoundTitle.module.css';
+"use client";
 
-export function NotFoundTitle() {
+import { useEffect, useState } from "react";
+import { Card, Image, Stack, Text, Button, Loader, Modal } from "@mantine/core";
+import styles from './NotFoundTitle.module.css';
+import { getListProject } from "../../api/apigetlistProject";
+
+interface Project {
+  id: string;
+  name: string;
+  address?: string | null;
+  overview_image?: string | null;
+  investor?: string | null;
+  project_template_id: string;
+  rank?: number;
+  template?: string | null;
+  timeout_minutes?: number;
+   rank_name?: string | null;
+  type?: string | null;
+  link?: string;
+}
+
+export default function DetailInteractive() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [initialOrder, setInitialOrder] = useState<string[]>([]); // <--- lưu thứ tự ban đầu
+  const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token") ?? "";
+
+    if (!token) {
+      setShowLoginModal(true);
+      setLoading(false);
+      return;
+    }
+
+    async function fetchProjects() {
+      try {
+        const { data } = await getListProject({ token, skip: 0, limit: 20 });
+
+        // Nếu đây là lần đầu fetch -> lưu lại thứ tự ID ban đầu
+        if (initialOrder.length === 0) {
+          setInitialOrder(data.map((p: Project) => p.id));
+        }
+
+        // Nếu đã có thứ tự ban đầu -> sắp xếp lại theo đúng thứ tự đó
+        const sortedData = [...data].sort((a, b) => {
+          return (
+            initialOrder.indexOf(a.id) - initialOrder.indexOf(b.id)
+          );
+        });
+
+        // Gán link + ảnh nhưng KHÔNG thay đổi thứ tự
+        const dataWithLink = sortedData.map((project: Project, index: number) => {
+          let baseLink = "";
+          if (index === 0) baseLink = "/Tuong-tac/Millennia-City";
+          else if (index === 1) baseLink = "/Tuong-tac/Phuoc-tho";
+          else if (index === 2) baseLink = "/Dieu-khien";
+          else baseLink = `/Dieu-khien-${index}`;
+
+          const link = `${baseLink}?id=${project.id}`;
+
+      
+
+          return { ...project, link, };
+        });
+
+        setProjects(dataWithLink);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProjects();
+  }, [initialOrder]); // <--- theo dõi initialOrder để không bị gọi sai
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: 100 }}>
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <Container className={classes.root}>
-      <div className={classes.label}>404</div>
-    <Title className={classes.title}>Website đang được cập nhật</Title>
-<Text c="dimmed" size="lg" ta="center" className={classes.description}>
-  Xin lỗi, hiện tại trang website này đang trong quá trình cập nhật. Vui lòng quay lại sau.
-</Text>
-      <Group justify="center">
-   <Button
-  component={Link}
-  href="/"
-  variant="subtle"
-  size="md"
-  styles={{
-    root: {
-      color: "#762f0b",
-      "&:hover": {
-        backgroundColor: "rgba(118, 47, 11, 0.1)",
-      },
-    },
-  }}
->
-  Quay lại trang chủ !
-</Button>
-      </Group>
-    </Container>
+    <>
+      <div className={styles.background}>
+        <div className={styles.container}>
+          <div className={styles.cardGrid}>
+                 <Card
+   
+  >
+   
+  </Card>
+
+            {projects.map((project) => (
+              <Card
+                key={project.id}
+                shadow="sm"
+                radius="md"
+                withBorder
+                padding="0"
+                className={styles.card}
+              >
+                <Image
+                  src={project.overview_image || "/placeholder.png"}
+                  height={160}
+                  alt={project.name}
+                  style={{
+                    borderTopLeftRadius: "var(--mantine-radius-md)",
+                    borderTopRightRadius: "var(--mantine-radius-md)",
+                  }}
+                />
+                <Stack gap="xs" p="md" style={{ flexGrow: 1 }}>
+                  <Text fw={500}>{project.name}</Text>
+                   <Text size="sm" c="dimmed">
+                    Loại dự án: {project.template || "Thông tin chưa có"}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    Địa chỉ: {project.address || "Địa chỉ chưa có"}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    Nhà đầu tư: {project.investor || "Thông tin chưa có"}
+                  </Text>
+                      {/* <Text size="sm" c="dimmed">
+                    Rank của bạn trong dự án: {project. rank_name || "Thông tin chưa có"}
+                  </Text> */}
+                 
+                </Stack>
+                <Button
+                  component="a"
+                  href={project.link}
+                  className={`${styles.baseButton} ${styles.primaryButton}`}
+                >
+                  Đi tới dự án
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Modal
+        opened={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title="Thông báo"
+        centered
+      >
+        <Text>Bạn cần đăng nhập để xem danh sách dự án.</Text>
+        <Button
+          mt="md"
+          fullWidth
+          onClick={() => (window.location.href = "/dang-nhap")}
+          style={{
+            backgroundColor: "#ffbe00",
+            color: "#762f0b",
+            fontWeight: 600,
+          }}
+        >
+          Đăng nhập ngay
+        </Button>
+      </Modal>
+    </>
   );
 }

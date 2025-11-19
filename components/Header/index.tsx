@@ -16,7 +16,7 @@ const baseLinks = [
     { label: "MÔ HÌNH TƯƠNG TÁC", href: "/Tuong-tac",highlight: true },
  
 
-  // { label: "QUẢN LÝ BÁN HÀNG", href: "/quan-ly-ban-hang" },
+  { label: "QUẢN LÝ BÁN HÀNG", href: "/quan-ly-ban-hang" },
   { label: "QUẢN TRỊ DỰ ÁN", href: "/quan-tri-du-an" },
   { label: "QUẢN TRỊ HỆ THỐNG", href: "/quan-ly-he-thong" },
 ];
@@ -67,7 +67,7 @@ export default function Header() {
         "TRANG CHỦ",
         "GIỚI THIỆU",
         "MÔ HÌNH TƯƠNG TÁC",
-        "QUẢN LÝ BÁN HÀNG",
+       
       ].includes(link.label);
     } else if (isSuperUser) {
       // ✅ Admin → hiển thị tất cả
@@ -78,7 +78,7 @@ export default function Header() {
         "TRANG CHỦ",
         "GIỚI THIỆU",
         "MÔ HÌNH TƯƠNG TÁC",
-        "QUẢN LÝ BÁN HÀNG",
+       
       ].includes(link.label);
     }
   });
