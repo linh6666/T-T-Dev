@@ -7,12 +7,16 @@ export interface CreateUserPayload {
   template: string;
   address: string;
   investor: string;
-  overview_image: string;
+overview_image: File | null;
   rank: string;
     
 }
 
 export const createUser = async (payload: CreateUserPayload) => {
-  const response = await api.post(API_ROUTE.CREATE_PROJECTS, payload); // ✅ dùng đúng key từ object
+  const response = await api.post(API_ROUTE.CREATE_PROJECTS, payload, {
+    headers: {
+      "Content-Type": "multipart/form-data", // cần để server nhận file
+    },
+  }); // ✅ dùng đúng key từ object
   return response.data;
 };

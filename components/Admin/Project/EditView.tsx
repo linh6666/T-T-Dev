@@ -3,199 +3,147 @@
 import {
   Box,
   Button,
+  FileInput,
   Group,
   Image,
   LoadingOverlay,
-
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useEffect, useCallback, useRef,  } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { API_ROUTE } from "../../../const/apiRouter";
 import { api } from "../../../libray/axios";
 import { CreateUserPayload } from "../../../api/apiEditproject";
+import { AxiosError } from "axios";
 
 interface EditViewProps {
   onSearch: () => Promise<void>;
   id: string;
 }
 
-// interface SystemOption {
-//   id: number; // hoặc string, tùy thuộc vào API của bạn
-//   name: string;
-// }
-
 const EditView = ({ onSearch, id }: EditViewProps) => {
   const [visible, { open, close }] = useDisclosure(false);
-  // const [systemOptions, setSystemOptions] = useState<
-  //   { value: string; label: string }[]
-  // >([]);
 
   const form = useForm<CreateUserPayload>({
     initialValues: {
       name: "",
-  template: "",
-  address: "",
-  investor: "",
-  overview_image: "",
-  rank: "",
-    },
-    validate: {
-      // name: (value) => (value ? null : "Tên không được để trống"),
-      // rank: (value) => (value ? null : "Cấp bậckhông được để trống"),
-      // type: (value) => (value ? null : "Loại không được để trống"),
-      // address: (value) => (value ? null : "Địa chỉ không được để trống"),
-      // investor: (value) => (value ? null : "Chủ đầu tư không được để trống"),
-      // image_url: (value) => (value ? null : "Hình ảnh không được để trống"),
-     
-      
+      template: "",
+      address: "",
+      investor: "",
+      overview_image: null,
+      rank: "",
     },
   });
 
   const formRef = useRef(form);
 
-  /** Submit cập nhật user */
-  const handleSubmit = async (values: CreateUserPayload) => {
-    open();
-    try {
-      const url = API_ROUTE.UPDATE_PROJECTS.replace("{project_id}", id);
-      await api.put(url, values);
-      await onSearch();
-      modals.closeAll();
-    } catch (error) {
-      console.error("Lỗi khi cập nhật user:", error);
-      alert("Đã xảy ra lỗi khi cập nhật người dùng.");
-    } finally {
-      close();
-    }
-  };
-
-  /** Lấy dữ liệu chi tiết user */
-const fetchUserDetail = useCallback(async () => {
-  if (!id) return;
+  /** Submit cập nhật project */
+ const handleSubmit = async (values: CreateUserPayload) => {
   open();
   try {
-    // Thêm lang=vi vào URL
-    let url = API_ROUTE.UPDATE_PROJECTS.replace("{project_id}", id);
+    const url = API_ROUTE.UPDATE_PROJECTS.replace("{project_id}", id);
 
-    // Nếu URL chưa có query → thêm ?
-    // Nếu URL đã có query → thêm &
-    url += url.includes("?") ? "&lang=vi" : "?lang=vi";
+    // Tạo payload JSON cho project_in
+    const projectPayload = {
+      name_vi: values.name,
+      template: values.template,
+      address_vi: values.address,
+      investor: values.investor,
+      rank: values.rank,
+    };
 
-    const response = await api.get(url);
-    const userData = response.data;
+    const formData = new FormData();
+    formData.append("project_in", JSON.stringify(projectPayload));
 
-    formRef.current.setValues({
-      name: userData.name || "",
-      rank: userData.rank || "",
-      template: userData.template || "",
-      address: userData.address || "",
-      investor: userData.investor || "",
-      overview_image: userData.overview_image || "",
+    // Nếu có file ảnh mới
+    if (values.overview_image instanceof File) {
+      formData.append("file", values.overview_image);
+    }
+
+    // Debug log
+    console.log("🧾 FormData update nội dung:");
+    formData.forEach((value, key) => {
+      console.log("→", key, value);
     });
-  } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu user:", error);
-    alert("Không thể tải thông tin người dùng.");
+
+    await api.put(url, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    await onSearch();
     modals.closeAll();
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error("Lỗi khi cập nhật project:", error.response?.data || error.message);
+    } else if (error instanceof Error) {
+      console.error("Lỗi khi cập nhật project:", error.message);
+    } else {
+      console.error("Lỗi khi cập nhật project:", error);
+    }
+    alert("Đã xảy ra lỗi khi cập nhật dự án.");
   } finally {
     close();
   }
-}, [id, open, close]);
+};
 
-
-  /** Lấy danh sách chức vụ hệ thống */
-  const fetchSystemOptions = useCallback(async () => {
+  /** Lấy dữ liệu chi tiết project */
+  const fetchUserDetail = useCallback(async () => {
+    if (!id) return;
+    open();
     try {
-      // const res = await api.get(API_ROUTE.GET_LIST_ROLES);
-      // const rawData = Array.isArray(res.data) ? res.data : res.data.data;
-      // const options = rawData.map((item: SystemOption) => ({
-      //   value: item.id.toString(),
-      //   label: item.name,
-      // }));
-      // setSystemOptions(options);
+      let url = API_ROUTE.UPDATE_PROJECTS.replace("{project_id}", id);
+      url += url.includes("?") ? "&lang=vi" : "?lang=vi";
+
+      const response = await api.get(url);
+      const userData = response.data;
+
+      formRef.current.setValues({
+        name: userData.name || "",
+        rank: userData.rank || "",
+        template: userData.template || "",
+        address: userData.address || "",
+        investor: userData.investor || "",
+        overview_image: userData.overview_image || "",
+      });
     } catch (error) {
-      console.error("Lỗi khi load system options:", error);
+      console.error("Lỗi khi lấy dữ liệu project:", error);
+      alert("Không thể tải thông tin dự án.");
+      modals.closeAll();
+    } finally {
+      close();
     }
-  }, []);
+  }, [id, open, close]);
 
   useEffect(() => {
     fetchUserDetail();
-    fetchSystemOptions();
-  }, [fetchUserDetail, fetchSystemOptions]);
+  }, [fetchUserDetail]);
 
   return (
-   <Box
-  component="form"
-  miw={320}
-  mx="auto"
-  onSubmit={form.onSubmit(handleSubmit)}
->
-  <LoadingOverlay
-    visible={visible}
-    zIndex={1000}
-    overlayProps={{ radius: "sm", blur: 2 }}
-  />
-  {/* <TextInput
-  label="Tên loại dự án"
-  placeholder="Nhập loại dự án"
+    <Box component="form" miw={320} mx="auto" onSubmit={form.onSubmit(handleSubmit)}>
+      <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
 
-  mt="md"
-  {...form.getInputProps("project_template_id")}
-/> */}
+      <TextInput label="Tên dự án" placeholder="Nhập Tên dự án" withAsterisk mt="md" {...form.getInputProps("name")} />
+      <TextInput label="Cấp bậc" placeholder="Nhập Cấp bậc" withAsterisk mt="md" {...form.getInputProps("rank")} />
+      <TextInput label="Loại dự án" placeholder="Nhập loại dự án" withAsterisk mt="md" {...form.getInputProps("template")} />
+      <TextInput label="Địa chỉ" placeholder="Nhập địa chỉ" mt="md" {...form.getInputProps("address")} />
+      <TextInput label="Chủ đầu tư" placeholder="Nhập tên chủ đầu tư" mt="md" {...form.getInputProps("investor")} />
 
-  <TextInput
-    label="Tên dự án"
-    placeholder="Nhập Tên dự án"
-    withAsterisk
-    mt="md"
-    {...form.getInputProps("name")}
-  />
+      <FileInput
+        label="Hình ảnh đại diện"
+        placeholder="Chọn file ảnh JPG/PNG"
+        mt="md"
+        {...form.getInputProps("overview_image")}
+      />
 
-  <TextInput
-    label="Cấp bậc"
-    placeholder="Nhập Cấp bậc"
-    withAsterisk
-    mt="md"
-    {...form.getInputProps("rank")}
-  />
-
-  <TextInput
-    label="Loại dự án"
-    placeholder="Nhập loại dự án"
-    withAsterisk
-    mt="md"
-    {...form.getInputProps("template")}
-  />
-
-  <TextInput
-    label="Địa chỉ"
-    placeholder="Nhập địa chỉ"
-    mt="md"
-    {...form.getInputProps("address")}
-  />
-
-  <TextInput
-    label="Chủ đầu tư"
-    placeholder="Nhập tên chủ đầu tư"
-    mt="md"
-    {...form.getInputProps("investor")}
-  />
-
-  <TextInput
-    label="Đường dẫn hình ảnh"
-    placeholder="Nhập URL hình ảnh"
-    mt="md"
-    {...form.getInputProps("overview_image")}
-  />
-   {form.values.overview_image && (
+      {form.values.overview_image && typeof form.values.overview_image === "string" && (
         <Image
           src={form.values.overview_image}
           alt="Preview"
-          width={200} // Thay đổi giá trị này theo kích thước bạn cần
-          height={150} // Thay đổi giá trị này theo kích thước bạn cần
+          width={200}
+          height={150}
           style={{
             marginTop: "10px",
             maxWidth: "200px",
@@ -205,28 +153,22 @@ const fetchUserDetail = useCallback(async () => {
         />
       )}
 
-  <Group justify="flex-end" mt="lg">
-    <Button
-      type="submit"
-      color="#3598dc"
-      loading={visible}
-      leftSection={<IconCheck size={18} />}
-    >
-      Lưu
-    </Button>
-
-    <Button
-      variant="outline"
-      color="black"
-      type="button"
-      loading={visible}
-      onClick={() => modals.closeAll()}
-      leftSection={<IconX size={18} />}
-    >
-      Đóng
-    </Button>
-  </Group>
-</Box>
+      <Group justify="flex-end" mt="lg">
+        <Button type="submit" color="#3598dc" loading={visible} leftSection={<IconCheck size={18} />}>
+          Lưu
+        </Button>
+        <Button
+          variant="outline"
+          color="black"
+          type="button"
+          loading={visible}
+          onClick={() => modals.closeAll()}
+          leftSection={<IconX size={18} />}
+        >
+          Đóng
+        </Button>
+      </Group>
+    </Box>
   );
 };
 

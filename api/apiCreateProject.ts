@@ -12,7 +12,11 @@ timeout_minutes:string;
  
 }
 
-export const createUser = async (payload: CreateUserPayload) => {
-  const response = await api.post(API_ROUTE.CREATE_PROJECTS, payload); // ✅ dùng đúng key từ object
+export const createUser = async (payload: FormData) => {
+  const response = await api.post(API_ROUTE.CREATE_PROJECTS, payload, {
+    headers: {
+      "Content-Type": "multipart/form-data", // cần để server nhận file
+    },
+  });
   return response.data;
 };
