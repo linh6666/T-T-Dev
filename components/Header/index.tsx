@@ -5,8 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Image } from "@mantine/core";
 import { jwtDecode } from "jwt-decode";
-import { IconPhoneCall, IconShoppingCart } from "@tabler/icons-react";
+import {  IconPhoneCall, IconShoppingCart } from "@tabler/icons-react";
 import LoginButton from "./ButtonLogin/index";
+import Notification from "./Notification/index";
 import styles from "./Header.module.css";
 
 // 🧭 Danh sách menu gốc
@@ -64,9 +65,10 @@ export default function Header() {
     if (!isLoggedIn) {
       // ❌ Chưa đăng nhập → chỉ hiển thị 4 mục public
       return [
-        "TRANG CHỦ",
+        // "TRANG CHỦ",
         "GIỚI THIỆU",
         "MÔ HÌNH TƯƠNG TÁC",
+
        
       ].includes(link.label);
     } else if (isSuperUser) {
@@ -75,9 +77,10 @@ export default function Header() {
     } else {
       // 👤 User thường → chỉ 4 trang public
       return [
-        "TRANG CHỦ",
+        // "TRANG CHỦ",
         "GIỚI THIỆU",
         "MÔ HÌNH TƯƠNG TÁC",
+        "QUẢN LÝ BÁN HÀNG",
        
       ].includes(link.label);
     }
@@ -140,6 +143,7 @@ const isActive = (href: string, highlight?: boolean) => {
           className={`hidden md:flex ${styles.loginLangBlock}`}
           style={{ display: "flex", gap: "20px" }}
         >
+         
           <div
             style={{
               border: "1px solid #752E0B",
@@ -166,6 +170,9 @@ const isActive = (href: string, highlight?: boolean) => {
           >
             <IconShoppingCart size={17} color="#752E0B" stroke={1.5} />
           </div>
+          
+<Notification />
+
           <LoginButton />
         </div>
       </div>

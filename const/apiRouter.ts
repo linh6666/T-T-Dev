@@ -90,7 +90,17 @@ GET_LIST_ADDRESS_DEATIL:"/api/v1/address/provinces",
 
 
 /// delete
-DELETE_PROJECT:"/api/v1/control/release_controll/{project_id}"
+DELETE_PROJECT:"/api/v1/control/release_controll/{project_id}",
+
+
+////JoinProject
+
+GET_LIST_JOINPROJECT:"/api/v1/JoinProject/me",
+GET_REQUEST:"/api/v1/JoinProject/{request_id}",
+GET_LIST_REQUESTS:"/api/v1/JoinProject/",
+CREATE_REQUEST:"/api/v1/JoinProject/{project_id}",
+  UPDATE_REQUEST:"/api/v1/JoinProject/{project_id}/{request_id}",
+DELETE_REQUEST:"/api/v1/JoinProject/{project_id}/{request_id}",
 
 
 
