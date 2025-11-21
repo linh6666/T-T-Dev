@@ -396,7 +396,7 @@ const Login = () => {
 
           <Text style={{ textAlign: "center", marginTop: "16px" }}>
             Bạn chưa có tài khoản?{" "}
-            <Anchor href="/dang-ky" size="sm" c="red">
+            <Anchor href="/dang-ky"  c="red">
               Đăng ký ngay
             </Anchor>
           </Text>

@@ -45,7 +45,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
   const form = useForm<{
     id: string;
     name_vi: string;
-    timeout_minutes: string;
+ 
     project_template_id: string;
     address_vi: string;
     investor: string;
@@ -54,7 +54,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     initialValues: {
       id: "",
       name_vi: "",
-      timeout_minutes: "",
+    
       project_template_id: "",
       address_vi: "",
       investor: "",
@@ -62,7 +62,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     },
     validate: {
       name_vi: isNotEmpty("Không được để trống"),
-      timeout_minutes: isNotEmpty("Không được để trống"),
+   
       project_template_id: isNotEmpty("Loại dự án không được để trống"),
        address_vi: isNotEmpty("Đia chỉ không được để trống"),
        investor: isNotEmpty("Chủ đầu tư không được để trống"),
@@ -97,7 +97,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     const projectPayload = {
       id: values.id,
       name_vi: values.name_vi,
-      timeout_minutes: Number(values.timeout_minutes),
+    
       project_template_id: values.project_template_id,
       address_vi: values.address_vi,
       investor: values.investor,
@@ -156,15 +156,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
         {...form.getInputProps("name_vi")}
       />
 
-      <TextInput
-        label="Thời gian chờ (phút)"
-        placeholder="Nhập số phút"
-        withAsterisk
-        mt="md"
-        type="number"
-        min={1}
-        {...form.getInputProps("timeout_minutes")}
-      />
+     
 
       <TextInput
         label="Địa chỉ"

@@ -38,6 +38,7 @@ interface JoinRequestItem {
   role_id: number;
   request_message: string;
   created_at: string;
+    status: string;
 }
 
 interface JoinRequestResponse {
@@ -109,7 +110,9 @@ export default function HomePage() {
   // ================================
   // ⭐ GỘP REQUEST
   // ================================
-  const flatRequests: JoinRequestItem[] = requests.flatMap((req) => req.data);
+  const flatRequests: JoinRequestItem[] = requests
+  .flatMap((req) => req.data)
+  .filter((item) => item.status === "pending");
 
   return (
     <Menu

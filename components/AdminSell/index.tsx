@@ -1,12 +1,9 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { Card, Image, Stack, Text, Button, Loader, Modal} from "@mantine/core";
+import { Card, Image, Stack, Text, Button, Loader, Modal } from "@mantine/core";
 import styles from './NotFoundTitle.module.css';
 import { getListProject } from "../../api/apigetlistProject";
 import { GetJoinProject } from "../../api/apiGetJoinProject";
-
-// 👉 Import modal tách file
 import RequestModal from "./RequestModal";
 
 interface Project {
@@ -24,13 +21,16 @@ interface Project {
   link?: string;
 }
 
+interface JoinedProject {
+  project_id: string;
+  status: string; // e.g., "pending", "approved"
+}
+
 export default function DetailInteractive() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [initialOrder, setInitialOrder] = useState<string[]>([]);
+  const [joinedProjects, setJoinedProjects] = useState<JoinedProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
-  // 👉 State modal gửi yêu cầu
   const [requestModal, setRequestModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
@@ -45,33 +45,16 @@ export default function DetailInteractive() {
 
     async function fetchProjects() {
       try {
-        const [listProjectRes] = await Promise.all([
+        const [listProjectRes, joinedProjectRes] = await Promise.all([
           getListProject({ token, skip: 0, limit: 20 }),
           GetJoinProject({ token })
         ]);
 
-        const data = listProjectRes.data;
+        const projectData = listProjectRes.data;
+        const joinedData = joinedProjectRes.data; // Dữ liệu từ GetJoinProject
 
-        if (initialOrder.length === 0) {
-          setInitialOrder(data.map((p: Project) => p.id));
-        }
-
-        const sortedData = [...data].sort(
-          (a, b) => initialOrder.indexOf(a.id) - initialOrder.indexOf(b.id)
-        );
-
-        const dataWithLink = sortedData.map((project, index) => {
-          let baseLink = "";
-          if (index === 0) baseLink = "";
-          else if (index === 1) baseLink = "";
-          else if (index === 2) baseLink = "";
-          else baseLink = `/Dieu-khien-${index}`;
-
-          const link = `${baseLink}?id=${project.id}`;
-          return { ...project, link };
-        });
-
-        setProjects(dataWithLink);
+        setProjects(projectData);
+        setJoinedProjects(joinedData); // Lưu trữ dữ liệu dự án đã tham gia
       } catch (error) {
         console.error("Failed to fetch:", error);
       } finally {
@@ -95,68 +78,72 @@ export default function DetailInteractive() {
       <div className={styles.background}>
         <div className={styles.container}>
           <div className={styles.cardGrid}>
-           
             <Card></Card>
-            {projects.map((project) => (
-              <Card
-                key={project.id}
-                shadow="sm"
-                radius="md"
-                withBorder
-                padding="0"
-                className={styles.card}
-              >
-                <Image
-                  src={project.overview_image || "/placeholder.png"}
-                  height={160}
-                  alt={project.name}
-                  style={{
-                    borderTopLeftRadius: "var(--mantine-radius-md)",
-                    borderTopRightRadius: "var(--mantine-radius-md)",
-                  }}
-                />
-                <Stack gap="xs" p="md" style={{ flexGrow: 1 }}>
-                  <Text fw={500}>{project.name}</Text>
-                  <Text size="sm" c="dimmed">Loại dự án: {project.template || "Thông tin chưa có"}</Text>
-                  <Text size="sm" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
-                  <Text size="sm" c="dimmed">Nhà đầu tư: {project.investor || "Thông tin chưa có"}</Text>
-                  <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
-                </Stack>
+            {projects.map((project) => {
+              // Kiểm tra xem dự án có trong danh sách joinedProjects không
+              const joinedProject = joinedProjects.find(item => item.project_id === project.id);
+              const status = joinedProject?.status; // Lấy trạng thái của joinedProject
 
-                {/* 👉 Nút xử lý logic cũ + mở modal */}
-                <Button
-                  component={project.rank_name ? "a" : "button"}
-                  href={project.rank_name ? project.link : undefined}
-                  className={`${styles.baseButton} ${styles.primaryButton}`}
-                  onClick={() => {
-                    if (!project.rank_name) {
-                      setSelectedProject(project);
-                      setRequestModal(true);
-                    }
-                  }}
+              return (
+                
+                <Card
+                  key={project.id}
+                  shadow="sm"
+                  radius="md"
+                  withBorder
+                  padding="0"
+                  className={styles.card}
                 >
-                  {project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu"}
-                </Button>
-              </Card>
-            ))}
-           
+                  <Image
+                    src={project.overview_image || "/placeholder.png"}
+                    height={160}
+                    alt={project.name}
+                    style={{
+                      borderTopLeftRadius: "var(--mantine-radius-md)",
+                      borderTopRightRadius: "var(--mantine-radius-md)",
+                    }}
+                  />
+                  <Stack gap="xs" p="md" style={{ flexGrow: 1 }}>
+                    <Text fw={500}>{project.name}</Text>
+                    <Text size="sm" c="dimmed">Loại dự án: {project.template || "Thông tin chưa có"}</Text>
+                    <Text size="sm" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
+                    <Text size="sm" c="dimmed">Nhà đầu tư: {project.investor || "Thông tin chưa có"}</Text>
+                    <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
+                  </Stack>
+
+              <Button
+  component={status === "approved" ? "a" : "button"}
+  href={status === "approved" ? project.link : undefined}
+  className={`${styles.baseButton} ${styles.primaryButton}`}
+  onClick={() => {
+    if (status !== "approved" && !project.rank_name) {
+      setSelectedProject(project);
+      setRequestModal(true);
+    }
+  }}
+  disabled={status === "pending"} // Disable button if pending
+>
+  {status === "pending" 
+    ? "Đang chờ phê duyệt" 
+    : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
+</Button>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* 👉 Modal gửi yêu cầu */}
       <RequestModal
-  opened={requestModal}
-  onClose={() => setRequestModal(false)}
-  projectName={selectedProject?.name}
-  projectId={selectedProject?.id}
-  onConfirm={() => {
-    console.log("API gửi yêu cầu...", selectedProject?.id);
-  }}
-  // Giả sử bạn có một biến userToken chứa token của người dùng
-/>
+        opened={requestModal}
+        onClose={() => setRequestModal(false)}
+        projectName={selectedProject?.name}
+        projectId={selectedProject?.id}
+        onConfirm={() => {
+          console.log("API gửi yêu cầu...", selectedProject?.id);
+        }}
+      />
 
-      {/* Modal đăng nhập giữ nguyên */}
       <Modal
         opened={showLoginModal}
         onClose={() => setShowLoginModal(false)}
