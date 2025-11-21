@@ -38,6 +38,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const form = useForm<CreateUserPayload>({
     initialValues: {
       template_vi: "",
+      project_label: "",
     
       // description_en: "",
     },
@@ -76,6 +77,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
       formRef.current.setValues({
         template_vi: userData.template_vi || "",
+        project_label: userData.project_label || "",
        
     
        
@@ -128,6 +130,13 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         withAsterisk
         mt="md"
         {...form.getInputProps("template_vi")}
+      />
+       <TextInput
+        label="Tên hiển thị dự án"
+        placeholder="Nhập tên hiển thị dự án"
+        withAsterisk
+        mt="md"
+        {...form.getInputProps("project_label")}
       />
 
      

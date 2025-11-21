@@ -9,6 +9,7 @@ import { ScrollArea } from '@mantine/core';
 import { LinksGroup } from './NavbarLinksGroup/NavbarLinksGroup';
 import classes from './NavbarSimple.module.css';
 import Project from './Project'; 
+import JionProject from './JionProject'; 
 // import System from './System'; 
 // import Users from './Users'; 
 // import ListProject from './ListProject'; 
@@ -32,7 +33,7 @@ const mockdata = [
     label: 'Phân quyền người dùng trong dự án',
     icon: IconUser,
     initiallyOpened: true,
-    links: [{ label: 'Quản lý vai trò người dùng dự án', link: 'user-list' },
+    links: [{ label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
      
     ],
   },
@@ -56,8 +57,8 @@ export function ProjectManagement() {
         return <div>Đây là trang dự án</div>;
       case 'project-list':
         return <div>Đây là trang dự án</div>;
-      case 'project-1':
-       return <div>Đây là trang dự án</div>;
+      case 'JionProject':
+       return <JionProject/>;
       // case 'user-list':
       //   return <UserProjectRole/>;
          

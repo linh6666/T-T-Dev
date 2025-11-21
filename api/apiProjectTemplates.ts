@@ -12,6 +12,7 @@ export interface GetListRolesParams {
 
 export interface CreateUserPayload {
    template_vi: string;
+   project_label: string;
   
 }
 

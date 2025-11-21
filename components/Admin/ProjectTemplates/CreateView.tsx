@@ -25,6 +25,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
   const form = useForm({
     initialValues: {
         template_vi: "",
+        project_label: "",
      
      
  
@@ -41,6 +42,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     try {
       const userData = {
         template_vi: values.template_vi,
+        project_label: values.project_label,
            
       };
       await createUser(userData);
@@ -73,6 +75,13 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
         withAsterisk
         mt="md"
         {...form.getInputProps("template_vi")}
+      />
+      <TextInput
+        label="Tên hiển thị dự án"
+        placeholder="Nhập tên hiển thị dự án"
+        withAsterisk
+        mt="md"
+        {...form.getInputProps("project_label")}
       />
 
       <Group justify="flex-end" mt="lg">
