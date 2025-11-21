@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, Image, Stack, Text, Button, Loader, Modal } from "@mantine/core";
+import { Card, Image, Stack, Text, Button, Loader, Modal} from "@mantine/core";
 import styles from './NotFoundTitle.module.css';
 import { getListProject } from "../../api/apigetlistProject";
 import { GetJoinProject } from "../../api/apiGetJoinProject";
@@ -62,9 +62,9 @@ export default function DetailInteractive() {
 
         const dataWithLink = sortedData.map((project, index) => {
           let baseLink = "";
-          if (index === 0) baseLink = "/Tuong-tac/Millennia-City";
-          else if (index === 1) baseLink = "/Tuong-tac/Phuoc-tho";
-          else if (index === 2) baseLink = "/Dieu-khien";
+          if (index === 0) baseLink = "";
+          else if (index === 1) baseLink = "";
+          else if (index === 2) baseLink = "";
           else baseLink = `/Dieu-khien-${index}`;
 
           const link = `${baseLink}?id=${project.id}`;
@@ -95,6 +95,7 @@ export default function DetailInteractive() {
       <div className={styles.background}>
         <div className={styles.container}>
           <div className={styles.cardGrid}>
+           
             <Card></Card>
             {projects.map((project) => (
               <Card
@@ -138,6 +139,7 @@ export default function DetailInteractive() {
                 </Button>
               </Card>
             ))}
+           
           </div>
         </div>
       </div>
