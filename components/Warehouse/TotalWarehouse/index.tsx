@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { Group, MultiSelect, Card, Text, SimpleGrid, Loader } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehouse";
+import styles from "./TotalWarehouse.module.css";
+import WarehouseDetail from "../WarehouseDetail"; // đường dẫn tùy project
 
 interface TotalWarehouseProps {
   projectId: string;
 }
 
-interface WarehouseItem {
-    id:string;
+export interface WarehouseItem {
+  id: string;
   unit_code: string;
   color: string;
   zone: string;
@@ -23,6 +25,7 @@ interface WarehouseItem {
 export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedWarehouse, setSelectedWarehouse] = useState<WarehouseItem | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -34,22 +37,19 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
           filters: [
             {
               label: "type_info",
-              values: ["bh"], // ví dụ filter
+              values: ["bh"],
             },
           ],
         };
 
-        // Gọi API
         const res = await createWarehouse(body);
         console.log("API response:", res);
 
-        // ✅ Lấy đúng mảng từ response
-        // Giả sử API trả về { data: [...] }
         const warehouseList = Array.isArray(res) ? res : res.data || [];
         setItems(warehouseList);
       } catch (error) {
         console.error("Failed to fetch warehouse data:", error);
-        setItems([]); // đảm bảo luôn là mảng
+        setItems([]);
       } finally {
         setLoading(false);
       }
@@ -62,9 +62,24 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     return <Loader style={{ marginTop: 50, display: "block" }} />;
   }
 
+  // --- Nếu có kho được chọn, hiển thị màn hình chi tiết ---
+  if (selectedWarehouse) {
+    return (
+      <WarehouseDetail
+       unit_code={selectedWarehouse.unit_code}
+    zone={selectedWarehouse.zone}
+    building_type={selectedWarehouse.building_type}
+    bedroom={selectedWarehouse.bedroom}
+    bathroom={selectedWarehouse.bathroom}
+    direction={selectedWarehouse.direction}
+    price={selectedWarehouse.price}
+    onBack={() => setSelectedWarehouse(null)}
+      />
+    );
+  }
+
   return (
     <>
-
       {/* --- Bộ lọc --- */}
       <div style={{ paddingTop: "20px" }}>
         <Group gap="xs">
@@ -77,30 +92,28 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
       </div>
 
       {/* --- Danh sách card --- */}
-      <div style={{ paddingTop: "30px" }}>
+      <div className={styles.container}>
         <SimpleGrid cols={5} spacing="xl">
-          {Array.isArray(items) && items.map((item) => (
-            <Card
-              key={item.id}
-              shadow="md"
-              radius="lg"
-              style={{
-                backgroundColor: "#C9352C",
-                color: "white",
-                width: 220,
-              }}
-            >
-              <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
-                {item.unit_code}
-              </Text>
-              <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
-              <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
-              <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
-              <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
-              <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
-             
-            </Card>
-          ))}
+          {Array.isArray(items) &&
+            items.map((item) => (
+              <Card
+                key={item.id}
+                shadow="md"
+                radius="lg"
+                className={styles.card}
+                onClick={() => setSelectedWarehouse(item)}
+                style={{ cursor: "pointer" }}
+              >
+                <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
+                  {item.unit_code}
+                </Text>
+                <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
+                <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
+                <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
+                <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
+                <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
+              </Card>
+            ))}
         </SimpleGrid>
       </div>
     </>
