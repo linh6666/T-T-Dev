@@ -88,7 +88,7 @@ DELETE_TEMPLATEATTRIBUTESLINK:"/api/v1/template_attributes/{link_id}",
 CREATE_NODEATTRIBUTE:"/api/v1/node_attribute/filter",
 
 //filterwarehouse
-CREATE_SALEINFORMATION:"/api/v1/product_information/sale_information",
+CREATE_SALEINFORMATION:"/api/v1/product_information/basic_information",
 
 
 
