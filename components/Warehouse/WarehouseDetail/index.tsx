@@ -6,6 +6,7 @@ import styles from "./App.module.css";
 import { IconArrowLeft, IconClipboardText } from "@tabler/icons-react";
 import Image from "next/image";
 import { AxiosError } from "axios";
+import { Text } from "@mantine/core";
 
 interface WarehouseDetailProps {
   unit_code: string;
@@ -91,6 +92,20 @@ export default function WarehouseDetail({ unit_code,projectId, onBack }: Warehou
           {/* Cột trái */}
           <div style={{ flex: 1 }}>
             <h2>Chi tiết căn hộ: {unit_code}</h2>
+           <Text>
+  <b>Hướng:</b> Nam
+</Text>
+<Text>
+  <b>Phòng ngủ:</b> 2 phòng
+</Text>
+<Text>
+  <b>Giá:</b> 0đ
+</Text>
+<Text>
+  <b>Mô tả:</b> Căn hộ rộng rãi với thiết kế hiện đại, bao gồm 3 phòng ngủ, 2 phòng tắm, phòng khách và bếp mở. Ban công lớn hướng sáng, tầm nhìn đẹp ra thành phố. Nội thất sang trọng, tiện nghi đầy đủ, thích hợp cho gia đình trẻ hoặc người yêu thích không gian thoáng đãng.
+</Text>
+
+
 
             {/* Hiển thị tất cả PDF */}
             {pdfData.map(pdf => (
