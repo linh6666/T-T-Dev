@@ -86,7 +86,9 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
                 radius="lg"
                 className={styles.card}
                 style={{ cursor: "pointer" }}
-                onClick={() => router.push(`/quan-ly-ban-hang/chi-tiet/${item.unit_code}`)} // <- chuyển sang trang mới
+                onClick={() =>
+  router.push(`/quan-ly-ban-hang/chi-tiet/${item.unit_code}?projectId=${projectId}`)
+}
               >
                 <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
                   {item.unit_code}

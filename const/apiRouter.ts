@@ -112,5 +112,5 @@ DELETE_REQUEST:"/api/v1/JoinProject/{project_id}/{request_id}",
 
 
 /////deltai home
-GET_LIST_DETAIL_HOME:"/api/v1/detal_unit/get_detal_units/{unit_code}",
+GET_LIST_DETAIL_HOME:"/api/v1/detal_unit/get_detal_units/{project_id}/{unit_code}",
 }

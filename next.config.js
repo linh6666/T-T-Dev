@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'vietmodel.com.vn',
+        hostname: 'www.vietmodel.com.vn',
         pathname: '/api/v1/static/**',
       },
     ],

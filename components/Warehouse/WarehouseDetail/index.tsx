@@ -9,6 +9,7 @@ import { AxiosError } from "axios";
 
 interface WarehouseDetailProps {
   unit_code: string;
+  projectId: string;
   onBack: () => void;
 }
 
@@ -22,7 +23,7 @@ interface WarehouseItem {
   id: string;
 }
 
-export default function WarehouseDetail({ unit_code, onBack }: WarehouseDetailProps) {
+export default function WarehouseDetail({ unit_code,projectId, onBack }: WarehouseDetailProps) {
   const [data, setData] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,33 +35,37 @@ export default function WarehouseDetail({ unit_code, onBack }: WarehouseDetailPr
   const imageData = data.filter(item => item.url.match(/\.(jpg|jpeg|png|gif)$/i));
   const pdfData = data.filter(item => item.url.match(/\.pdf$/i));
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await Getlisthome({ unit_code });
-        setData(response);
-        setIndex(0); // reset slider khi đổi căn
-      } catch (err: unknown) {
-        if (err instanceof AxiosError) {
-          if (err.response?.status === 404) {
-            setError("Không có dữ liệu!");
-          } else {
-            setError(err.message || "Lỗi khi lấy dữ liệu");
-          }
-        } else if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Lỗi không xác định");
-        }
-      } finally {
-        setLoading(false);
+ useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!projectId) {
+        setError("Project ID không hợp lệ");
+        return;
       }
-    };
+      const response = await Getlisthome({ project_id: projectId, unit_code });
+      setData(response);
+      setIndex(0); // reset slider khi đổi căn
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 404) {
+          setError("Không có dữ liệu!");
+        } else {
+          setError(err.message || "Lỗi khi lấy dữ liệu");
+        }
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Lỗi không xác định");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [unit_code]);
+  fetchData();
+}, [unit_code, projectId]);
 
   const goNext = () => {
     if (index < imageData.length - 1) setIndex(index + 1);
