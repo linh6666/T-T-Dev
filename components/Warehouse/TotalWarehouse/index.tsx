@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // <- dùng để chuyển trang
 import { Group, MultiSelect, Card, Text, SimpleGrid, Loader } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehouse";
 import styles from "./TotalWarehouse.module.css";
-import WarehouseDetail from "../WarehouseDetail"; // đường dẫn tùy project
 
 interface TotalWarehouseProps {
   projectId: string;
@@ -25,7 +25,7 @@ export interface WarehouseItem {
 export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedWarehouse, setSelectedWarehouse] = useState<WarehouseItem | null>(null);
+  const router = useRouter(); // <- khởi tạo router
 
   useEffect(() => {
     async function fetchData() {
@@ -62,22 +62,6 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     return <Loader style={{ marginTop: 50, display: "block" }} />;
   }
 
-  // --- Nếu có kho được chọn, hiển thị màn hình chi tiết ---
-  if (selectedWarehouse) {
-    return (
-      <WarehouseDetail
-       unit_code={selectedWarehouse.unit_code}
-    zone={selectedWarehouse.zone}
-    building_type={selectedWarehouse.building_type}
-    bedroom={selectedWarehouse.bedroom}
-    bathroom={selectedWarehouse.bathroom}
-    direction={selectedWarehouse.direction}
-    price={selectedWarehouse.price}
-    onBack={() => setSelectedWarehouse(null)}
-      />
-    );
-  }
-
   return (
     <>
       {/* --- Bộ lọc --- */}
@@ -101,8 +85,8 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
                 shadow="md"
                 radius="lg"
                 className={styles.card}
-                onClick={() => setSelectedWarehouse(item)}
                 style={{ cursor: "pointer" }}
+                onClick={() => router.push(`/quan-ly-ban-hang/chi-tiet/${item.unit_code}`)} // <- chuyển sang trang mới
               >
                 <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
                   {item.unit_code}

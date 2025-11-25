@@ -90,11 +90,7 @@ export default function DetailInteractive() {
       <div className={styles.background}>
         <div className={styles.container}>
           <div className={styles.cardGrid}>
-                 <Card
-   
-  >
-   
-  </Card>
+             
 
             {projects.map((project) => (
               <Card

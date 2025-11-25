@@ -81,7 +81,7 @@ export default function DetailInteractive() {
       <div className={styles.background}>
         <div className={styles.container}>
           <div className={styles.cardGrid}>
-            <Card></Card>
+           
             {projects.map((project) => {
               const joinedProject = joinedProjects.find(item => item.project_id === project.id);
               const status = joinedProject?.status;
