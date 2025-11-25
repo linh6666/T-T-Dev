@@ -43,7 +43,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       // description_en: "",
     },
     validate: {
-      template_vi: (value) => (value ? null : "không được để trống"),
+      // template_vi: (value) => (value ? null : "không được để trống"),
     
     },
   });
@@ -54,7 +54,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const handleSubmit = async (values: CreateUserPayload) => {
     open();
     try {
-      const url = API_ROUTE.UPDATE_PROJECTTEMPLATES.replace("{template_id}", id);
+      const url = API_ROUTE.UPDATE_PROJECTTYPE.replace("{type_id}", id);
       await api.put(url, values);
       await onSearch();
       modals.closeAll();
@@ -71,12 +71,12 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     if (!id) return;
     open();
     try {
-      const url = API_ROUTE.UPDATE_PROJECTTEMPLATES.replace("{template_id}", id);
+      const url = API_ROUTE.UPDATE_PROJECTTYPE.replace("{type_id}", id);
       const response = await api.get(url);
       const userData = response.data;
 
       formRef.current.setValues({
-        template_vi: userData.template_vi || "",
+        template_vi: userData.type_vi|| "",
         project_label: userData.project_label || "",
        
     

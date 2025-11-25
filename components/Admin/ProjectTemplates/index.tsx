@@ -80,6 +80,7 @@ export default function LargeFixedTable() {
   // ✅ Định nghĩa cột bảng
   const columns: ColumnsType<DataType> = [
     { title: "Loai dự án", dataIndex: "template_vi", key: "template_vi", width: 30 },
+  
    
     { title: "Tên hiển thị dự án", dataIndex: "project_label", key: "project_label", width: 100 },
     {

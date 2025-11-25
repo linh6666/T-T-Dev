@@ -5,6 +5,7 @@ import styles from './NotFoundTitle.module.css';
 import { getListProject } from "../../api/apigetlistProject";
 import { GetJoinProject } from "../../api/apiGetJoinProject";
 import RequestModal from "./RequestModal";
+import { useRouter } from "next/navigation"; // Thêm useRouter
 
 interface Project {
   id: string;
@@ -34,6 +35,8 @@ export default function DetailInteractive() {
   const [requestModal, setRequestModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  const router = useRouter(); // Khởi tạo router
+
   useEffect(() => {
     const token = localStorage.getItem("access_token") ?? "";
 
@@ -51,10 +54,10 @@ export default function DetailInteractive() {
         ]);
 
         const projectData = listProjectRes.data;
-        const joinedData = joinedProjectRes.data; // Dữ liệu từ GetJoinProject
+        const joinedData = joinedProjectRes.data;
 
         setProjects(projectData);
-        setJoinedProjects(joinedData); // Lưu trữ dữ liệu dự án đã tham gia
+        setJoinedProjects(joinedData);
       } catch (error) {
         console.error("Failed to fetch:", error);
       } finally {
@@ -80,12 +83,10 @@ export default function DetailInteractive() {
           <div className={styles.cardGrid}>
             <Card></Card>
             {projects.map((project) => {
-              // Kiểm tra xem dự án có trong danh sách joinedProjects không
               const joinedProject = joinedProjects.find(item => item.project_id === project.id);
-              const status = joinedProject?.status; // Lấy trạng thái của joinedProject
+              const status = joinedProject?.status;
 
               return (
-                
                 <Card
                   key={project.id}
                   shadow="sm"
@@ -111,22 +112,23 @@ export default function DetailInteractive() {
                     <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
                   </Stack>
 
-              <Button
-  component={status === "approved" ? "a" : "button"}
-  href={status === "approved" ? project.link : undefined}
-  className={`${styles.baseButton} ${styles.primaryButton}`}
-  onClick={() => {
-    if (status !== "approved" && !project.rank_name) {
-      setSelectedProject(project);
-      setRequestModal(true);
-    }
-  }}
-  disabled={status === "pending"} // Disable button if pending
->
-  {status === "pending" 
-    ? "Đang chờ phê duyệt" 
-    : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
-</Button>
+                  <Button
+                    className={`${styles.baseButton} ${styles.primaryButton}`}
+                    onClick={() => {
+                      if (status === "approved" || project.rank_name) {
+                        // Khi là "Đi tới dự án", chuyển sang trang khác
+                        router.push(`/quan-ly-ban-hang/Kho-hang/${project.id}`);
+                      } else if (!project.rank_name) {
+                        setSelectedProject(project);
+                        setRequestModal(true);
+                      }
+                    }}
+                    disabled={status === "pending"}
+                  >
+                    {status === "pending" 
+                      ? "Đang chờ phê duyệt" 
+                      : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
+                  </Button>
                 </Card>
               );
             })}

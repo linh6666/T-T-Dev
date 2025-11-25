@@ -69,6 +69,12 @@ CREATE_PROJECTTEMPLATES:"/api/v1/project_templates/",
 UPDATE_PROJECTTEMPLATES:"/api/v1/project_templates/{template_id}",
 DELETE_PROJECTTEMPLATES:"/api/v1/project_templates/{template_id}",
 
+///ProjectType
+GET_LIST_PROJECTTYPE:"/api/v1/project_type/",
+CREATE_PROJECTTYPE:"/api/v1/project_type/",
+UPDATE_PROJECTTYPE:"/api/v1/project_type/{type_id}",
+DELETE_PROJECTTYPE:"/api/v1/project_type/{type_id}",
+
 
 ///TemplateAttributesLink
 
@@ -81,7 +87,9 @@ DELETE_TEMPLATEATTRIBUTESLINK:"/api/v1/template_attributes/{link_id}",
 ///NodeAttribute
 CREATE_NODEATTRIBUTE:"/api/v1/node_attribute/filter",
 
-//filter
+//filterwarehouse
+CREATE_SALEINFORMATION:"/api/v1/product_information/sale_information",
+
 
 
 //Address
