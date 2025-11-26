@@ -1,24 +1,23 @@
-import React from "react";
-import { Metadata } from "next";
-import Managent from "../../../../../components/Warehouse";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Kho hàng T&T Homes",
-  description: "Quản lý kho hàng về T&T Homes",
-};
+import { useSearchParams } from "next/navigation";
+import Managent from "../../../../../components/Warehouse";
 
 interface PageProps {
   params: {
-    id: string;
+    id: string; // dynamic segment = projectId
   };
 }
 
 export default function QuanLyBanHangPage({ params }: PageProps) {
-  const { id } = params; // đây chính là project.id
+  const { id: projectId } = params; // Lấy projectId từ folder [id]
+  const searchParams = useSearchParams();
+  const target = searchParams.get("target") || undefined; // Lấy target từ query param
 
   return (
     <>
-      <Managent projectId={id} />
+      {/* Truyền projectId và target vào Managent, không render gì */}
+      <Managent projectId={projectId} target={target} />
     </>
   );
 }

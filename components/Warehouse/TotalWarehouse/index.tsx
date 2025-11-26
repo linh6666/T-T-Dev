@@ -8,6 +8,7 @@ import styles from "./TotalWarehouse.module.css";
 
 interface TotalWarehouseProps {
   projectId: string;
+   target?: string; 
 }
 
 export interface WarehouseItem {
@@ -42,7 +43,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
           ],
         };
 
-        const res = await createWarehouse(body);
+        const res = await createWarehouse(projectId, body);
         console.log("API response:", res);
 
         const warehouseList = Array.isArray(res) ? res : res.data || [];

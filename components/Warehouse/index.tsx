@@ -7,10 +7,11 @@ import TotalWarehouse from "./TotalWarehouse";
 
 interface AppProps {
   projectId: string;
+  target?: string;
 }
 
 // 💡 Nhận props projectId
-export default function Managent({ projectId }: AppProps) {
+export default function Managent({ projectId,target }: AppProps) {
 //   const [activeTab, setActiveTab] = useState<string | null>("all"); 
   const [activeView, setActiveView] = useState<string>("warehouse"); // main view
 
@@ -56,7 +57,7 @@ export default function Managent({ projectId }: AppProps) {
       </div>
 
       {/* Nội dung view */}
-      {activeView === "warehouse" && <TotalWarehouse projectId={projectId} />}
+      {activeView === "warehouse" &&  <TotalWarehouse projectId={projectId} target={target} />}
 
       {/* 
       {activeView === "amenities" && <AmenityContent projectId={projectId} />}

@@ -117,7 +117,8 @@ export default function DetailInteractive() {
                     onClick={() => {
                       if (status === "approved" || project.rank_name) {
                         // Khi là "Đi tới dự án", chuyển sang trang khác
-                        router.push(`/quan-ly-ban-hang/Kho-hang/${project.id}`);
+                      router.push(`/quan-ly-ban-hang/tong-mat-bang/${project.id}?name=${encodeURIComponent(project.name)}`);
+
                       } else if (!project.rank_name) {
                         setSelectedProject(project);
                         setRequestModal(true);

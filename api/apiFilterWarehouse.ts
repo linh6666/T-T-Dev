@@ -12,9 +12,12 @@ interface CreateNodeAttributeBody {
 }
 
 // 🧩 Hàm call API POST
-export const createWarehouse = async (body: CreateNodeAttributeBody) => {
+export const createWarehouse = async (project_id: string, body: CreateNodeAttributeBody) => {
   try {
-    const response = await api.post(API_ROUTE.CREATE_SALEINFORMATION, body);
+    // Gắn project_id vào đường dẫn
+    const url = API_ROUTE.CREATE_SALE_INFORMATION.replace("{project_id}", project_id);
+
+    const response = await api.post(url, body);
 
     console.log("✅ API response:", response.data);
     return response.data;
