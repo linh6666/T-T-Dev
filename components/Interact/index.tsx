@@ -26,56 +26,57 @@ export default function DetailInteractive() {
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("access_token") ?? "";
+ useEffect(() => {
+  const token = localStorage.getItem("access_token") ?? "";
 
-    if (!token) {
-      setShowLoginModal(true);
-      setLoading(false);
-      return;
-    }
+  if (!token) {
+    setShowLoginModal(true);
+    setLoading(false);
+    return;
+  }
 
-    async function fetchProjects() {
-      try {
-        const { data } = await getListProject({ token, skip: 0, limit: 20 });
+  async function fetchProjects() {
+    try {
+      const { data } = await getListProject({ token, skip: 0, limit: 20 });
 
-        // Nếu đây là lần đầu fetch -> lưu lại thứ tự ID ban đầu
-        if (initialOrder.length === 0) {
-          setInitialOrder(data.map((p: Project) => p.id));
-        }
-
-        // Nếu đã có thứ tự ban đầu -> sắp xếp lại theo đúng thứ tự đó
-        const sortedData = [...data].sort((a, b) => {
-          return (
-            initialOrder.indexOf(a.id) - initialOrder.indexOf(b.id)
-          );
-        });
-
-        // Gán link + ảnh nhưng KHÔNG thay đổi thứ tự
-        const dataWithLink = sortedData.map((project: Project, index: number) => {
-          let baseLink = "";
-          if (index === 0) baseLink = "/Tuong-tac/Millennia-City";
-          else if (index === 1) baseLink = "/Tuong-tac/Phuoc-tho";
-          else if (index === 2) baseLink = "/Dieu-khien";
-          else baseLink = `/Dieu-khien-${index}`;
-
-          const link = `${baseLink}?id=${project.id}`;
-
-      
-
-          return { ...project, link, };
-        });
-
-        setProjects(dataWithLink);
-      } catch (error) {
-        console.error("Failed to fetch projects:", error);
-      } finally {
-        setLoading(false);
+      // Nếu đây là lần đầu fetch -> lưu lại thứ tự ID ban đầu
+      if (initialOrder.length === 0) {
+        setInitialOrder(data.map((p: Project) => p.id));
       }
-    }
 
-    fetchProjects();
-  }, [initialOrder]); // <--- theo dõi initialOrder để không bị gọi sai
+      // Nếu đã có thứ tự ban đầu -> sắp xếp lại theo đúng thứ tự đó
+      const sortedData = [...data].sort((a, b) => {
+        return initialOrder.indexOf(a.id) - initialOrder.indexOf(b.id);
+      });
+
+      // Tạo mapping giữa tên dự án và đường dẫn
+      const linkMap: Record<string, string> = {
+        "T&T City Millennia": "/Tuong-tac/Millennia-City",
+        "T&T Phước Thọ": "/Tuong-tac/Phuoc-tho",
+        "T&T Times Square": "/Tuong-tac/Times-Square",
+        "T&T Cà Mau": "/Tuong-tac/Ca-mau",
+
+        // thêm các dự án khác nếu cần
+      };
+
+      // Gán link theo name
+      const dataWithLink = sortedData.map((project: Project) => {
+        const baseLink = linkMap[project.name] || `/Dieu-khien-${project.id}`;
+        const link = `${baseLink}?id=${project.id}`;
+        return { ...project, link };
+      });
+
+      setProjects(dataWithLink);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchProjects();
+}, [initialOrder]);
+
 
   if (loading) {
     return (
