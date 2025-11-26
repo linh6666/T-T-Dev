@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Card, Text, Button, Image } from "@mantine/core";
+import { Text, Button, Image } from "@mantine/core";
 import { IconArrowLeft, IconClipboardText } from "@tabler/icons-react";
 import { Getlisthome } from "../../../api/apiGetListHome";
 import styles from "./App.module.css";
