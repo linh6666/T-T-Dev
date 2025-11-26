@@ -52,6 +52,9 @@ export default function Totalarea({
 
       {matchedImage ? (
         <div className={styles.imageWrapper}>
+              {/* <h1 className={styles.title}>
+        Tổng mặt bằng: {projectName || "Chưa có tên dự án"}
+      </h1> */}
 
           {/* ẢNH DỰ ÁN */}
           <Image

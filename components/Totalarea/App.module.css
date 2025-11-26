@@ -9,9 +9,9 @@
   color: #222;
   font-weight: 600;
   margin-bottom: 20px;
-  letter-spacing: 0.5px;
-  text-transform: capitalize;
-  padding-left: 12px;
+  /* letter-spacing: 0.5px;
+  text-transform: capitalize; */
+  padding-left: 150px;
 }
 
 .imageWrapper {
