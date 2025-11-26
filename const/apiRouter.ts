@@ -90,6 +90,7 @@ CREATE_NODEATTRIBUTE:"/api/v1/node_attribute/filter",
 //filterwarehouse
 CREATE_SALEINFORMATION:"/api/v1/product_information/basic_information",
 
+CREATE_SALE_INFORMATION:"/api/v1/product_information/sale_information/{project_id}",
 
 
 //Address
