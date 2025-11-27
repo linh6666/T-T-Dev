@@ -52,11 +52,7 @@ export default function Totalarea({
 
       {matchedImage ? (
         <div className={styles.imageWrapper}>
-              {/* <h1 className={styles.title}>
-        Tổng mặt bằng: {projectName || "Chưa có tên dự án"}
-      </h1> */}
-
-          {/* ẢNH DỰ ÁN */}
+          
           <Image
             src={`/Sales/${matchedImage}`}
             alt={projectName || "Hình ảnh dự án"}
@@ -149,6 +145,76 @@ onClick={() => handleSvgClick("THE HERITAGE")}
 </svg>
             </>
           )}
+          {matchedImage === "ttphuoctho.png" && (
+        <>
+          <svg className={styles.overlaySvg1}
+  xmlns="http://www.w3.org/2000/svg"
+  width="930" 
+  height="500" 
+  viewBox="0 0 1684.079 1212.689"
+  onClick={() => handleSvgClick("Đa Lộc")}
+>
+  <path 
+    id="ĐA" 
+    d="M-13190.622-18854.254s862.054,261.3,882.364,267.1,208.914-411.115,208.914-411.115l-806.628-349.084s-153.781,266.939-182.8,301.758S-13190.622-18854.254-13190.622-18854.254Z" 
+    transform="translate(13194.104 19700.432)" 
+    fill="rgba(237,155,0,0.3)" 
+    stroke="#fcb814" 
+    strokeWidth="5"
+  />
+  <text 
+    x="600" 
+    y="800" 
+    fill="white" 
+    stroke="white" 
+    strokeWidth="1" 
+    fontSize="50" 
+    fontFamily="Arial" 
+    fontWeight="bold" 
+    textAnchor="middle" 
+    alignmentBaseline="middle" 
+    style={{ pointerEvents: 'none' }}
+  >
+    Đa Lộc
+  </text>
+</svg>
+
+{/* Thẻ SVG thứ hai */}
+<svg className={styles.overlaySvg}
+  xmlns="http://www.w3.org/2000/svg"
+  width="930" 
+  height="500" 
+  viewBox="0 0 1684.079 1212.689"
+  onClick={() => handleSvgClick("Đa Phúc")}
+>
+  <path 
+    id="ĐA-2" 
+    data-name="ĐA" 
+    d="M-12300.424-18587.09s358.339,96.848,384.742,96.848,354.566-207.457,373.426-233.861,41.492-844.926,22.632-867.557-233.862-105.615-233.862-105.615Z" 
+    transform="translate(13194.104 19700.432)" 
+    fill="rgba(223,243,79,0.3)" 
+    stroke="#fcb814" 
+    strokeWidth="5"
+  />
+  <text 
+    x="1400" 
+    y="700" 
+    fill="white" 
+    stroke="white" 
+    strokeWidth="1" 
+    fontSize="50" 
+    fontFamily="Arial" 
+    fontWeight="bold" 
+    textAnchor="middle" 
+    alignmentBaseline="middle" 
+    style={{ pointerEvents: 'none' }}
+  >
+    Đa Phúc
+  </text>
+</svg>
+        
+        </>
+      )}
 
         </div>
       ) : (
