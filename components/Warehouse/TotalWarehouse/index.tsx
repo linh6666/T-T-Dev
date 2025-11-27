@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Group, Card, Text, SimpleGrid, Loader, Button, ActionIcon, TextInput } from "@mantine/core";
+import { Group, Card, Text, SimpleGrid, Loader, ActionIcon, TextInput } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehouse";
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail"; // import component mới
@@ -83,25 +83,45 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
 <div style={{ paddingTop: "20px" }}>
   {/* Nhóm icon + search */}
   <Group gap="md">
-    <ActionIcon variant="outline" radius="md" size="lg">
-      <IconFilter2
- size={20} />
-    </ActionIcon>
+  <ActionIcon
+  variant="outline"
+  radius="md"
+  size="lg"
+  styles={{
+    root: {
+      borderColor: '#762f0b', // màu viền
+      color: '#762f0b',       // màu icon
+    },
+    icon: {
+      color: '#762f0b',       // đảm bảo icon cũng đổi màu
+    },
+  }}
+>
+  <IconFilter2 size={20} />
+</ActionIcon>
 
     <TextInput
       placeholder="Tìm kiếm...."
-      leftSection={<IconSearch size={16} />}
+      leftSection={<IconSearch size={16} color="#762f0b" />}
       style={{ width: 240 }}
     />
   </Group>
 
   {/* Nhóm các nút trạng thái */}
-  <Group gap="sm" style={{ marginTop: 16 }}>
-    <Button variant="outline">Quan tâm</Button>
-    <Button variant="outline">Đang bán</Button>
-    <Button variant="outline">Đã đặt cọc</Button>
-    <Button variant="outline">Đã bán</Button>
-  </Group>
+ <Group gap="sm" style={{ marginTop: 16 }}>
+  <button style={{ backgroundColor: '#c99945', color: '#fff', padding: '8px 16px', border: 'none', borderRadius: 20 }}>
+    Quan tâm
+  </button>
+  <button style={{ backgroundColor: '#3d6985', color: '#fff', padding: '8px 16px', border: 'none', borderRadius: 20 }}>
+    Đang bán
+  </button>
+  <button style={{ backgroundColor: '#e56a3e', color: '#fff', padding: '8px 16px', border: 'none', borderRadius: 20 }}>
+    Đã đặt cọc
+  </button>
+  <button style={{ backgroundColor: '#d73a24', color: '#fff', padding: '8px 16px', border: 'none', borderRadius: 20 }}>
+    Đã bán
+  </button>
+</Group>
 </div>
 
   {/* --- Danh sách card --- */}
