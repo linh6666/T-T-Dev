@@ -19,7 +19,7 @@ export default function Managent({ projectId,target }: AppProps) {
  
 
   return (
-    <div className={styles.container}>
+    <div className={styles.containerr}>
       {/* Header view */}
       <div className={styles.headerList}>
         <h1

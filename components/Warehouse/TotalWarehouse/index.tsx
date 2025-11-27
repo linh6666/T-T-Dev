@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Group, MultiSelect, Card, Text, SimpleGrid, Loader } from "@mantine/core";
+import { Group, Card, Text, SimpleGrid, Loader, Button, ActionIcon, TextInput } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehouse";
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail"; // import component mới
+import {  IconFilter2, IconSearch } from "@tabler/icons-react";
 
 interface TotalWarehouseProps {
   projectId: string;
@@ -77,43 +78,60 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   }
 
   return (
-    <>
-      {/* --- Bộ lọc --- */}
-      <div style={{ paddingTop: "20px" }}>
-        <Group gap="xs">
-          <MultiSelect placeholder="Loại công trình" data={["Shophouse", "Biệt thự"]} searchable />
-          <MultiSelect placeholder="Hướng nhà" data={["Nam", "Bắc", "Tây", "Đông"]} searchable />
-          <MultiSelect placeholder="Phòng ngủ" data={["1", "2", "3", "4"]} searchable />
-          <MultiSelect placeholder="Phòng tắm" data={["1", "2", "3"]} searchable />
-        </Group>
-      </div>
+ <>
+  {/* --- Bộ lọc --- */}
+<div style={{ paddingTop: "20px" }}>
+  {/* Nhóm icon + search */}
+  <Group gap="md">
+    <ActionIcon variant="outline" radius="md" size="lg">
+      <IconFilter2
+ size={20} />
+    </ActionIcon>
 
-      {/* --- Danh sách card --- */}
-      <div className={styles.container}>
-        <SimpleGrid cols={5} spacing="xl">
-          {Array.isArray(items) &&
-            items.map((item) => (
-              <Card
-                key={item.id}
-                shadow="md"
-                radius="lg"
-                className={styles.card}
-                style={{ cursor: "pointer" }}
-                onClick={() => setSelectedItem(item)} // nhấp chọn item
-              >
-                <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
-                  {item.unit_code}
-                </Text>
-                <Text style={{ fontSize: "13px" }}>Phân khu: {item.layer6}</Text>
-                <Text style={{ fontSize: "13px" }}>Loại công trình: {item.layer3}</Text>
-                <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
-                <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
-                <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
-                <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
-              </Card>
-            ))}
-        </SimpleGrid>
-      </div>
-    </>
+    <TextInput
+      placeholder="Tìm kiếm...."
+      leftSection={<IconSearch size={16} />}
+      style={{ width: 240 }}
+    />
+  </Group>
+
+  {/* Nhóm các nút trạng thái */}
+  <Group gap="sm" style={{ marginTop: 16 }}>
+    <Button variant="outline">Quan tâm</Button>
+    <Button variant="outline">Đang bán</Button>
+    <Button variant="outline">Đã đặt cọc</Button>
+    <Button variant="outline">Đã bán</Button>
+  </Group>
+</div>
+
+  {/* --- Danh sách card --- */}
+  <div className={styles.container}>
+    <SimpleGrid cols={5} spacing="xl">
+      {Array.isArray(items) &&
+        items.map((item) => (
+          <Card
+            key={item.id}
+            shadow="md"
+            radius="lg"
+            className={styles.card}
+            style={{ cursor: "pointer" }}
+            onClick={() => setSelectedItem(item)}
+          >
+            <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
+              {item.unit_code}
+            </Text>
+            <Text style={{ fontSize: "13px" }}>Phân khu: {item.layer6}</Text>
+            <Text style={{ fontSize: "13px" }}>Loại công trình: {item.layer3}</Text>
+            <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
+            <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
+            <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
+            <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
+          </Card>
+        ))}
+    </SimpleGrid>
+  </div>
+</>
+
+  
   );
 }
