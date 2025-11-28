@@ -216,7 +216,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
             </ActionIcon>
 
             {/* Autocomplete search */}
-          <Autocomplete
+         <Autocomplete
   placeholder="Tìm kiếm...."
   value={searchText}
   data={searchSuggestions}
@@ -225,15 +225,18 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     if (e.key === "Enter") handleSearch();
   }}
   leftSection={
-
-      <IconSearch
-  onClick={handleSearch}
-  size={16}
-  color="#762f0b"
-  style={{ cursor: "pointer" }}
-/>
-    
+    <IconSearch
+      onClick={handleSearch}
+      size={16}
+      color="#762f0b"
+      style={{ cursor: "pointer" }}
+    />
   }
+  styles={{
+    input: {
+      paddingLeft: 36, // thêm padding để placeholder không bị che
+    },
+  }}
   style={{ width: 240 }}
 />
           </Group>
