@@ -6,6 +6,8 @@ import { createWarehouse } from "../../../api/apiFilterWarehouse";
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail"; 
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
+import { Pagination } from 'antd';
+// import 'antd/dist/reset.css';
 
 interface TotalWarehouseProps {
   projectId: string;
@@ -32,7 +34,11 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null); 
-  const [showFilterSidebar, setShowFilterSidebar] = useState(false); // State cho sidebar
+  const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+
+  // --- Pagination state ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   // --- Fetch data ---
   useEffect(() => {
@@ -72,126 +78,82 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     );
   }
 
+  // --- Pagination calculation ---
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+
   return (
     <div style={{ display: "flex" }}>
       {/* --- Sidebar bên trái --- */}
       {showFilterSidebar && (
-<div
-  style={{
-    backgroundColor: "#f7f7f7",
-    padding: 20,
-    boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)",
-    borderRadius: "10px",
-  }}
->
-  <h1 style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}>
-    Bộ lọc sản phẩm
-  </h1>
-  <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-    <MultiSelect
-      label="Phân Khu"
-      placeholder="Chọn phân khu"
-      data={['React', 'Angular', 'Vue', 'Svelte']}
-    />
-    <MultiSelect
-      label="Loại công trình"
-      placeholder="Chọn loại công trình"
-      data={['React', 'Angular', 'Vue', 'Svelte']}
-    />
-    <MultiSelect
-      label="Hướng"
-      placeholder="Chọn hướng"
-      data={['React', 'Angular', 'Vue', 'Svelte']}
-    />
-  </div>
+        <div
+          style={{
+            backgroundColor: "#f7f7f7",
+            padding: 20,
+            boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)",
+            borderRadius: "10px",
+            width: 300,
+          }}
+        >
+          <h1 style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}>
+            Bộ lọc sản phẩm
+          </h1>
+          <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+            <MultiSelect
+              label="Phân Khu"
+              placeholder="Chọn phân khu"
+              data={['React', 'Angular', 'Vue', 'Svelte']}
+            />
+            <MultiSelect
+              label="Loại công trình"
+              placeholder="Chọn loại công trình"
+              data={['React', 'Angular', 'Vue', 'Svelte']}
+            />
+            <MultiSelect
+              label="Hướng"
+              placeholder="Chọn hướng"
+              data={['React', 'Angular', 'Vue', 'Svelte']}
+            />
+          </div>
 
-  {/* Phần Số lượng tầng, Phòng ngủ, Phòng tắm */}
-  <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
-    <div>
-      <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>Số lượng tầng</label>
-      <div style={{ display: "flex", gap: "10px" }}>
-        {[1, 2, 3, 4].map((num) => (
-          <button
-            key={num}
-            style={{
-              width: "40px", // Chiều rộng
-              height: "40px", // Chiều cao
-              border: "1px solid #762f0b", // Màu viền
-              borderRadius: "50%", // Làm cho nút tròn
-              cursor: "pointer",
-              backgroundColor: "#fff",
-              color: "#762f0b", // Màu chữ
-              display: "flex",
-              alignItems: "center", // Canh giữa
-              justifyContent: "center", // Canh giữa
-              fontWeight: "bold", // Để chữ đậm
-            }}
-          >
-            {num}
-          </button>
-        ))}
-      </div>
-    </div>
-
-    <div>
-      <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>Phòng ngủ</label>
-      <div style={{ display: "flex", gap: "10px" }}>
-        {[1, 2, 3, 4].map((num) => (
-          <button
-            key={num}
-            style={{
-              width: "40px",
-              height: "40px",
-              border: "1px solid #762f0b", // Màu viền
-              borderRadius: "50%",
-              cursor: "pointer",
-              backgroundColor: "#fff",
-              color: "#762f0b", // Màu chữ
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-            }}
-          >
-            {num}
-          </button>
-        ))}
-      </div>
-    </div>
-
-    <div>
-      <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>Phòng tắm</label>
-      <div style={{ display: "flex", gap: "10px" }}>
-        {[1, 2, 3, 4].map((num) => (
-          <button
-            key={num}
-            style={{
-              width: "40px",
-              height: "40px",
-              border: "1px solid #762f0b", // Màu viền
-              borderRadius: "50%",
-              cursor: "pointer",
-              backgroundColor: "#fff",
-              color: "#762f0b", // Màu chữ
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-            }}
-          >
-            {num}
-          </button>
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
+          {/* Số lượng tầng, Phòng ngủ, Phòng tắm */}
+          <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+            {["Số lượng tầng", "Phòng ngủ", "Phòng tắm"].map((label, idx) => (
+              <div key={idx}>
+                <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>{label}</label>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[1, 2, 3, 4].map((num) => (
+                    <button
+                      key={num}
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        border: "1px solid #762f0b",
+                        borderRadius: "50%",
+                        cursor: "pointer",
+                        backgroundColor: "#fff",
+                        color: "#762f0b",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* --- Nội dung chính --- */}
       <div style={{ flex: 1, padding: 20 }}>
-        {/* --- Bộ lọc: icon + search + trạng thái --- */}
-        <div >
+        {/* Header: icon filter + search + trạng thái */}
+        <div>
           <Group gap="md">
             <ActionIcon
               variant="outline"
@@ -201,7 +163,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
                 root: { borderColor: "#762f0b", color: "#762f0b" },
                 icon: { color: "#762f0b" },
               }}
-              onClick={() => setShowFilterSidebar((prev) => !prev)} // toggle sidebar
+              onClick={() => setShowFilterSidebar(prev => !prev)}
             >
               <IconFilter2 size={20} />
             </ActionIcon>
@@ -221,41 +183,48 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
           </Group>
         </div>
 
-        {/* --- Danh sách card --- */}
+        {/* Danh sách card */}
         <div className={styles.container}>
-      <SimpleGrid
-  cols={{
-    base: 1,
-    sm: 2,
-    md: 3,
-    lg: 4,
-    xl: showFilterSidebar ? 4 : 5, // Nếu sidebar mở, giảm từ 5 xuống 4
-  }}
-  spacing="xl"
->
-  {items.map((item) => (
-    <Card
-      key={item.id}
-      shadow="md"
-      radius="lg"
-      className={styles.card}
-      style={{ cursor: "pointer" }}
-      onClick={() => setSelectedItem(item)}
-    >
-      <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
-        {item.unit_code}
-      </Text>
-      <Text style={{ fontSize: "13px" }}>Phân khu: {item.layer6}</Text>
-      <Text style={{ fontSize: "13px" }}>Loại công trình: {item.layer3}</Text>
-      <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
-      <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
-      <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
-      <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
-    </Card>
-  ))}
-</SimpleGrid>
+          <SimpleGrid
+            cols={{ base: 1, sm: 2, md: 3, lg: 4, xl: showFilterSidebar ? 4 : 5 }}
+            spacing="xl"
+          >
+            {currentItems.map((item) => (
+              <Card
+                key={item.id}
+                shadow="md"
+                radius="lg"
+                className={styles.card}
+                style={{ cursor: "pointer" }}
+                onClick={() => setSelectedItem(item)}
+              >
+                <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
+                  {item.unit_code}
+                </Text>
+                <Text style={{ fontSize: "13px" }}>Phân khu: {item.layer6}</Text>
+                <Text style={{ fontSize: "13px" }}>Loại công trình: {item.layer3}</Text>
+                <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
+                <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
+                <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
+                <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
+              </Card>
+            ))}
+          </SimpleGrid>
         </div>
+
+        {/* --- Ant Design Pagination --- */}
+      <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#fff', padding: '10px 0', zIndex: 10, display: 'flex', justifyContent: 'flex-end' }}>
+  <Pagination
+    current={currentPage}
+    pageSize={itemsPerPage}
+    total={items.length}
+    onChange={(page) => setCurrentPage(page)}
+    showSizeChanger={false}
+    // showQuickJumper
+  />
+</div>
       </div>
     </div>
   );
 }
+
