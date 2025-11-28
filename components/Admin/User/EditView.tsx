@@ -5,7 +5,8 @@ import {
   Button,
   Group,
   LoadingOverlay,
-  MultiSelect,
+
+  Select,
   Switch,
   TextInput,
 } from "@mantine/core";
@@ -41,8 +42,8 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     initialValues: {
       email: "",
       is_active: false,
-      is_superuser: false,
-      // system_id: [],
+      // is_superuser: false,
+      system_id:"",
       // introducer_id: "",
     },
   });
@@ -93,9 +94,9 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
       formRef.current.setValues({
         email: userData.email || "",
-        // system_id: userData.system_id ? [userData.system_id] : [],
+        system_id: userData.system_id ||"",
         is_active: userData.is_active || false,
-        is_superuser: userData.is_superuser || false,
+        // is_superuser: userData.is_superuser || false,
         // introducer_id: userData.introducer_id || "",
       });
 
@@ -155,19 +156,14 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         mt="md"
         {...form.getInputProps("email")}
       />
-
-      <MultiSelect
-        label="Vai trò"
-        placeholder="Chọn vai trò"
-        data={provinceOptions}
-        mt="md"
-        // value={form.values.system_id}
-        onChange={(value) => {
-          const limited = value.slice(-1);
-          // setSelectedProvince(limited[0] || null);
-          form.setFieldValue("system_id", limited);
-        }}
-      />
+<Select
+  label="Vai trò"
+  placeholder="Chọn vai trò"
+  data={provinceOptions}
+  mt="md"
+  value={form.values.system_id} // string
+  onChange={(value) => form.setFieldValue("system_id", value || "")} // string
+/>
 
       <TextInput
         label="Người giới thiệu"
@@ -182,11 +178,11 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         {...form.getInputProps("is_active", { type: "checkbox" })}
       />
 
-      <Switch
+      {/* <Switch
         label="Quyền quản trị"
         mt="md"
         {...form.getInputProps("is_superuser", { type: "checkbox" })}
-      />
+      /> */}
 
       <Group justify="flex-end" mt="lg">
         <Button

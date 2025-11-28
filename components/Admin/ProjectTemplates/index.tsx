@@ -16,8 +16,8 @@ import DeleteView from "./DeleteView";
 
 interface DataType {
   id: string; // ✅ thêm id để dùng cho chỉnh sửa
-  template_vi:string;
-  project_label:string;
+ type_vi:string;
+  type_en:string;
   
 }
 
@@ -79,10 +79,10 @@ export default function LargeFixedTable() {
 
   // ✅ Định nghĩa cột bảng
   const columns: ColumnsType<DataType> = [
-    { title: "Loai dự án", dataIndex: "template_vi", key: "template_vi", width: 30 },
+    { title: "Loai dự án", dataIndex: "type_vi", key: "type_vi", width: 30 },
   
    
-    { title: "Tên hiển thị dự án", dataIndex: "project_label", key: "project_label", width: 100 },
+    { title: "Loai dự án (Tiếng Anh)", dataIndex: "type_en", key: "type_en", width: 100 },
     {
       title: "Hành Động",
       width: 30,

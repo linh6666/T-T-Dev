@@ -3,10 +3,10 @@ import { API_ROUTE } from "../const/apiRouter"; // ✅ import đúng object ch�
 
 export interface CreateUserPayload {
   email: string;
-//  system_id: string[];
+ system_id: string;
 
   is_active: boolean;
-  is_superuser: boolean;
+  // is_superuser: boolean;
   //  area_id: string,
   
       // introducer_id: string,

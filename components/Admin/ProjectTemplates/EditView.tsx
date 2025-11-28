@@ -37,8 +37,8 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
   const form = useForm<CreateUserPayload>({
     initialValues: {
-      template_vi: "",
-      project_label: "",
+    type_vi: "",
+      type_en: "",
     
       // description_en: "",
     },
@@ -76,8 +76,8 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       const userData = response.data;
 
       formRef.current.setValues({
-        template_vi: userData.type_vi|| "",
-        project_label: userData.project_label || "",
+        type_vi: userData.type_vi|| "",
+        type_en: userData.type_en || "",
        
     
        
@@ -129,14 +129,14 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         placeholder="Nhập loại dự án"
         withAsterisk
         mt="md"
-        {...form.getInputProps("template_vi")}
+        {...form.getInputProps("type_vi")}
       />
        <TextInput
-        label="Tên hiển thị dự án"
-        placeholder="Nhập tên hiển thị dự án"
+        label="Loại dự án (Tiếng Anh)"
+        placeholder="Nhập loại dự án (Tiếng Anh)"
         withAsterisk
         mt="md"
-        {...form.getInputProps("project_label")}
+        {...form.getInputProps("type_en")}
       />
 
      
