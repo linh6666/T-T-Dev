@@ -1,16 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Group, Card, Text, SimpleGrid, Loader, ActionIcon, TextInput, MultiSelect } from "@mantine/core";
+import {
+  Group,
+  Card,
+  Text,
+  SimpleGrid,
+  Loader,
+  ActionIcon,
+  MultiSelect,
+  Autocomplete,
+} from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehouse";
 import styles from "./TotalWarehouse.module.css";
-import WarehouseDetail from "../WarehouseDetail"; 
+import WarehouseDetail from "../WarehouseDetail";
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
-import { Pagination } from 'antd';
+import { Pagination } from "antd";
 
 interface TotalWarehouseProps {
   projectId: string;
-  target?: string; 
+  target?: string;
 }
 
 export interface WarehouseItem {
@@ -31,17 +40,18 @@ export interface WarehouseItem {
 
 export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const [items, setItems] = useState<WarehouseItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null); 
+  const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
-
-  // --- Search state ---
-  const [searchText, setSearchText] = useState("");
 
   // --- Pagination ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+
+  // --- Search ---
+  const [searchText, setSearchText] = useState("");
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
 
   // --- Fetch data ---
   useEffect(() => {
@@ -55,7 +65,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
         const res = await createWarehouse(projectId, body);
         const warehouseList = Array.isArray(res) ? res : res.data || [];
         setItems(warehouseList);
-        setFilteredItems(warehouseList); // khởi tạo dữ liệu tìm kiếm
+        setFilteredItems(warehouseList); // ban đầu hiển thị toàn bộ
       } catch (error) {
         console.error("Failed to fetch warehouse data:", error);
         setItems([]);
@@ -66,28 +76,6 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     }
     fetchData();
   }, [projectId]);
-
-  // --- Hàm lọc khi nhấn icon search ---
-  const handleSearch = () => {
-    if (!searchText.trim()) {
-      setFilteredItems(items);
-      return;
-    }
-
-    const result = items.filter((item) =>
-      (
-        item.unit_code +
-        item.layer6 +
-        item.layer3 +
-        item.direction
-      )
-        .toLowerCase()
-        .includes(searchText.toLowerCase())
-    );
-
-    setFilteredItems(result);
-    setCurrentPage(1); // Reset về page 1
-  };
 
   // --- Loading ---
   if (loading) {
@@ -105,6 +93,30 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     );
   }
 
+  // --- Search handlers ---
+  const handleInputChange = (value: string) => {
+    setSearchText(value);
+
+    const suggestions = items
+      .map(
+        (item) =>
+          `${item.unit_code} ${item.layer6} ${item.layer3} `
+      )
+      .filter((text) => text.toLowerCase().includes(value.toLowerCase()));
+
+    setSearchSuggestions(suggestions);
+  };
+
+  const handleSearch = () => {
+    const filtered = items.filter((item) =>
+      `${item.unit_code} ${item.layer6} ${item.layer3} ${item.direction}`
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    );
+    setFilteredItems(filtered);
+    setCurrentPage(1); // reset page về đầu
+  };
+
   // --- Pagination calculation ---
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -112,7 +124,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
 
   return (
     <div style={{ display: "flex" }}>
-      {/* --- Sidebar bên trái --- */}
+      {/* --- Sidebar --- */}
       {showFilterSidebar && (
         <div
           style={{
@@ -123,31 +135,40 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
             width: 300,
           }}
         >
-          <h1 style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}>
+          <h1
+            style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}
+          >
             Bộ lọc sản phẩm
           </h1>
           <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
             <MultiSelect
               label="Phân Khu"
               placeholder="Chọn phân khu"
-              data={['React', 'Angular', 'Vue', 'Svelte']}
+              data={["React", "Angular", "Vue", "Svelte"]}
             />
             <MultiSelect
               label="Loại công trình"
               placeholder="Chọn loại công trình"
-              data={['React', 'Angular', 'Vue', 'Svelte']}
+              data={["React", "Angular", "Vue", "Svelte"]}
             />
             <MultiSelect
               label="Hướng"
               placeholder="Chọn hướng"
-              data={['React', 'Angular', 'Vue', 'Svelte']}
+              data={["React", "Angular", "Vue", "Svelte"]}
             />
           </div>
 
-          <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          {/* Số lượng tầng, Phòng ngủ, Phòng tắm */}
+          <div
+            style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}
+          >
             {["Số lượng tầng", "Phòng ngủ", "Phòng tắm"].map((label, idx) => (
               <div key={idx}>
-                <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>{label}</label>
+                <label
+                  style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}
+                >
+                  {label}
+                </label>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {[1, 2, 3, 4].map((num) => (
                     <button
@@ -176,9 +197,9 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
         </div>
       )}
 
-      {/* --- Nội dung chính --- */}
+      {/* --- Main content --- */}
       <div style={{ flex: 1, padding: 20 }}>
-        {/* Header */}
+        {/* Header: filter icon + search + trạng thái */}
         <div>
           <Group gap="md">
             <ActionIcon
@@ -187,42 +208,80 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
               size="lg"
               styles={{
                 root: { borderColor: "#762f0b", color: "#762f0b" },
+                icon: { color: "#762f0b" },
               }}
-              onClick={() => setShowFilterSidebar(prev => !prev)}
+              onClick={() => setShowFilterSidebar((prev) => !prev)}
             >
               <IconFilter2 size={20} />
             </ActionIcon>
 
-           <TextInput
+            {/* Autocomplete search */}
+          <Autocomplete
   placeholder="Tìm kiếm...."
   value={searchText}
-  onChange={(e) => setSearchText(e.currentTarget.value)}
+  data={searchSuggestions}
+  onChange={handleInputChange}
   onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
   }}
   leftSection={
-    <IconSearch
-      size={16}
-      color="#762f0b"
-      style={{ cursor: "pointer" }}
-      onClick={handleSearch}
-    />
+    <ActionIcon onClick={handleSearch}>
+      <IconSearch size={16} color="#762f0b" />
+    </ActionIcon>
   }
   style={{ width: 240 }}
 />
           </Group>
 
           <Group gap="sm" style={{ marginTop: 16 }}>
-            <button style={{ backgroundColor: "#c99945", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}>Quan tâm</button>
-            <button style={{ backgroundColor: "#3d6985", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}>Đang bán</button>
-            <button style={{ backgroundColor: "#e56a3e", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}>Đã đặt cọc</button>
-            <button style={{ backgroundColor: "#d73a24", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}>Đã bán</button>
+            <button
+              style={{
+                backgroundColor: "#c99945",
+                color: "#fff",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: 20,
+              }}
+            >
+              Quan tâm
+            </button>
+            <button
+              style={{
+                backgroundColor: "#3d6985",
+                color: "#fff",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: 20,
+              }}
+            >
+              Đang bán
+            </button>
+            <button
+              style={{
+                backgroundColor: "#e56a3e",
+                color: "#fff",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: 20,
+              }}
+            >
+              Đã đặt cọc
+            </button>
+            <button
+              style={{
+                backgroundColor: "#d73a24",
+                color: "#fff",
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: 20,
+              }}
+            >
+              Đã bán
+            </button>
           </Group>
         </div>
 
-        {/* Danh sách card */}
+        {/* List cards */}
         <div className={styles.container}>
           <SimpleGrid
             cols={{ base: 1, sm: 2, md: 3, lg: 4, xl: showFilterSidebar ? 4 : 5 }}
@@ -252,7 +311,17 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
         </div>
 
         {/* Pagination */}
-        <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#fff', padding: '10px 0', zIndex: 10, display: 'flex', justifyContent: 'flex-end' }}>
+        <div
+          style={{
+            position: "sticky",
+            bottom: 0,
+            backgroundColor: "#fff",
+            padding: "10px 0",
+            zIndex: 10,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
           <Pagination
             current={currentPage}
             pageSize={itemsPerPage}
