@@ -225,9 +225,14 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
     if (e.key === "Enter") handleSearch();
   }}
   leftSection={
-    <ActionIcon onClick={handleSearch}>
-      <IconSearch size={16} color="#762f0b" />
-    </ActionIcon>
+
+      <IconSearch
+  onClick={handleSearch}
+  size={16}
+  color="#762f0b"
+  style={{ cursor: "pointer" }}
+/>
+    
   }
   style={{ width: 240 }}
 />
