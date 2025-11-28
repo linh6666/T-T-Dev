@@ -7,7 +7,6 @@ import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail"; 
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
 import { Pagination } from 'antd';
-// import 'antd/dist/reset.css';
 
 interface TotalWarehouseProps {
   projectId: string;
@@ -32,11 +31,15 @@ export interface WarehouseItem {
 
 export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const [items, setItems] = useState<WarehouseItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null); 
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
 
-  // --- Pagination state ---
+  // --- Search state ---
+  const [searchText, setSearchText] = useState("");
+
+  // --- Pagination ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -52,15 +55,39 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
         const res = await createWarehouse(projectId, body);
         const warehouseList = Array.isArray(res) ? res : res.data || [];
         setItems(warehouseList);
+        setFilteredItems(warehouseList); // khởi tạo dữ liệu tìm kiếm
       } catch (error) {
         console.error("Failed to fetch warehouse data:", error);
         setItems([]);
+        setFilteredItems([]);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
   }, [projectId]);
+
+  // --- Hàm lọc khi nhấn icon search ---
+  const handleSearch = () => {
+    if (!searchText.trim()) {
+      setFilteredItems(items);
+      return;
+    }
+
+    const result = items.filter((item) =>
+      (
+        item.unit_code +
+        item.layer6 +
+        item.layer3 +
+        item.direction
+      )
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    );
+
+    setFilteredItems(result);
+    setCurrentPage(1); // Reset về page 1
+  };
 
   // --- Loading ---
   if (loading) {
@@ -81,7 +108,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   // --- Pagination calculation ---
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div style={{ display: "flex" }}>
@@ -117,7 +144,6 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
             />
           </div>
 
-          {/* Số lượng tầng, Phòng ngủ, Phòng tắm */}
           <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
             {["Số lượng tầng", "Phòng ngủ", "Phòng tắm"].map((label, idx) => (
               <div key={idx}>
@@ -152,7 +178,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
 
       {/* --- Nội dung chính --- */}
       <div style={{ flex: 1, padding: 20 }}>
-        {/* Header: icon filter + search + trạng thái */}
+        {/* Header */}
         <div>
           <Group gap="md">
             <ActionIcon
@@ -161,18 +187,31 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
               size="lg"
               styles={{
                 root: { borderColor: "#762f0b", color: "#762f0b" },
-                icon: { color: "#762f0b" },
               }}
               onClick={() => setShowFilterSidebar(prev => !prev)}
             >
               <IconFilter2 size={20} />
             </ActionIcon>
 
-            <TextInput
-              placeholder="Tìm kiếm...."
-              leftSection={<IconSearch size={16} color="#762f0b" />}
-              style={{ width: 240 }}
-            />
+           <TextInput
+  placeholder="Tìm kiếm...."
+  value={searchText}
+  onChange={(e) => setSearchText(e.currentTarget.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  }}
+  leftSection={
+    <IconSearch
+      size={16}
+      color="#762f0b"
+      style={{ cursor: "pointer" }}
+      onClick={handleSearch}
+    />
+  }
+  style={{ width: 240 }}
+/>
           </Group>
 
           <Group gap="sm" style={{ marginTop: 16 }}>
@@ -212,19 +251,17 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
           </SimpleGrid>
         </div>
 
-        {/* --- Ant Design Pagination --- */}
-      <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#fff', padding: '10px 0', zIndex: 10, display: 'flex', justifyContent: 'flex-end' }}>
-  <Pagination
-    current={currentPage}
-    pageSize={itemsPerPage}
-    total={items.length}
-    onChange={(page) => setCurrentPage(page)}
-    showSizeChanger={false}
-    // showQuickJumper
-  />
-</div>
+        {/* Pagination */}
+        <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#fff', padding: '10px 0', zIndex: 10, display: 'flex', justifyContent: 'flex-end' }}>
+          <Pagination
+            current={currentPage}
+            pageSize={itemsPerPage}
+            total={filteredItems.length}
+            onChange={(page) => setCurrentPage(page)}
+            showSizeChanger={false}
+          />
+        </div>
       </div>
     </div>
   );
 }
-
