@@ -1,7 +1,9 @@
 "use client";
+import { Button, Group } from "@mantine/core";
 import styles from "./App.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 interface WarehouseDetailProps {
   projectId: string;
@@ -42,7 +44,9 @@ export default function Totalarea({
     router.push(`/quan-ly-ban-hang/Kho-hang/${projectId}?target=${encodeURIComponent(target)}`);
   };
 
-
+const handleBack = () => {
+  router.push("/quan-ly-ban-hang");
+};
 
   return (
     <div className={styles.container}>
@@ -248,6 +252,30 @@ export default function Totalarea({
       ) : (
         <p>Chưa có hình ảnh dự án</p>
       )}
+  <div className={styles.footer}>
+        <Group gap="xs"justify="flex-end">
+          <Button
+            onClick={handleBack}
+            variant="filled"
+            style={{
+              width: 30,
+              height: 30,
+              padding: 0,
+              borderRadius: 40,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              transition: "background 0.3s",
+              background: "#FFFAEE",
+              color: "#752E0B",
+              border: "1.5px solid #752E0B",
+            }}
+          >
+            <IconArrowLeft size={18} color="#752E0B" />
+          </Button>
+        </Group>
+      </div>
     </div>
   );
 }
