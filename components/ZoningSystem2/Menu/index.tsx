@@ -5,7 +5,7 @@ import styles from "./Menu.module.css";
 import { Button, Group, Image, Stack, Loader, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { createNodeAttribute } from "../../../api/apifilter";
+import { createNodeAttribute } from "../../../api/apifilter2";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface MenuProps {
@@ -40,7 +40,7 @@ export default function Menu({ project_id }: MenuProps) {
       try {
         const body = {
           project_id,
-          filters: [{ label: "group", values: ["ct"] }],
+          filters: [{ lable: "group", values: ["ct"] }],
         };
 
         const data: ApiResponse = await createNodeAttribute(body);
@@ -53,7 +53,7 @@ export default function Menu({ project_id }: MenuProps) {
         if (data?.data && Array.isArray(data.data)) {
           const allPhases: string[] = data.data.flatMap(
             (item: NodeAttributeItem) =>
-              String(item.phase_vi || "")
+              String(item.layer5 || "")
                 .split(";")
                 .map((z) => z.trim())
                 .filter(Boolean)
