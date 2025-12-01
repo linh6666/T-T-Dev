@@ -3,7 +3,7 @@
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
-import ControlAbout from "../../../../components/Control";
+import ControlAbout from "../../../../components/Control2";
 
 export default function InteractiveClient() {
   // Lấy project_id từ URL query (?id=...)
