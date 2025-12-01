@@ -105,10 +105,10 @@ export default function Menu({ project_id }: MenuProps) {
     fetchData();
   }, [project_id]);
 
-  const handleNavigate = (phase: string) => {
-    if (!project_id) return;
-    router.push(`/Tuong-tac/Millennia-City/Mau-cong-trinh?id=${project_id}&phase=${encodeURIComponent(phase)}`);
-  };
+const handleNavigate = (layer5: string) => {
+  if (!project_id) return;
+  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(layer5)}`);
+};
 
   const handleBack = () => {
     if (!project_id) return;
