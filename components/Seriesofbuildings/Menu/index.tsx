@@ -123,11 +123,10 @@ export default function Menu({
   };
 
   // ⏪ Quay lại
-  const handleBack = () => {
-    if (!project_id) return;
-    router.push(`/Tuong-tac/Ca-mau/Phan-khu?id=${project_id}`);
-  };
-
+const handleBack = () => {
+  if (!project_id || !phase) return;
+  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(phase)}`);
+};
   // 🔆 ON / OFF
   const handleClickOn = async () => {
     if (!project_id) return;
