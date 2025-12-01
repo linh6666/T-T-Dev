@@ -13,6 +13,7 @@ import { createOFF } from "../../../api/apiOFF";
 interface MenuProps {
   project_id: string | null;
   initialPhase?: string | null;
+   initialLayer4?: string | null; 
   onPhaseChange?: (phases: string) => void;
 }
 
@@ -23,7 +24,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  layer4?: string;
+  layer3?: string;
   group?: string;
   [key: string]: unknown;
 }
@@ -31,15 +32,18 @@ interface NodeAttributeItem {
 export default function Menu({
   project_id,
   initialPhase,
+  initialLayer4,
   onPhaseChange,
 }: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phaseValue = searchParams.get("layer5") || initialPhase;
+   const valuelayer4 = searchParams.get("layer4") || initialLayer4 ||"";
 
   // ⚙️ State
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
+    const [layer4, setlayer4] = useState<string>(valuelayer4 || "");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null);
@@ -47,9 +51,10 @@ export default function Menu({
   useEffect(() => {
     if (phaseValue && phaseValue !== phase) {
       setPhase(phaseValue);
+      setlayer4(valuelayer4);
       onPhaseChange?.(phaseValue);
     }
-  }, [phaseValue, phase, onPhaseChange]);
+  }, [phaseValue, phase, onPhaseChange,valuelayer4]);
 
   // 📡 Gọi API danh sách nhà
   const fetchData = useCallback(async () => {
@@ -61,6 +66,7 @@ export default function Menu({
         filters: [
           { lable: "group", values: ["ct"] },
           { lable: "layer5", values: [phase] },
+           { lable: "layer4", values: [layer4] },
         ],
       });
 
@@ -68,7 +74,7 @@ export default function Menu({
         const uniqueMap = new Map<string, MenuItem>();
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const layer4 = item.layer4 || "";
+          const layer4 = item.layer3 || "";
           const groupValue = item.group;
 
           // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
@@ -180,7 +186,7 @@ export default function Menu({
 
       {/* Tiêu đề */}
       <div className={styles.title}>
-        <h1>{phase?.toUpperCase()}</h1>
+        <h1>{layer4?.toUpperCase()}</h1>
       </div>
 
       {/* Danh sách menu */}
