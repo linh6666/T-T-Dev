@@ -15,6 +15,8 @@ interface MenuProps {
   initialPhase?: string | null;
    initialLayer4?: string | null; 
    initialLayer3?: string | null; 
+       onModelsLoaded?: (models: string[]) => void;
+  onSelectModel?: (modelName: string) => void;
   onPhaseChange?: (phases: string) => void;
 }
 
@@ -39,6 +41,8 @@ export default function Menu({
   initialPhase,
   initialLayer4,
     initialLayer3,
+        onModelsLoaded,
+  // onSelectModel,
   onPhaseChange,
 }: MenuProps) {
   const router = useRouter();
@@ -82,6 +86,10 @@ export default function Menu({
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
         const uniqueMap = new Map<string, MenuItem>();
+                  onModelsLoaded?.(
+          data.data.map((i: NodeAttributeItem) => i.layer4)
+        );
+
 
         data.data.forEach((item: NodeAttributeItem) => {
           const layer2 = item.layer2 || "";
@@ -119,7 +127,7 @@ export default function Menu({
     } finally {
       setLoading(false);
     }
-  }, [project_id, phase]);
+  }, [project_id, phase,onModelsLoaded]);
 
   useEffect(() => {
     fetchData();
