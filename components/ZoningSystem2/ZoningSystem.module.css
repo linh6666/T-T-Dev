@@ -12,38 +12,32 @@
 
 /* Wrapper để đặt SVG lên ảnh */
 .imageWrapper {
-  position: relative; /* ✅ để SVG có thể đặt lên ảnh */
+  position: relative; /* Để SVG có thể đặt lên ảnh */
   width: 100%;
 }
 
 /* Ảnh full kích thước */
 .img {
   width: 100%;
-  height: auto; /* Để đảm bảo ảnh giữ tỷ lệ */
-  object-fit: cover; 
+  height: auto; /* Có thể thay đổi thành height: 100% nếu cần */
+  object-fit: cover;
   display: block;
-}
-.imageWrapper svg {
-  position: absolute;
-  z-index: 10; /* đảm bảo SVG nằm trên ảnh */
-  pointer-events: all; /* cho phép path nhận hover */
+  z-index: 1; /* Đảm bảo ảnh nằm dưới SVG */
 }
 
+/* SVG overlay */
 .overlaySvg {
-  position: absolute;
-  top: 1%;
-  left: 6%;
-  pointer-events: auto; /* Đảm bảo SVG nhận sự kiện hover */
+  position: absolute; /* Để đặt SVG ở vị trí chính xác */
+  /* top: 20px; 
+  left: 20px;  */
+  z-index: 2; /* Đặt SVG lên trên ảnh */
+  pointer-events: none; /* Ngăn chặn sự kiện chuột trên SVG nếu không cần thiết */
 }
-
-/* .overlaySvg:hover path {
-  fill: black; 
-} */
 
 /* Cột phải (text) */
 .right {
-  width: 240px;     
-  background-color: #FFFAEE;
+  width: 240px;
+  background-color: #fffaee;
   justify-content: center;
   color: #762f0b;
   font-size: 18px;
@@ -72,14 +66,14 @@
   }
 
   .img {
-    height: 100%; /* Đảm bảo ảnh chiếm đầy không gian */
+    height: 100%;
   }
 
   .overlaySvg {
     top: 10px;
     left: 10px;
-    width: 40px;
-    height: 40px;
+    width: 40px; /* Kích thước SVG */
+    height: 40px; /* Kích thước SVG */
   }
 }
 
@@ -97,22 +91,7 @@
   .overlaySvg {
     top: 5px;
     left: 5px;
-    width: 30px;
-    height: 30px;
+    width: 30px; /* Kích thước SVG */
+    height: 30px; /* Kích thước SVG */
   }
 }
-.hoverablePath1,
-.hoverablePath2,
-.hoverablePath3,
-.hoverablePath4 {
-  pointer-events: all;
-  cursor: pointer;
-  transition: fill 0.3s;
-}
-
-/* .hoverablePath1:hover,
-.hoverablePath2:hover,
-.hoverablePath3:hover,
-.hoverablePath4:hover {
-  fill: rgba(243, 232, 190, 0.7);
-} */
