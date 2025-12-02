@@ -57,7 +57,7 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
          onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
+          data.data.map((i: NodeAttributeItem) => i.layer3)
         );
         const uniqueMap = new Map<string, MenuItem>();
 
