@@ -5,7 +5,7 @@ import styles from "./Menu.module.css";
 import { Button, Group, Image, Loader, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { createNodeAttribute } from "../../../api/apifiterutilities";
+import { createNodeAttribute } from "../../../api/apifiterutilities2";
 
 interface MenuProps {
   project_id: string | null;
@@ -17,7 +17,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  building_type_vi?: string;
+  layer6?: string;
   [key: string]: unknown;
 }
 
@@ -34,7 +34,7 @@ useEffect(() => {
     try {
       const body = {
         project_id,
-        filters: [{ label: "group", values: ["ti"] }],
+        filters: [{ lable: "group", values: ["ti"] }],
       };
 
       const data = await createNodeAttribute(body);
@@ -47,22 +47,23 @@ useEffect(() => {
 
         const allZones: string[] = data.data
           .flatMap((item: NodeAttributeItem) =>
-            String(item.building_type_vi || "")
+            String(item.layer4 || "")
               .split(";")
               .map((z) => z.trim())
               .filter(Boolean)
+              .filter(z => z !== "skip") // ✅ bỏ qua "skip"
           );
 
         const uniqueZones = Array.from(new Set(allZones));
 
-        // --- Sắp xếp fix cứng ---
+
         const fixedOrder = [
           "Trung tâm thương mại",
-          "Trường học",
-          "Giao thông",
-          "Thể dục thể thao",
-          "Hạ tầng kỹ thuật",
-          "Đài phun nước",
+          // "Trường học",
+          // "Giao thông",
+          // "Thể dục thể thao",
+          // "Hạ tầng kỹ thuật",
+          // "Đài phun nước",
         ];
 
         const sortedZones = fixedOrder.filter((z) => uniqueZones.includes(z));

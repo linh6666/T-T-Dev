@@ -14,6 +14,7 @@ interface MenuProps {
   project_id: string | null;
   initialPhase?: string | null;
    initialLayer4?: string | null; 
+   initialLayer3?: string | null; 
   onPhaseChange?: (phases: string) => void;
 }
 
@@ -22,9 +23,12 @@ interface MenuItem {
   layer5: string;
   layer4: string;
  layer3: string;
+  layer2: string;
+
 }
 
 interface NodeAttributeItem {
+    layer2?: string;
   layer3?: string;
   group?: string;
   [key: string]: unknown;
@@ -34,17 +38,20 @@ export default function Menu({
   project_id,
   initialPhase,
   initialLayer4,
+    initialLayer3,
   onPhaseChange,
 }: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phaseValue = searchParams.get("layer5") || initialPhase;
    const valuelayer4 = searchParams.get("layer4") || initialLayer4 ||"";
+    const valuelayer3 = searchParams.get("layer3") || initialLayer3 ||"";
 
   // ⚙️ State
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
     const [layer4, setlayer4] = useState<string>(valuelayer4 || "");
+        const [layer3, setlayer3] = useState<string>(valuelayer3 || "");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null);
@@ -53,6 +60,7 @@ export default function Menu({
     if (phaseValue && phaseValue !== phase) {
       setPhase(phaseValue);
       setlayer4(valuelayer4);
+      setlayer3(valuelayer3);
       onPhaseChange?.(phaseValue);
     }
   }, [phaseValue, phase, onPhaseChange,valuelayer4]);
@@ -68,6 +76,7 @@ export default function Menu({
           { lable: "group", values: ["ct"] },
           { lable: "layer5", values: [phase] },
            { lable: "layer4", values: [layer4] },
+           { lable: "layer3", values: [layer3] },
         ],
       });
 
@@ -75,7 +84,7 @@ export default function Menu({
         const uniqueMap = new Map<string, MenuItem>();
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const layer3 = item.layer3 || "";
+          const layer2 = item.layer2 || "";
           const groupValue = item.group;
 
           // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
@@ -94,6 +103,8 @@ export default function Menu({
               layer5: phase,
               layer4: layer4,
                layer3: layer3,
+                layer2: layer2,
+              
             });
           }
         });
@@ -114,20 +125,10 @@ export default function Menu({
     fetchData();
   }, [fetchData]);
 
-  // 🧭 Điều hướng
-  const handleNavigate = (layer5: string, layer4: string,layer3: string,) => {
-    if (!project_id) return;
-    router.push(
-      `/Tuong-tac/Ca-mau/Cong-trinh?id=${project_id}&layer5=${encodeURIComponent(
-        layer5
-      )}&layer4=${encodeURIComponent(layer4)}&layer3=${encodeURIComponent(layer3)}`
-    );
-  };
 
-  // ⏪ Quay lại
 const handleBack = () => {
   if (!project_id || !phase) return;
-  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(phase)}`);
+  router.push(`/Tuong-tac/Ca-mau/Day-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(phase)}&layer4=${encodeURIComponent(layer4)}`);
 };
   // 🔆 ON / OFF
   const handleClickOn = async () => {
@@ -187,7 +188,7 @@ const handleBack = () => {
 
       {/* Tiêu đề */}
       <div className={styles.title}>
-        <h1>{layer4?.toUpperCase()}</h1>
+        <h1>{layer3?.toUpperCase()}</h1>
       </div>
 
       {/* Danh sách menu */}
@@ -200,7 +201,7 @@ const handleBack = () => {
               <Button
                 key={index}
                 className={styles.menuBtn}
-                onClick={() => handleNavigate(item.layer5, item.layer4, item.layer3)}
+                // onClick={() => handleNavigate(item.layer5, item.layer4, item.layer3)}
                 variant="filled"
                 color="orange"
                 style={{
