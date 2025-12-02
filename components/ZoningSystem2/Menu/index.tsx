@@ -5,7 +5,7 @@ import styles from "./Menu.module.css";
 import { Button, Group, Image, Stack, Loader, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { createNodeAttribute } from "../../../api/apifilter2";
+import { createNodeAttribute } from "../../../api/apifilter";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface MenuProps {
@@ -40,7 +40,7 @@ export default function Menu({ project_id }: MenuProps) {
       try {
         const body = {
           project_id,
-          filters: [{ lable: "group", values: ["ct"] }],
+          filters: [{ label: "layer6", values: ["ct"] }],
         };
 
         const data: ApiResponse = await createNodeAttribute(body);

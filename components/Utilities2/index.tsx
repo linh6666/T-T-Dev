@@ -14,30 +14,45 @@ interface ZoningSystemProps {
 
 export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const [activeModels, setActiveModels] = useState<string[]>([]);
-        const filteredPaths = useMemo(() => {
-           if (!activeModels || activeModels.length === 0) return [];
-    
-     const result = pathsData.map((item: SvgItem) => {
-          const parser = new DOMParser();
-          const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
-    
-          Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
-            const elPrefix = el.id?.split(".").slice(0, 2).join(".");
-            if (!elPrefix || !activeModels.includes(elPrefix)) {
-              el.setAttribute("style", "display:none");
-            } else {
-              el.removeAttribute("style");
-            }
-          });
-    
-          return {
-            ...item,
-            svg: svgDoc.documentElement.outerHTML,
-          };
-        });
-    
-        return result;
-      }, [activeModels]);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+   
+   const filteredPaths = useMemo(() => {
+            if (!activeModels || activeModels.length === 0) return [];
+        
+            const result = pathsData.map((item: SvgItem) => {
+              const parser = new DOMParser();
+              const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
+        
+              // Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
+              //   const elPrefix = el.id?.split(".").slice(0, 2).join(".");
+              //   if (!elPrefix || !activeModels.includes(elPrefix)) {
+              //     el.setAttribute("style", "display:none");
+              //   } else {
+              //     el.removeAttribute("style");
+              //     if (selectedModel && elPrefix === selectedModel) {
+              //       el.setAttribute("fill", "#bb8d38");
+              //       el.setAttribute("stroke", "white");
+              //     }
+              //   }
+              // });
+        
+              return {
+                ...item,
+                svg: svgDoc.documentElement.outerHTML,
+              };
+            });
+        
+            return result;
+          }, [activeModels, selectedModel]);
+
+
+          
+                const handleModelSelect = (modelName: string) => {
+    setSelectedModel((prev) => (prev === modelName ? null : modelName));
+
+    // Zoom vào vùng SVG tương ứng (giả sử có id là modelName)
+ 
+  };
   return (
     <div className={styles.box}>
       <div className={styles.left}>
@@ -50,7 +65,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
         >
           <TransformComponent>
         <div className={styles.imageWrapper}>
-          <Image src="/image/ca-mau.jpg" alt="Ảnh" className={styles.img} />
+          <Image src="/image/Home_ca_mau.png" alt="Ảnh" className={styles.img} />
 
        {filteredPaths.length > 0 ? (
                 filteredPaths.map((item) => (
@@ -75,6 +90,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
       <div className={styles.right}>
         {/* 👇 Truyền project_id sang Menu */}
         <Menu project_id={project_id} 
+          onSelectModel={handleModelSelect} 
            onModelsLoaded={setActiveModels}
         />
       </div>

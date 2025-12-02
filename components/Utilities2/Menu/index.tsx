@@ -5,11 +5,12 @@ import styles from "./Menu.module.css";
 import { Button, Group, Image, Loader, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { createNodeAttribute } from "../../../api/apifiterutilities2";
+import { createNodeAttribute } from "../../../api/apifiterutilities";
 
 interface MenuProps {
   project_id: string | null;
   onModelsLoaded?: (models: string[]) => void;
+    onSelectModel?: (modelName: string) => void;
 }
 
 interface MenuItem {
@@ -34,7 +35,7 @@ useEffect(() => {
     try {
       const body = {
         project_id,
-        filters: [{ lable: "group", values: ["ti"] }],
+        filters: [{ label: "layer6", values: ["ti"] }],
       };
 
       const data = await createNodeAttribute(body);

@@ -5,7 +5,7 @@ import styles from "./Menu.module.css";
 import { Button, Group, Image, Loader, Stack, Text } from "@mantine/core";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { createNodeAttribute } from "../../../api/apifilter2";
+import { createNodeAttribute } from "../../../api/apifilter";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
 // import Function from "./Function";
@@ -69,9 +69,9 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { lable: "group", values: ["ct"] },
-          { lable: "layer5", values: [phase] },
-           { lable: "layer4", values: [layer4] },
+          { label: "layer6", values: ["ct"] },
+          { label: "layer5", values: [phase] },
+           { label: "layer4", values: [layer4] },
         ],
       });
 
@@ -82,22 +82,23 @@ export default function Menu({
         );
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const layer3 = item.layer3 || "";
+          const layer3 = item.layer3
+ || "";
           const groupValue = item.group;
 
           // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
-          if (layer4.toLowerCase() === "skip") {
+          if (layer3.toLowerCase() === "skip") {
             return; 
           }
 
           if (
-            layer4.trim() &&
-            !layer4.includes(";") &&
+            layer3.trim() &&
+            !layer3.includes(";") &&
             groupValue !== "ct;ti" &&
-            !uniqueMap.has(layer4)
+            !uniqueMap.has(layer3)
           ) {
-            uniqueMap.set(layer4, {
-              label: layer4,
+            uniqueMap.set(layer3, {
+              label: layer3,
               layer5: phase,
               layer4: layer4,
                layer3: layer3,

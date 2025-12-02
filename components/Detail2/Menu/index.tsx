@@ -5,7 +5,7 @@ import styles from "./Menu.module.css";
 import { Button, Group, Image, Loader, Stack, Text } from "@mantine/core";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { createNodeAttribute } from "../../../api/apifilter2";
+import { createNodeAttribute } from "../../../api/apifilter";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
 // import Function from "./Function";
@@ -63,8 +63,8 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { lable: "group", values: ["ct"] },
-          { lable: "layer5", values: [phase] },
+          { label: "layer6", values: ["ct"] },
+          { label: "layer5", values: [phase] },
         ],
       });
 
