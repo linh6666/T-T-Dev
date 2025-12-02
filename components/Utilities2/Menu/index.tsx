@@ -87,10 +87,10 @@ useEffect(() => {
 }, [project_id, onModelsLoaded]);
 
 
-  const handleNavigate = (building_type_vi: string) => {
+  const handleNavigate = (layer4: string) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Ca-mau/Chi-tiet-tien-ich?id=${project_id}&building_type_vi=${encodeURIComponent(building_type_vi)}`
+      `/Tuong-tac/Ca-mau/Chi-tiet-tien-ich?id=${project_id}&layer4=${encodeURIComponent(layer4)}`
     );
   };
 
