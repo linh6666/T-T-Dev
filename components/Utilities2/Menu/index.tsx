@@ -43,7 +43,7 @@ useEffect(() => {
       if (data?.data && Array.isArray(data.data)) {
         // ✅ Gọi callback khi models đã load xong
         onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
+          data.data.map((i: NodeAttributeItem) => i.layer4)
         );
 
         const allZones: string[] = data.data
