@@ -87,7 +87,7 @@ export default function Menu({
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
         const uniqueMap = new Map<string, MenuItem>();
                   onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.layer4)
+          data.data.map((i: NodeAttributeItem) => i.layer2)
         );
 
 
@@ -132,6 +132,28 @@ export default function Menu({
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+  // 🔹 Xử lý khi nhấn 1 nút menu
+const handleMenuClick = async (layer2: string) => {
+    if (!project_id || !valuelayer3) return;
+
+    try {
+      const data = await createNodeAttribute({
+        project_id,
+       filters: [
+          { label: "layer6", values: ["ct"] },
+          { label: "layer5", values: [phase] },
+           { label: "layer4", values: [layer4] },
+           { label: "layer3", values: [layer3] },
+            { label: "layer2", values: [layer2] },
+        ],
+      });
+
+      console.log("✅ API trả về cho",layer2 , data);
+    } catch (error) {
+      console.error("❌ Lỗi khi gọi API:", error);
+    }
+  };
+
 
 
 const handleBack = () => {
@@ -209,6 +231,9 @@ const handleBack = () => {
               <Button
                 key={index}
                 className={styles.menuBtn}
+                   onClick={() => {handleMenuClick(item.label);
+                
+                }}
                 // onClick={() => handleNavigate(item.layer5, item.layer4, item.layer3)}
                 variant="filled"
                 color="orange"
