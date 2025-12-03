@@ -14,7 +14,7 @@
 }
 
 .registerPage .container .topNavBar .navBarContainer {
-  display: flex !important;
+  /* display: flex !important; */
   align-items: center;
   min-height: 53px;
   padding: 10px;
@@ -180,4 +180,20 @@
   background-color: var(--clr-bright-primary);
   border-radius: 50%;
   color: white;
+}
+.navBarSubtitle {
+  font-size: 14px;
+  color: #666666; /* chữ màu xám nhạt */
+  margin-top: 4px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.navBarLink {
+  color: #ff4d4f; /* màu đỏ cho link */
+  text-decoration: none;
+}
+
+.navBarLink:hover {
+  text-decoration: underline;
 }

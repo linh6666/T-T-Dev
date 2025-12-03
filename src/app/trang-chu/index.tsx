@@ -3,8 +3,8 @@ import { Loader } from "@mantine/core";
 import { Suspense } from "react";
 // import Home from "../../../feature/index";
 // import PageAbout from "../../../components/PegaAbout";
-import PageInteract from "../../../components/Interact";
-
+// import PageInteract from "../../../components/Interact";
+import PageLogin from "../../../components/Login";
 
 const HomePage = () => {
   return (
@@ -26,7 +26,8 @@ const HomePage = () => {
         }
       >
           {/* <PageAbout /> */}
-           <PageInteract/>
+           {/* <PageInteract/> */}
+             <PageLogin />
          {/* <Home />  */}
       </Suspense>
     </div>
