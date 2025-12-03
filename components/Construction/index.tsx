@@ -7,9 +7,8 @@ import Menu from "./Menu/index";
 import {
   TransformWrapper,
   TransformComponent,
-  ReactZoomPanPinchRef,
+  ReactZoomPanPinchContentRef,
 } from "react-zoom-pan-pinch";
-import { useSearchParams } from "next/navigation";
 import { pathsData, SvgItem } from "./Data";
 
 interface ZoningSystemProps {
@@ -20,52 +19,34 @@ interface ZoningSystemProps {
 }
 
 export default function ZoningSystem({ project_id }: ZoningSystemProps) {
-  const searchParams = useSearchParams();
-  const urlPhase = searchParams.get("layer5");
-  const urlLayer4 = searchParams.get("layer4");
-  const urlLayer3 = searchParams.get("layer3");
+  const [currentLayer3, setCurrentLayer3] = useState<string>("");
+  const [currentLayer4, setCurrentLayer4] = useState<string>("");
+  const [currentPhase, setCurrentPhase] = useState<string>("");
 
-  const [currentLayer3, setCurrentLayer3] = useState<string>(urlLayer3 || "");
-  const [currentLayer4, setCurrentLayer4] = useState<string>(urlLayer4 || "");
-  const [currentPhase, setCurrentPhase] = useState<string>(urlPhase || "");
-  const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
+  const transformRef = useRef<ReactZoomPanPinchContentRef | null>(null);
 
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<"single" | "multi" | null>(null);
 
-  // ✅ Lọc và highlight SVG
   const filteredPaths = useMemo(() => {
-    if (!activeModels || activeModels.length === 0) {
-      console.log("❌ Không có activeModels → Không hiển thị SVG");
-      return [];
-    }
-
-    console.log("👉 activeModels từ API:", activeModels);
-
-    const result = pathsData.map((item: SvgItem) => {
+    if (!activeModels || activeModels.length === 0) return [];
+    return pathsData.map((item: SvgItem) => {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
-
       Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
         const elId = el.id || "";
         const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
-
         const isMatch = activeModels.some((model) => {
           const cleanModel = (model || "").replace(/\s+/g, "_").toUpperCase();
           return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
         });
-
         if (isMatch) {
           el.removeAttribute("style");
-
-          // MULTI MODE → highlight tất cả models
           if (activeMode === "multi") {
             el.setAttribute("fill", "#bb8d38");
             el.setAttribute("stroke", "white");
-          }
-          // SINGLE MODE → chỉ highlight model được chọn
-          else if (
+          } else if (
             selectedModel &&
             cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())
           ) {
@@ -85,82 +66,50 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
           el.setAttribute("style", "display:none");
         }
       });
-
-      return {
-        ...item,
-        svg: svgDoc.documentElement.outerHTML,
-      };
+      return { ...item, svg: svgDoc.documentElement.outerHTML };
     });
-
-    return result;
   }, [activeModels, selectedModel, activeMode]);
 
-  // ✅ Chọn model trong SINGLE MODE
-const handleModelSelect = (modelName: string | null) => {
-  setActiveMode("single");
+  const handleModelSelect = (modelName: string | null) => {
+    setActiveMode("single");
+    if (!modelName) {
+      setSelectedModel(null);
+      setActiveModels([]);
+      return;
+    }
+    setSelectedModel((prev) => (prev === modelName ? null : modelName));
+  };
 
-  if (!modelName) {
-    // Nếu nhấn nút single mà không truyền model → clear hết
-    setSelectedModel(null);
-    setActiveModels([]);
-    return;
-  }
-
-  // Nếu chọn model cụ thể thì toggle
-  setSelectedModel((prev) => (prev === modelName ? null : modelName));
-};
-
-  // ✅ MULTI MODE callback ổn định
   const handleModelsLoaded = useCallback((models: string[]) => {
     setActiveMode("multi");
     setActiveModels(models);
-    setSelectedModel(null); // bỏ chọn riêng lẻ khi multi
+    setSelectedModel(null);
   }, []);
 
-  // ✅ Hàm pan/zoom tới phase tương ứng
-  const panToPhase = (phase: string) => {
-    if (!transformRef.current) return;
-
-    switch (phase) {
-      case "THE MARINA":
-        transformRef.current.setTransform(-117, -81, 1.2);
-        break;
-      case "THE STELLA":
-        transformRef.current.setTransform(-50, -20, 1.2);
-        break;
-      case "THE HERITAGE":
-        transformRef.current.setTransform(-200, -150, 1.3);
-        break;
-      case "THE OPERA":
-        transformRef.current.setTransform(-172, -157, 1.2);
-        break;
-      default:
-        break;
-    }
-  };
-
-  // ✅ Khi load URL lần đầu → tự động pan
+  // ✅ Zoom mặc định khi mở trang (có delay để chắc chắn mount xong)
   useEffect(() => {
-    if (!transformRef.current || !urlPhase) return;
     const timer = setTimeout(() => {
-      panToPhase(urlPhase);
-    }, 150);
+      if (transformRef.current) {
+        transformRef.current.setTransform(-117, -81, 1.2);
+      }
+    }, 200);
     return () => clearTimeout(timer);
-  }, [urlPhase]);
+  }, []);
 
-  // ✅ Khi click hoặc chọn từ Menu
   const handlePhaseChange = (newPhase: string) => {
     setCurrentPhase(newPhase);
     setCurrentLayer4(newPhase);
     setCurrentLayer3(newPhase);
-    panToPhase(newPhase);
+    // không zoom nữa
   };
 
   return (
     <div className={styles.box}>
       <div className={styles.left}>
         <TransformWrapper
-          ref={transformRef}
+          ref={(ref) => {
+            if (ref) transformRef.current = ref;
+          }}
           initialScale={1}
           minScale={1}
           maxScale={5}
