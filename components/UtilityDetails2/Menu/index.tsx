@@ -6,14 +6,14 @@ import { Button, Group, Image, Loader, Stack, Text } from "@mantine/core";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifiterutilities";
-import { createON } from "../../../api/apiON"; 
+import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
 import Function from "./Function";
 
 interface MenuProps {
   project_id: string | null;
   initiallayer4?: string | null;
-    onModelsLoaded?: (models: string[]) => void;
+  onModelsLoaded?: (models: string[]) => void;
   onSelectModel?: (modelName: string) => void;
 }
 
@@ -29,19 +29,24 @@ interface NodeAttributeItem {
   [key: string]: unknown;
 }
 
-export default function Menu({ project_id, initiallayer4,onModelsLoaded,
-  onSelectModel, }: MenuProps) {
+export default function Menu({
+  project_id,
+  initiallayer4,
+  onModelsLoaded,
+  onSelectModel,
+}: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phaseFromQuery = searchParams.get("layer4") || initiallayer4;
 
   const [active, setActive] = useState<"on" | "off" | null>(null);
-  const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null); // ✅ ban đầu null
+  const [isMultiMode, setIsMultiMode] =
+    useState<"single" | "multi" | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingOn, setLoadingOn] = useState(false);
 
-  // ✅ Hàm fetch dữ liệu
+  // Fetch data
   const fetchData = async () => {
     if (!project_id || !phaseFromQuery) return;
 
@@ -56,9 +61,8 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
       });
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
-         onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.layer3)
-        );
+        onModelsLoaded?.(data.data.map((i: NodeAttributeItem) => i.layer3));
+
         const uniqueMap = new Map<string, MenuItem>();
 
         data.data.forEach((item: NodeAttributeItem) => {
@@ -92,9 +96,9 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
 
   useEffect(() => {
     fetchData();
-  }, [project_id, phaseFromQuery,onModelsLoaded]);
+  }, [project_id, phaseFromQuery, onModelsLoaded]);
 
-  // ✅ Xử lý khi nhấn 1 nút model
+  // Khi nhấn 1 item
   const handleMenuClick = async (subzoneLabel: string) => {
     if (!project_id || !phaseFromQuery) return;
 
@@ -114,19 +118,31 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
     }
   };
 
-  // ✅ Quay lại trang tiện ích
-  const handleBack = () => {
-    if (!project_id) return;
-    router.push(`/Tuong-tac/Ca-mau/Tien-ich?id=${project_id}`);
+  // ❗❗ MULTI MODE API
+  const handleMultiModeAPI = async () => {
+    if (!project_id || !phaseFromQuery) return;
+
+    try {
+      console.log("🔄 MULTI MODE → gọi lại API...");
+      const res = await createNodeAttribute({
+        project_id,
+        filters: [
+          { label: "layer6", values: ["ti"] },
+          { label: "layer4", values: [phaseFromQuery] },
+        ],
+      });
+
+      console.log("🔥 MULTI MODE API:", res);
+
+      if (res?.data && Array.isArray(res.data)) {
+        onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.layer3));
+      }
+    } catch (error) {
+      console.error("❌ Lỗi MULTI MODE API:", error);
+    }
   };
 
-  // ✅ Khi nhấn MULTI
-  const handleMultiModeClick = () => {
-    // Bấm lần đầu: kích hoạt multi, bấm lại thì tắt (null)
-    setIsMultiMode(prev => (prev === "multi" ? null : "multi"));
-    fetchData();
-  };
-
+  // ON / OFF API
   const getButtonStyle = (isActive: boolean) => ({
     width: 30,
     height: 30,
@@ -144,16 +160,15 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
     border: "1.5px solid #752E0B",
   });
 
-  // ✅ ON/OFF API
   const handleClickOn = async () => {
     if (!project_id) return;
     setActive("on");
     setLoadingOn(true);
     try {
       const res = await createON({ project_id });
-      console.log("✅ API ON result:", res);
+      console.log("API ON:", res);
     } catch (err) {
-      console.error("❌ Lỗi khi gọi API ON:", err);
+      console.error("Lỗi ON:", err);
     } finally {
       setLoadingOn(false);
     }
@@ -165,12 +180,17 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
     setLoadingOn(true);
     try {
       const res = await createOFF({ project_id });
-      console.log("✅ API OFF result:", res);
+      console.log("API OFF:", res);
     } catch (err) {
-      console.error("❌ Lỗi khi gọi API OFF:", err);
+      console.error("Lỗi OFF:", err);
     } finally {
       setLoadingOn(false);
     }
+  };
+
+  const handleBack = () => {
+    if (!project_id) return;
+    router.push(`/Tuong-tac/Ca-mau/Tien-ich?id=${project_id}`);
   };
 
   return (
@@ -189,7 +209,7 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
         <h1>{phaseFromQuery?.toUpperCase()}</h1>
       </div>
 
-      {/* Menu danh sách */}
+      {/* Menu list */}
       <div className={styles.Function}>
         {loading ? (
           <Loader color="orange" />
@@ -199,10 +219,10 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
               <Button
                 key={index}
                 className={styles.menuBtn}
-                onClick={() => {handleMenuClick(item.label);
+                onClick={() => {
+                  handleMenuClick(item.label);
                   onSelectModel?.(item.label);
                 }}
-  
                 variant="filled"
                 color="orange"
                 style={{
@@ -231,10 +251,11 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
           <Function
             activeMode={isMultiMode}
             setActiveMode={setIsMultiMode}
-            onMultiModeClick={handleMultiModeClick}
+            onMultiModeClick={handleMultiModeAPI}
           />
+
           <Group gap="xs">
-            {/* Nút ON */}
+            {/* ON */}
             <Button
               style={getButtonStyle(active === "on")}
               onClick={() => {
@@ -246,7 +267,7 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
               <Text style={{ fontSize: "13px" }}>ON</Text>
             </Button>
 
-            {/* Nút OFF */}
+            {/* OFF */}
             <Button
               style={getButtonStyle(active === "off")}
               onClick={() => {
@@ -257,7 +278,7 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
               <Text style={{ fontSize: "12px" }}>OFF</Text>
             </Button>
 
-            {/* Nút quay lại */}
+            {/* Back */}
             <Button
               onClick={handleBack}
               variant="filled"
@@ -284,4 +305,3 @@ export default function Menu({ project_id, initiallayer4,onModelsLoaded,
     </div>
   );
 }
-
