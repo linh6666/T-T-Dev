@@ -8,14 +8,13 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifilter";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
-// import Function from "./Function";
 
 interface MenuProps {
   project_id: string | null;
   initialPhase?: string | null;
-   initialLayer4?: string | null; 
-   initialLayer3?: string | null; 
-       onModelsLoaded?: (models: string[]) => void;
+  initialLayer4?: string | null;
+  initialLayer3?: string | null;
+  onModelsLoaded?: (models: string[]) => void;
   onSelectModel?: (modelName: string) => void;
   onPhaseChange?: (phases: string) => void;
 }
@@ -24,13 +23,12 @@ interface MenuItem {
   label: string;
   layer5: string;
   layer4: string;
- layer3: string;
+  layer3: string;
   layer2: string;
-
 }
 
 interface NodeAttributeItem {
-    layer2?: string;
+  layer2?: string;
   layer3?: string;
   group?: string;
   [key: string]: unknown;
@@ -40,26 +38,27 @@ export default function Menu({
   project_id,
   initialPhase,
   initialLayer4,
-    initialLayer3,
-        onModelsLoaded,
-  // onSelectModel,
+  initialLayer3,
+  onModelsLoaded,
+  onSelectModel,
   onPhaseChange,
 }: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const phaseValue = searchParams.get("layer5") || initialPhase;
-   const valuelayer4 = searchParams.get("layer4") || initialLayer4 ||"";
-    const valuelayer3 = searchParams.get("layer3") || initialLayer3 ||"";
+  const valuelayer4 = searchParams.get("layer4") || initialLayer4 || "";
+  const valuelayer3 = searchParams.get("layer3") || initialLayer3 || "";
 
   // ⚙️ State
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
-    const [layer4, setlayer4] = useState<string>(valuelayer4 || "");
-        const [layer3, setlayer3] = useState<string>(valuelayer3 || "");
+  const [layer4, setlayer4] = useState<string>(valuelayer4 || "");
+  const [layer3, setlayer3] = useState<string>(valuelayer3 || "");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
-  // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null);
 
+  // useEffect với dependency đầy đủ
   useEffect(() => {
     if (phaseValue && phaseValue !== phase) {
       setPhase(phaseValue);
@@ -67,9 +66,9 @@ export default function Menu({
       setlayer3(valuelayer3);
       onPhaseChange?.(phaseValue);
     }
-  }, [phaseValue, phase, onPhaseChange,valuelayer4]);
+  }, [phaseValue, phase, onPhaseChange, valuelayer4, valuelayer3]);
 
-  // 📡 Gọi API danh sách nhà
+  // fetchData với useCallback đầy đủ dependencies
   const fetchData = useCallback(async () => {
     if (!project_id || !phase) return;
     setLoading(true);
@@ -79,40 +78,28 @@ export default function Menu({
         filters: [
           { label: "layer6", values: ["ct"] },
           { label: "layer5", values: [phase] },
-           { label: "layer4", values: [layer4] },
-           { label: "layer3", values: [layer3] },
+          { label: "layer4", values: [layer4] },
+          { label: "layer3", values: [layer3] },
         ],
       });
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
         const uniqueMap = new Map<string, MenuItem>();
-                  onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.layer2)
-        );
-
+        onModelsLoaded?.(data.data.map((i: NodeAttributeItem) => i.layer2));
 
         data.data.forEach((item: NodeAttributeItem) => {
           const layer2 = item.layer2 || "";
           const groupValue = item.group;
 
-          // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
-          if (layer2.toLowerCase() === "skip") {
-            return; 
-          }
+          if (layer2.toLowerCase() === "skip") return;
 
-          if (
-            layer2.trim() &&
-            !layer2.includes(";") &&
-            groupValue !== "ct;ti" &&
-            !uniqueMap.has(layer2)
-          ) {
+          if (layer2.trim() && !layer2.includes(";") && groupValue !== "ct;ti" && !uniqueMap.has(layer2)) {
             uniqueMap.set(layer2, {
               label: layer2,
               layer5: phase,
               layer4: layer4,
-               layer3: layer3,
-                layer2: layer2,
-              
+              layer3: layer3,
+              layer2: layer2,
             });
           }
         });
@@ -127,39 +114,43 @@ export default function Menu({
     } finally {
       setLoading(false);
     }
-  }, [project_id, phase,onModelsLoaded]);
+  }, [project_id, phase, layer4, layer3, onModelsLoaded]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
   // 🔹 Xử lý khi nhấn 1 nút menu
-const handleMenuClick = async (layer2: string) => {
+  const handleMenuClick = async (layer2: string) => {
     if (!project_id || !valuelayer3) return;
 
     try {
       const data = await createNodeAttribute({
         project_id,
-       filters: [
+        filters: [
           { label: "layer6", values: ["ct"] },
           { label: "layer5", values: [phase] },
-           { label: "layer4", values: [layer4] },
-           { label: "layer3", values: [layer3] },
-            { label: "layer2", values: [layer2] },
+          { label: "layer4", values: [layer4] },
+          { label: "layer3", values: [layer3] },
+          { label: "layer2", values: [layer2] },
         ],
       });
 
-      console.log("✅ API trả về cho",layer2 , data);
+      console.log("✅ API trả về cho", layer2, data);
     } catch (error) {
       console.error("❌ Lỗi khi gọi API:", error);
     }
   };
 
+  const handleBack = () => {
+    if (!project_id || !phase) return;
+    router.push(
+      `/Tuong-tac/Ca-mau/Day-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(
+        phase
+      )}&layer4=${encodeURIComponent(layer4)}`
+    );
+  };
 
-
-const handleBack = () => {
-  if (!project_id || !phase) return;
-  router.push(`/Tuong-tac/Ca-mau/Day-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(phase)}&layer4=${encodeURIComponent(layer4)}`);
-};
   // 🔆 ON / OFF
   const handleClickOn = async () => {
     if (!project_id) return;
@@ -183,13 +174,6 @@ const handleBack = () => {
     }
   };
 
-  // 🌗 MULTI
-  // const handleMultiModeClick = () => {
-  //   setIsMultiMode("multi");
-  //   fetchData();
-  // };
-
-  // 🎨 Style nút ON/OFF
   const getButtonStyle = (isActive: boolean) => ({
     width: 30,
     height: 30,
@@ -207,43 +191,30 @@ const handleBack = () => {
 
   return (
     <div className={styles.box}>
-      {/* Logo */}
       <div className={styles.logo}>
-        <Image
-          src="/Logo/TTHOMES logo-01.png"
-          alt="Logo"
-          className={styles.imgea}
-        />
+        <Image src="/Logo/TTHOMES logo-01.png" alt="Logo" className={styles.imgea} />
       </div>
 
-      {/* Tiêu đề */}
       <div className={styles.title}>
         <h1>{layer3?.toUpperCase()}</h1>
       </div>
 
-      {/* Danh sách menu */}
       <div className={styles.Function}>
         {loading ? (
           <Loader color="orange" />
         ) : menuItems.length > 0 ? (
           <div className={styles.scroll} style={{ marginTop: "5px" }}>
-            {menuItems.map((item, index) => (
+            {menuItems.map((item) => (
               <Button
-                key={index}
+                key={item.label}
                 className={styles.menuBtn}
-                   onClick={() => {handleMenuClick(item.label);
-                
+                onClick={() => {
+                  handleMenuClick(item.label);
+                  onSelectModel?.(item.label);
                 }}
-                // onClick={() => handleNavigate(item.layer5, item.layer4, item.layer3)}
                 variant="filled"
                 color="orange"
-                style={{
-                  marginBottom: "10px",
-                  // background:
-                  //   isMultiMode === "multi"
-                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                  //     : undefined,
-                }}
+                style={{ marginBottom: "10px" }}
               >
                 {item.label}
               </Button>
@@ -256,32 +227,19 @@ const handleBack = () => {
         )}
       </div>
 
-      {/* Footer */}
       <div className={styles.footer}>
         <Stack align="center" gap="xs">
-          {/* 🔘 MULTI/SINGLE */}
-          {/* <Function
-            activeMode={isMultiMode}
-            setActiveMode={setIsMultiMode}
-            onMultiModeClick={handleMultiModeClick}
-          /> */}
-
-          {/* ⚙️ ON/OFF + Back */}
           <Group gap="xs">
             <Button
               style={getButtonStyle(active === "on")}
-              onClick={() =>
-                active !== "on" ? handleClickOn() : setActive(null)
-              }
+              onClick={() => (active !== "on" ? handleClickOn() : setActive(null))}
             >
               <Text style={{ fontSize: "13px" }}>ON</Text>
             </Button>
 
             <Button
               style={getButtonStyle(active === "off")}
-              onClick={() =>
-                active !== "off" ? handleClickOFF() : setActive(null)
-              }
+              onClick={() => (active !== "off" ? handleClickOFF() : setActive(null))}
             >
               <Text style={{ fontSize: "12px" }}>OFF</Text>
             </Button>

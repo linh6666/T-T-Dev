@@ -116,7 +116,7 @@ export default function Menu({
     } finally {
       setLoading(false);
     }
-  }, [project_id, phase,onModelsLoaded]);
+  }, [project_id, phase,layer4,onModelsLoaded]);
 
   useEffect(() => {
     fetchData();
