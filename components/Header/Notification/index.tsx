@@ -17,6 +17,8 @@ import styles from "./Announcement.module.css";
 import { getListProject } from "../../../api/apigetlistProject";
 import { GetJoinProject } from "../../../api/apigetlistJoinProject";
 import { getListRoles } from "../../../api/getlistrole";
+import { updateRequest } from "../../../api/apiEdiJoinProject";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 // ============================================
 // ⭐ TẠO TYPE RÕ RÀNG
@@ -38,7 +40,7 @@ interface JoinRequestItem {
   role_id: number;
   request_message: string;
   created_at: string;
-    status: string;
+  status: string;
 }
 
 interface JoinRequestResponse {
@@ -46,9 +48,6 @@ interface JoinRequestResponse {
 }
 
 export default function HomePage() {
-  // ==============================
-  // ⭐ STATE KHÔNG DÙNG ANY
-  // ==============================
   const [requests, setRequests] = useState<JoinRequestResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -60,36 +59,25 @@ export default function HomePage() {
       try {
         const token = "access_token";
 
-        // ============================
-        // ⭐ 1. LẤY PROJECT
-        // ============================
         const projects = await getListProject({ token, skip: 0, limit: 100 });
-
         const projMap: Record<number, string> = {};
         projects.data.forEach((p: Project) => {
           projMap[p.id] = p.name;
         });
         setProjectMap(projMap);
 
-        // ============================
-        // ⭐ 2. LẤY ROLE
-        // ============================
         const roles = await getListRoles({ token, skip: 0, limit: 100 });
-
         const rMap: Record<number, string> = {};
         roles.data.forEach((r: Role) => {
           rMap[r.id] = r.name;
         });
         setRoleMap(rMap);
 
-        // ============================
-        // ⭐ 3. LẤY REQUEST MỖI PROJECT
-        // ============================
         const responses: JoinRequestResponse[] = await Promise.all(
           projects.data.map((proj: Project) =>
             GetJoinProject({
               token,
-           project_id: String(proj.id),
+              project_id: String(proj.id),
               skip: 0,
               limit: 100,
             })
@@ -107,12 +95,40 @@ export default function HomePage() {
     fetchData();
   }, []);
 
-  // ================================
-  // ⭐ GỘP REQUEST
-  // ================================
   const flatRequests: JoinRequestItem[] = requests
-  .flatMap((req) => req.data)
-  .filter((item) => item.status === "pending");
+    .flatMap((req) => req.data)
+    .filter((item) => item.status === "pending");
+
+  // ==============================
+  // ⭐ HÀM DUYỆT / TỪ CHỐI + NOTIFICATION
+  // ==============================
+  const handleUpdate = async (
+    project_id: number,
+    request_id: number,
+    status: "approved" | "rejected"
+  ) => {
+    try {
+      await updateRequest(String(project_id), String(request_id), { status });
+
+      // Cập nhật lại UI
+      setRequests((prev) =>
+        prev.map((req) => ({
+          ...req,
+          data: req.data.filter((r) => r.id !== request_id),
+        }))
+      );
+
+      // Hiển thị thông báo thành công
+      NotificationExtension.Success(
+        status === "approved"
+          ? "Yêu cầu đã được duyệt thành công!"
+          : "Yêu cầu đã bị từ chối!"
+      );
+    } catch (error) {
+      console.error(`Error updating request ${request_id}:`, error);
+      NotificationExtension.Fails("Có lỗi xảy ra khi cập nhật yêu cầu!");
+    }
+  };
 
   return (
     <Menu
@@ -120,7 +136,6 @@ export default function HomePage() {
       position="bottom-end"
       offset={5}
     >
-      {/* ICON THÔNG BÁO */}
       <Menu.Target>
         <div
           style={{
@@ -136,7 +151,6 @@ export default function HomePage() {
           }}
         >
           <IconBellRinging size={18} color="#752E0B" stroke={1.5} />
-
           <Badge
             size="xs"
             color="red"
@@ -148,7 +162,6 @@ export default function HomePage() {
         </div>
       </Menu.Target>
 
-      {/* MENU DROPDOWN */}
       <Menu.Dropdown w={350} p={0}>
         <Group justify="space-between" px="md" py="sm">
           <Text fw={600} size="lg">
@@ -186,15 +199,10 @@ export default function HomePage() {
                   </div>
 
                   <Stack style={{ flex: 1 }}>
-                    {/* ROLE NAME */}
                     <Text fw={700}>
                       {roleMap[item.role_id] || item.role_id}
                     </Text>
-
-                    {/* MESSAGE */}
                     <Text size="sm">{item.request_message}</Text>
-
-                    {/* PROJECT + CREATED AT */}
                     <Text size="xs" color="dimmed">
                       Dự án: {projectMap[item.project_id] || "Không rõ"} •{" "}
                       {new Date(item.created_at).toLocaleString("vi-VN", {
@@ -207,10 +215,24 @@ export default function HomePage() {
                     </Text>
 
                     <Group>
-                      <Button size="xs" color="green.6" variant="light">
+                      <Button
+                        size="xs"
+                        color="green.6"
+                        variant="light"
+                        onClick={() =>
+                          handleUpdate(item.project_id, item.id, "approved")
+                        }
+                      >
                         Duyệt
                       </Button>
-                      <Button size="xs" color="red.6" variant="light">
+                      <Button
+                        size="xs"
+                        color="red.6"
+                        variant="light"
+                        onClick={() =>
+                          handleUpdate(item.project_id, item.id, "rejected")
+                        }
+                      >
                         Từ chối
                       </Button>
                     </Group>
