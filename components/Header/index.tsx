@@ -15,7 +15,7 @@ const baseLinks = [
   // { label: "TRANG CHỦ", href: "/", highlight: true },
    { label: "GIỚI THIỆU", href: "/gioi-thieu" },
     { label: "MÔ HÌNH TƯƠNG TÁC", href: "/Tuong-tac",highlight: true },
- 
+  { label: "THÔNG TIN SẢN PHẨM", href: "/Thong-tin-san-pham" },
 
   { label: "QUẢN LÝ BÁN HÀNG", href: "/quan-ly-ban-hang" },
   { label: "QUẢN TRỊ DỰ ÁN", href: "/quan-tri-du-an" },
@@ -81,6 +81,7 @@ export default function Header() {
         "GIỚI THIỆU",
         "MÔ HÌNH TƯƠNG TÁC",
         "QUẢN LÝ BÁN HÀNG",
+       "THÔNG TIN SẢN PHẨM", 
        
       ].includes(link.label);
     }
