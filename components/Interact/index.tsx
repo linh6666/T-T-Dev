@@ -114,7 +114,7 @@ export default function DetailInteractive() {
                 <Stack gap="xs" p="md" style={{ flexGrow: 1 }}>
                   <Text fw={500}>{project.name}</Text>
                    <Text size="sm" c="dimmed">
-                    Loại dự án: {project.template || "Thông tin chưa có"}
+                    Loại dự án: {project.type || "Thông tin chưa có"}
                   </Text>
                   <Text size="sm" c="dimmed">
                     Địa chỉ: {project.address || "Địa chỉ chưa có"}

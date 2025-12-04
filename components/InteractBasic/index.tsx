@@ -102,7 +102,7 @@ export default function DetailInteractive() {
                   className={`${styles.baseButton} ${styles.primaryButton}`}
                   onClick={() => {
                     router.push(
-                      `/quan-ly-ban-hang/tong-mat-bang/${project.id}?name=${encodeURIComponent(
+                      `/Thong-tin-san-pham/tong-mat-bang/${project.id}?name=${encodeURIComponent(
                         project.name
                       )}`
                     );
