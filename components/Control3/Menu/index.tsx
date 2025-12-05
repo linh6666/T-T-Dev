@@ -18,12 +18,12 @@ export default function Menu({ project_id }: MenuProps) {
   // 🧠 Tạo sẵn link kèm project_id (nếu có)
   const menuItems = [
    
-      { label: "GIỚI THIỆU DỰ ÁN", link: `/Tuong-tac/Ca-mau/Gioi-thieu-du-an${project_id ? `?id=${project_id}` : ""}` },
-    { label: "HỆ THỐNG PHÂN KHU", link: `/Tuong-tac/Ca-mau/Phan-khu${project_id ? `?id=${project_id}` : ""}` },
-     { label: "HỆ THỐNG TIỆN ÍCH", link: `/Tuong-tac/Ca-mau/Tien-ich${project_id ? `?id=${project_id}` : ""}` } ,
-    { label: "HIỆU ỨNG ÁNH SÁNG", link: `/Tuong-tac/Ca-mau/Hieu-ung-anh-sang${project_id ? `?id=${project_id}` : ""}` },
-    { label: "THƯ VIỆN", link: `/Tuong-tac/Ca-mau/Thu-vien-anh${project_id ? `?id=${project_id}` : ""}` },
-    { label: "MÔ HÌNH", link: `/Tuong-tac/Ca-mau/Mo-hinh${project_id ? `?id=${project_id}` : ""}` },
+      { label: "GIỚI THIỆU DỰ ÁN", link: `/Tuong-tac/Times-Square/Gioi-thieu-du-an${project_id ? `?id=${project_id}` : ""}` },
+    { label: "HỆ THỐNG CÔNG TRÌNH", link: `/Tuong-tac/Times-Square/Cong-trinh${project_id ? `?id=${project_id}` : ""}` },
+     { label: "HỆ THỐNG TIỆN ÍCH", link: `/Tuong-tac/Times-Square/Tien-ich${project_id ? `?id=${project_id}` : ""}` } ,
+    { label: "HIỆU ỨNG ÁNH SÁNG", link: `/Tuong-tac/Times-Square/Hieu-ung-anh-sang${project_id ? `?id=${project_id}` : ""}` },
+    { label: "THƯ VIỆN", link: `/Tuong-tac/Times-Square/Thu-vien-anh${project_id ? `?id=${project_id}` : ""}` },
+    { label: "MÔ HÌNH", link: `/Tuong-tac/Times-Square/Mo-hinh${project_id ? `?id=${project_id}` : ""}` },
   
   ];
 
