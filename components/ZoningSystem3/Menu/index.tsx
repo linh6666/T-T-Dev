@@ -105,14 +105,14 @@ export default function Menu({ project_id }: MenuProps) {
     fetchData();
   }, [project_id]);
 
-const handleNavigate = (layer5: string) => {
+const handleNavigate = (layer3: string) => {
   if (!project_id) return;
-  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(layer5)}`);
+  router.push(`/Tuong-tac/Times-Square/Loai-cong-trinh?id=${project_id}&layer3=${encodeURIComponent(layer3)}`);
 };
 
   const handleBack = () => {
     if (!project_id) return;
-    router.push(`/Tuong-tac/Ca-mau?id=${project_id}`);
+    router.push(`/Tuong-tac/Times-Square?id=${project_id}`);
   };
 
   return (
