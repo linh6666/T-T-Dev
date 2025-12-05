@@ -14,7 +14,7 @@ import DeleteView from "./DeleteView";
 interface DataType {
   id: string;
   name: string;
-  template: string;
+  type: string;
   address: string;
   investor: string;
   overview_image: string;
@@ -54,7 +54,7 @@ export default function LargeFixedTable() {
         id: user.id,
         name: user.name,
         rank: user.rank,
-        template: user.template,
+        type: user.type,
         address: user.address,
         investor: user.investor,
         overview_image: user.overview_image,
@@ -131,8 +131,8 @@ const openDeleteUserModal = (role: DataType) => {
     },
     {
       title:  "Loại dự án" ,
-      dataIndex: "template",
-      key: "template",
+      dataIndex: "type",
+      key: "type",
       width: 7,
     },
     {

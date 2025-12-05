@@ -97,7 +97,6 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     const projectPayload = {
       id: values.id,
       name_vi: values.name_vi,
-    
       project_template_id: values.project_template_id,
       address_vi: values.address_vi,
       investor: values.investor,

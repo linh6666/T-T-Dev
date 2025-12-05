@@ -93,7 +93,7 @@ export default function LargeFixedTable() {
   // ✅ Định nghĩa cột bảng
   const columns: ColumnsType<DataType> = [
        {  title:  "Tên dự án" , dataIndex: "name", key: "name", width: 5 ,fixed: "left"},
-    { title:  "Loại dự án" , dataIndex: "template", key: "template", width: 5 },
+    { title:  "Loại dự án" , dataIndex: "type", key: "type", width: 5 },
     { title:  "Địa chỉ" , dataIndex: "address", key: "address", width: 5 },
     {title:  "Chủ đầu tư" , dataIndex: "investor", key: "investor", width: 5 },
      {
