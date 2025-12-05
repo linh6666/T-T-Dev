@@ -134,7 +134,7 @@ export default function Menu({
   // ⏪ Quay lại
 const handleBack = () => {
   if (!project_id || !phase) return;
-  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(phase)}`);
+  router.push(`/Tuong-tac/Times-Square/Loai-cong-trinh?id=${project_id}&layer3=${encodeURIComponent(phase)}`);
 };
   // 🔆 ON / OFF
   const handleClickOn = async () => {
