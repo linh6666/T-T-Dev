@@ -13,19 +13,20 @@ import { createOFF } from "../../../api/apiOFF";
 interface MenuProps {
   project_id: string | null;
   initialPhase?: string | null;
-    onModelsLoaded?: (models: string[]) => void;
+   initialLayer2?: string | null; 
+     onModelsLoaded?: (models: string[]) => void;
   onSelectModel?: (modelName: string) => void;
   onPhaseChange?: (phases: string) => void;
 }
 
 interface MenuItem {
   label: string;
-  layer5: string;
-  layer4: string;
+  layer3: string;
+ layer2: string;
 }
 
 interface NodeAttributeItem {
-  layer2?: string;
+  layer1?: string;
   group?: string;
   [key: string]: unknown;
 }
@@ -33,17 +34,20 @@ interface NodeAttributeItem {
 export default function Menu({
   project_id,
   initialPhase,
-    onModelsLoaded,
+      onModelsLoaded,
   // onSelectModel,
+  initialLayer2,
   onPhaseChange,
 }: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phaseValue = searchParams.get("layer3") || initialPhase;
+   const valuelayer2 = searchParams.get("layer2") || initialLayer2 ||"";
 
   // ⚙️ State
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
+    const [layer2, setlayer2] = useState<string>(valuelayer2 || "");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null);
@@ -51,9 +55,10 @@ export default function Menu({
   useEffect(() => {
     if (phaseValue && phaseValue !== phase) {
       setPhase(phaseValue);
+      setlayer2(valuelayer2);
       onPhaseChange?.(phaseValue);
     }
-  }, [phaseValue, phase, onPhaseChange]);
+  }, [phaseValue, phase, onPhaseChange,valuelayer2]);
 
   // 📡 Gọi API danh sách nhà
   const fetchData = useCallback(async () => {
@@ -65,34 +70,37 @@ export default function Menu({
         filters: [
           {  values: ["ct"] },
           { label: "layer3", values: [phase] },
+           { label: "layer2", values: [layer2] },
         ],
       });
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
         const uniqueMap = new Map<string, MenuItem>();
-           onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.layer2)
+                   onModelsLoaded?.(
+          data.data.map((i: NodeAttributeItem) => i.layer1)
         );
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const layer2 = item.layer2 || "";
+          const layer1 = item.layer1
+ || "";
           const groupValue = item.group;
 
           // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
-          if (layer2.toLowerCase() === "skip") {
+          if (layer1.toLowerCase() === "skip") {
             return; 
           }
 
           if (
-            layer2.trim() &&
-            !layer2.includes(";") &&
+            layer1.trim() &&
+            !layer1.includes(";") &&
             groupValue !== "ct;ti" &&
-            !uniqueMap.has(layer2)
+            !uniqueMap.has(layer1)
           ) {
-            uniqueMap.set(layer2, {
-              label: layer2,
-              layer5: phase,
-              layer4: layer2,
+            uniqueMap.set(layer1, {
+              label: layer1,
+              layer3: phase,
+              layer2: layer2,
+              
             });
           }
         });
@@ -107,28 +115,27 @@ export default function Menu({
     } finally {
       setLoading(false);
     }
-  }, [project_id, phase,onModelsLoaded]);
+  }, [project_id, phase,layer2,onModelsLoaded]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   // 🧭 Điều hướng
-  const handleNavigate = (layer3: string, layer2: string) => {
-    if (!project_id) return;
-    router.push(
-      `/Tuong-tac/Times-Square/Chi-tiet-cong-trinh?id=${project_id}&layer3=${encodeURIComponent(
-        layer3
-      )}&layer2=${encodeURIComponent(layer2)}`
-    );
-  };
+  // const handleNavigate = (layer5: string, layer4: string,layer3: string,) => {
+  //   if (!project_id) return;
+  //   router.push(
+  //     `/Tuong-tac/Ca-mau/Cong-trinh?id=${project_id}&layer5=${encodeURIComponent(
+  //       layer5
+  //     )}&layer4=${encodeURIComponent(layer4)}&layer3=${encodeURIComponent(layer3)}`
+  //   );
+  // };
 
   // ⏪ Quay lại
-  const handleBack = () => {
-    if (!project_id) return;
-    router.push(`/Tuong-tac/Times-Square/Cong-trinh?id=${project_id}`);
-  };
-
+const handleBack = () => {
+  if (!project_id || !phase) return;
+  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(phase)}`);
+};
   // 🔆 ON / OFF
   const handleClickOn = async () => {
     if (!project_id) return;
@@ -152,6 +159,13 @@ export default function Menu({
     }
   };
 
+  // 🌗 MULTI
+  // const handleMultiModeClick = () => {
+  //   setIsMultiMode("multi");
+  //   fetchData();
+  // };
+
+  // 🎨 Style nút ON/OFF
   const getButtonStyle = (isActive: boolean) => ({
     width: 30,
     height: 30,
@@ -180,7 +194,7 @@ export default function Menu({
 
       {/* Tiêu đề */}
       <div className={styles.title}>
-        <h1>{phase?.toUpperCase()}</h1>
+        <h1>{layer2?.toUpperCase()}</h1>
       </div>
 
       {/* Danh sách menu */}
@@ -193,7 +207,7 @@ export default function Menu({
               <Button
                 key={index}
                 className={styles.menuBtn}
-                onClick={() => handleNavigate(item.layer5, item.layer4)}
+                // onClick={() => handleNavigate(item.layer3, item.layer2,)}
                 variant="filled"
                 color="orange"
                 style={{
