@@ -96,7 +96,7 @@ useEffect(() => {
 
   const handleBack = () => {
     if (!project_id) return;
-    router.push(`/Tuong-tac/Times-Square=${project_id}`);
+    router.push(`/Tuong-tac/Times-Square?id=${project_id}`);
   };
 
   return (
