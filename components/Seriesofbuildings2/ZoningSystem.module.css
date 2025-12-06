@@ -30,7 +30,7 @@
   position: absolute; /* Để đặt SVG ở vị trí chính xác */
   /* top: 20px; 
   left: 20px;  */
-  z-index: 2; /* Đặt SVG lên trên ảnh */
+  /* z-index: 2;  */
   pointer-events: none; /* Ngăn chặn sự kiện chuột trên SVG nếu không cần thiết */
 }
 
