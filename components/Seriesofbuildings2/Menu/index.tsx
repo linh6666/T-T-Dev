@@ -121,17 +121,29 @@ export default function Menu({
     fetchData();
   }, [fetchData]);
 
-  // 🧭 Điều hướng
-  // const handleNavigate = (layer5: string, layer4: string,layer3: string,) => {
-  //   if (!project_id) return;
-  //   router.push(
-  //     `/Tuong-tac/Ca-mau/Cong-trinh?id=${project_id}&layer5=${encodeURIComponent(
-  //       layer5
-  //     )}&layer4=${encodeURIComponent(layer4)}&layer3=${encodeURIComponent(layer3)}`
-  //   );
-  // };
+ const handleMenuClick = async (layer1: string) => {
+    if (!project_id || !valuelayer2) return;
 
-  // ⏪ Quay lại
+    try {
+      const data = await createNodeAttribute({
+        project_id,
+        filters: [
+           {  values: ["ct"] },
+          { label: "layer3", values: [phase] },
+           { label: "layer2", values: [layer2] },
+           { label: "layer1", values: [layer1] },
+           
+
+        ],
+      });
+
+      console.log("✅ API trả về cho", layer1, data);
+    } catch (error) {
+      console.error("❌ Lỗi khi gọi API:", error);
+    }
+  };
+
+
 const handleBack = () => {
   if (!project_id || !phase) return;
   router.push(`/Tuong-tac/Times-Square/Loai-cong-trinh?id=${project_id}&layer3=${encodeURIComponent(phase)}`);
@@ -207,7 +219,10 @@ const handleBack = () => {
               <Button
                 key={index}
                 className={styles.menuBtn}
-                // onClick={() => handleNavigate(item.layer3, item.layer2,)}
+              onClick={() => {
+                  handleMenuClick(item.label);
+                  // onSelectModel?.(item.label);
+                }}
                 variant="filled"
                 color="orange"
                 style={{

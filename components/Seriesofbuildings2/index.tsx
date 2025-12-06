@@ -1,7 +1,7 @@
 "use client";
 
 import { Image } from "@mantine/core";
-import React, { useState, useRef, useEffect, useMemo, } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index";
 import {
@@ -14,9 +14,8 @@ import { pathsData, SvgItem } from "./Data";
 
 interface ZoningSystemProps {
   project_id: string | null;
-  layer2:string | null;
+  layer2: string | null;
   phase?: string | null;
-
 }
 
 export default function ZoningSystem({ project_id }: ZoningSystemProps) {
@@ -29,74 +28,101 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
+  // --------------------------
+  // ⭐ HÀM LẤY ẢNH THEO LAYER2
+  // --------------------------
+  const getImageByLayer = (layerName: string | null) => {
+    if (!layerName) return "/image/TIMES_HOME.png";
 
+    const clean = layerName.trim().toUpperCase();
 
-   const filteredPaths = useMemo(() => {
-     if (!activeModels || activeModels.length === 0) {
-       console.log("❌ Không có activeModels → Không hiển thị SVG");
-       return [];
-     }
-   
-     console.log("👉 activeModels từ API:", activeModels);
-   
-     const result = pathsData.map((item: SvgItem) => {
-       console.log("🟦 SVG đang xử lý:", item.id);
-   
-       const parser = new DOMParser();
-       const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
-   
-       Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
-         const elId = el.id || "";
-         const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
-   
-         // So sánh với activeModels → chuẩn hóa tên
-         const isMatch = activeModels.some((model) => {
-           const cleanModel = (model || "").replace(/\s+/g, "_").toUpperCase();
-           return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
-         });
-   
-         if (elId) {
-           console.log(
-             isMatch ? "✅ MATCH → SVG hiển thị:" : "⛔ HIDE →",
-             elId
-           );
-         }
-   
-         if (isMatch) {
-           el.removeAttribute("style");
-           if (selectedModel && cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())) {
-             el.setAttribute("fill", "#bb8d38");
-             el.setAttribute("stroke", "white");
-           } else {
-             const originalFill =
-               el.getAttribute("data-original-fill") || el.getAttribute("fill") || "#fff";
-             if (!el.hasAttribute("data-original-fill")) el.setAttribute("data-original-fill", originalFill);
-             el.setAttribute("fill", originalFill);
-             el.removeAttribute("stroke");
-           }
-         } else {
-           el.setAttribute("style", "display:none");
-         }
-       });
-   
-       return {
-         ...item,
-         svg: svgDoc.documentElement.outerHTML,
-       };
-     });
-   
-     return result;
-   }, [activeModels, selectedModel]);
-
-
-        const handleModelSelect = (modelName: string) => {
-    setSelectedModel((prev) => (prev === modelName ? null : modelName));
-
-    // Zoom vào vùng SVG tương ứng (giả sử có id là modelName)
- 
+    // tên file theo folder public
+    return `/TIMES SQUARE/${clean}.png`;
   };
 
-  // ✅ Hàm pan/zoom tới phase tương ứng
+  // ⭐ ẢNH ƯU TIÊN THEO LAYER2 (nếu API có layer2)
+  const layerImage = useMemo(() => {
+    return getImageByLayer(currentLayer2);
+  }, [currentLayer2]);
+
+  // ⭐ Nếu chọn model thì ưu tiên ảnh theo model → nếu không thì theo layer2
+  const imageSrc = useMemo(() => {
+    if (selectedModel) {
+      return `/TIMES SQUARE/${selectedModel}.png`;
+    }
+    return layerImage; // ảnh theo layer2
+  }, [selectedModel, layerImage]);
+
+  // --------------------------
+  // ⭐ FILTER SVG
+  // --------------------------
+  const filteredPaths = useMemo(() => {
+    if (!activeModels || activeModels.length === 0) {
+      console.log("❌ Không có activeModels → Không hiển thị SVG");
+      return [];
+    }
+
+    console.log("👉 activeModels từ API:", activeModels);
+
+    const result = pathsData.map((item: SvgItem) => {
+      console.log("🟦 SVG đang xử lý:", item.id);
+
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
+
+      Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
+        const elId = el.id || "";
+        const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
+
+        const isMatch = activeModels.some((model) => {
+          const cleanModel = (model || "")
+            .replace(/\s+/g, "_")
+            .toUpperCase();
+          return (
+            cleanElId.includes(cleanModel) ||
+            cleanModel.includes(cleanElId)
+          );
+        });
+
+        if (isMatch) {
+          el.removeAttribute("style");
+
+          if (
+            selectedModel &&
+            cleanElId.includes(
+              selectedModel.replace(/\s+/g, "_").toUpperCase()
+            )
+          ) {
+            el.setAttribute("fill", "#bb8d38");
+            el.setAttribute("stroke", "white");
+          } else {
+            const originalFill =
+              el.getAttribute("data-original-fill") ||
+              el.getAttribute("fill") ||
+              "#fff";
+            if (!el.hasAttribute("data-original-fill"))
+              el.setAttribute("data-original-fill", originalFill);
+            el.setAttribute("fill", originalFill);
+            el.removeAttribute("stroke");
+          }
+        } else {
+          el.setAttribute("style", "display:none");
+        }
+      });
+
+      return {
+        ...item,
+        svg: svgDoc.documentElement.outerHTML,
+      };
+    });
+
+    return result;
+  }, [activeModels, selectedModel]);
+
+  const handleModelSelect = (modelName: string) => {
+    setSelectedModel((prev) => (prev === modelName ? null : modelName));
+  };
+
   const panToPhase = (phase: string) => {
     if (!transformRef.current) return;
 
@@ -105,37 +131,30 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
         transformRef.current.setTransform(-117, -81, 1.2);
         break;
       case "THE STELLA":
-        transformRef.current.setTransform(-50, -20, 1.2); // 👉 chỉnh theo vị trí thực tế
+        transformRef.current.setTransform(-50, -20, 1.2);
         break;
       case "THE HERITAGE":
-        transformRef.current.setTransform(-200, -150, 1.3); // 👉 chỉnh theo vị trí thực tế
+        transformRef.current.setTransform(-200, -150, 1.3);
         break;
       case "THE OPERA":
-        transformRef.current.setTransform(-172, -157, 1.2); // 👉 chỉnh theo vị trí thực tế
-        break;
-      default:
+        transformRef.current.setTransform(-172, -157, 1.2);
         break;
     }
   };
 
-  // ✅ Khi load URL lần đầu → tự động pan
   useEffect(() => {
     if (!transformRef.current || !urlPhase) return;
     const timer = setTimeout(() => {
       panToPhase(urlPhase);
-    }, 150); // chờ DOM render
+    }, 150);
     return () => clearTimeout(timer);
   }, [urlPhase]);
 
-  // ✅ Khi click hoặc chọn từ Menu
   const handlePhaseChange = (newPhase: string) => {
     setCurrentPhase(newPhase);
     setCurrentLayer2(newPhase);
     panToPhase(newPhase);
   };
-
- 
-
 
   return (
     <div className={styles.box}>
@@ -147,16 +166,21 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
           maxScale={5}
           wheel={{ step: 0.2 }}
           doubleClick={{ disabled: true }}
-                 onPanningStop={(ref) => {
-            const { positionX, positionY } = ref.state;
-            console.log("📍 Vị trí sau khi kéo:", positionX, positionY);
-          }}
         >
           <TransformComponent>
             <div className={styles.imageWrapper}>
-            <Image src="/image/TIMES_HOME.png" alt="Ảnh" className={styles.img} />
+              
+              {/* ⭐ ẢNH THEO LAYER2 + FALLBACK */}
+              <Image
+                src={imageSrc}
+                alt="Ảnh"
+                className={styles.img}
+                onError={(e) => {
+                  e.currentTarget.src = "/image/TIMES_HOME.png";
+                }}
+              />
 
-   {filteredPaths.length > 0 ? (
+              {filteredPaths.length > 0 ? (
                 filteredPaths.map((item) => (
                   <div
                     key={item.id}
@@ -171,7 +195,6 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
               ) : (
                 <p>Không có SVG nào để hiển thị.</p>
               )}
-  
             </div>
           </TransformComponent>
         </TransformWrapper>
@@ -181,12 +204,13 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
         <Menu
           project_id={project_id}
           initialPhase={currentPhase}
-             initialLayer2={currentLayer2}  
-                    onModelsLoaded={setActiveModels}
-          onSelectModel={handleModelSelect} 
+          initialLayer2={currentLayer2}
+          onModelsLoaded={setActiveModels}
+          onSelectModel={handleModelSelect}
           onPhaseChange={handlePhaseChange}
         />
       </div>
     </div>
   );
 }
+
