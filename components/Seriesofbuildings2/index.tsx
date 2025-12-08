@@ -167,15 +167,7 @@ const imageSrc = useMemo(() => {
   return (
     <div className={styles.box}>
       <div className={styles.left}>
-        <TransformWrapper
-          ref={transformRef}
-          initialScale={1}
-          minScale={1}
-          maxScale={5}
-          wheel={{ step: 0.2 }}
-          doubleClick={{ disabled: true }}
-        >
-          <TransformComponent>
+       
             <div className={styles.imageWrapper}>
               <Image
                 src={imageSrc}
@@ -202,8 +194,7 @@ const imageSrc = useMemo(() => {
                 <p>Không có SVG nào để hiển thị.</p>
               )}
             </div>
-          </TransformComponent>
-        </TransformWrapper>
+        
       </div>
 
       <div className={styles.right}>
