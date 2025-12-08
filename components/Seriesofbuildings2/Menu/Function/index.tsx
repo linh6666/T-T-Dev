@@ -4,12 +4,18 @@ import { Button, Group, Text } from "@mantine/core";
 import React from "react";
 
 interface SunProps {
-  activeMode: "single" | "multi" | null; // Cho phép null để toggle off
-  setActiveMode: (mode: "single" | "multi" | null) => void; // Cho phép null
+  activeMode: "single" | "multi" | null; 
+  setActiveMode: (mode: "single" | "multi" | null) => void; 
   onMultiModeClick?: () => void;
+  onSelectModel?: (modelName: string) => void; // thêm prop này
 }
 
-export default function Sun({ activeMode, setActiveMode, onMultiModeClick }: SunProps) {
+export default function Sun({
+  activeMode,
+  setActiveMode,
+  onMultiModeClick,
+  // onSelectModel,
+}: SunProps) {
   const getButtonStyle = (isActive: boolean) => ({
     width: 83,
     height: 28,
@@ -31,17 +37,18 @@ export default function Sun({ activeMode, setActiveMode, onMultiModeClick }: Sun
     cursor: "pointer",
   });
 
-  const handleClick = (mode: "single" | "multi") => {
-    if (activeMode === mode) {
-      // Toggle off nếu nhấn lại nút đang active
-      setActiveMode(null);
-    } else {
-      setActiveMode(mode);
-      if (mode === "multi" && onMultiModeClick) {
-        onMultiModeClick();
-      }
+ const handleClick = (mode: "single" | "multi") => {
+  if (activeMode === mode) {
+    setActiveMode(null);
+  } else {
+    setActiveMode(mode);
+    if (mode === "multi") {
+      onMultiModeClick?.(); // gọi API để lấy danh sách models
+      // nếu muốn hiển thị tất cả models trong SVG:
+      // onModelsLoaded?.(models);  <-- models phải được trả về từ API
     }
-  };
+  }
+};
 
   return (
     <Group gap="md">

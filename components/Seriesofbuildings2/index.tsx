@@ -1,7 +1,7 @@
 "use client";
 
 import { Image } from "@mantine/core";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index";
 import {
@@ -27,6 +27,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [activeMode, setActiveMode] = useState<"single" | "multi" | null>(null);
 
   // --------------------------
   // ⭐ HÀM LẤY ẢNH THEO LAYER2
@@ -46,52 +47,46 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   }, [currentLayer2]);
 
   // ⭐ Nếu chọn model thì ưu tiên ảnh theo model → nếu không thì theo layer2
-  const imageSrc = useMemo(() => {
-    if (selectedModel) {
-      return `/TIMES SQUARE/${selectedModel}.png`;
-    }
-    return layerImage; // ảnh theo layer2
-  }, [selectedModel, layerImage]);
+  // const imageSrc = useMemo(() => {
+  //   if (selectedModel) {
+  //     return `/TIMES SQUARE/${selectedModel}.png`;
+  //   }
+  //   return layerImage; // ảnh theo layer2
+  // }, [selectedModel, layerImage]);
+//   const imageSrc = useMemo(() => {
+//     // Giữ logic so sánh cho lần đầu, nhưng không thay đổi sau khi đã chọn
+//     if (selectedModel) {
+//         return `/TIMES SQUARE/${selectedModel}.png`;
+//     }
+//     return layerImage; // ảnh theo layer2
+// }, [selectedModel, layerImage]);
+const imageSrc = useMemo(() => {
+  return layerImage;   // ⭐ luôn giữ ảnh ban đầu (theo layer2)
+}, [layerImage]);
 
   // --------------------------
   // ⭐ FILTER SVG
   // --------------------------
   const filteredPaths = useMemo(() => {
-    if (!activeModels || activeModels.length === 0) {
-      console.log("❌ Không có activeModels → Không hiển thị SVG");
-      return [];
-    }
-
-    console.log("👉 activeModels từ API:", activeModels);
-
-    const result = pathsData.map((item: SvgItem) => {
-      console.log("🟦 SVG đang xử lý:", item.id);
-
+    if (!activeModels || activeModels.length === 0) return [];
+    return pathsData.map((item: SvgItem) => {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
-
       Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
         const elId = el.id || "";
         const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
-
         const isMatch = activeModels.some((model) => {
-          const cleanModel = (model || "")
-            .replace(/\s+/g, "_")
-            .toUpperCase();
-          return (
-            cleanElId.includes(cleanModel) ||
-            cleanModel.includes(cleanElId)
-          );
+          const cleanModel = (model || "").replace(/\s+/g, "_").toUpperCase();
+          return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
         });
-
         if (isMatch) {
           el.removeAttribute("style");
-
-          if (
+          if (activeMode === "multi") {
+            el.setAttribute("fill", "#bb8d38");
+            el.setAttribute("stroke", "white");
+          } else if (
             selectedModel &&
-            cleanElId.includes(
-              selectedModel.replace(/\s+/g, "_").toUpperCase()
-            )
+            cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())
           ) {
             el.setAttribute("fill", "#bb8d38");
             el.setAttribute("stroke", "white");
@@ -109,18 +104,18 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
           el.setAttribute("style", "display:none");
         }
       });
-
-      return {
-        ...item,
-        svg: svgDoc.documentElement.outerHTML,
-      };
+      return { ...item, svg: svgDoc.documentElement.outerHTML };
     });
+  }, [activeModels, selectedModel, activeMode]);
 
-    return result;
-  }, [activeModels, selectedModel]);
-
-  const handleModelSelect = (modelName: string) => {
-    setSelectedModel((prev) => (prev === modelName ? null : modelName));
+  const handleModelSelect = (modelName: string | null) => {
+    setActiveMode("single");
+    if (!modelName) {
+      setSelectedModel(null);
+      setActiveModels([]);
+      return;
+    }
+    setSelectedModel(modelName);
   };
 
   const panToPhase = (phase: string) => {
@@ -156,6 +151,19 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     panToPhase(newPhase);
   };
 
+  const handleModelsLoaded = useCallback((models: string[]) => {
+    setActiveMode("multi");
+    setActiveModels(models);
+    setSelectedModel(null);
+  }, []);
+
+  // --------------------------
+  // ⭐ DEBUG LOG (đã thêm theo yêu cầu)
+  // --------------------------
+  console.log("➡ currentLayer2 =", currentLayer2);
+  console.log("➡ selectedModel =", selectedModel);
+  console.log("➡ Final imageSrc =", imageSrc);
+
   return (
     <div className={styles.box}>
       <div className={styles.left}>
@@ -169,8 +177,6 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
         >
           <TransformComponent>
             <div className={styles.imageWrapper}>
-              
-              {/* ⭐ ẢNH THEO LAYER2 + FALLBACK */}
               <Image
                 src={imageSrc}
                 alt="Ảnh"
@@ -205,7 +211,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
           project_id={project_id}
           initialPhase={currentPhase}
           initialLayer2={currentLayer2}
-          onModelsLoaded={setActiveModels}
+          onModelsLoaded={handleModelsLoaded}
           onSelectModel={handleModelSelect}
           onPhaseChange={handlePhaseChange}
         />
@@ -213,4 +219,3 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     </div>
   );
 }
-
