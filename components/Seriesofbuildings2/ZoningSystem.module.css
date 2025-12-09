@@ -95,3 +95,29 @@
     height: 30px; /* Kích thước SVG */
   }
 }
+.legendBox {
+  position: absolute;
+    top: 690px;
+    left: 300px;
+  z-index: 10;
+  display: flex;
+  gap: 100px;
+  /* background: rgba(255, 255, 255, 0.8); */
+  padding: 8px 12px;
+  border-radius: 8px;
+  /* backdrop-filter: blur(4px); */
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.colorBox {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}
