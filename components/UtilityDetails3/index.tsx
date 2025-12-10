@@ -39,7 +39,7 @@ export default function ZoningSystem({ project_id, initiallayer2 }: ZoningSystem
 
 
 
- const filteredPaths = useMemo(() => {
+  const filteredPaths = useMemo(() => {
     if (!activeModels || activeModels.length === 0) return [];
 
     return pathsData.map((item: SvgItem) => {
@@ -108,14 +108,7 @@ export default function ZoningSystem({ project_id, initiallayer2 }: ZoningSystem
   return (
     <div className={styles.box}>
       <div className={styles.left}>
-         {/* <TransformWrapper
-          initialScale={1}
-     minScale={1} 
-          maxScale={5}
-          wheel={{ step: 0.2 }}
-          doubleClick={{ disabled: true }}
-        >
-          <TransformComponent> */}
+        
         <div className={styles.imageWrapper}>
            <Image
             src={imageSrc}
@@ -126,21 +119,7 @@ export default function ZoningSystem({ project_id, initiallayer2 }: ZoningSystem
             }}
           />
 
-         {/* {filteredPaths.map((item) => {
-  console.log("🟩 SVG được render lên UI:", item.id);
-
-  return (
-    <div
-      key={item.id}
-      className={styles.overlaySvg}
-      style={{
-        top: `${item.topPercent}%`,
-        left: `${item.leftPercent}%`,
-      }}
-      dangerouslySetInnerHTML={{ __html: item.svg }}
-    />
-  );
-})} */}
+      
   {filteredPaths.length > 0 ? (
             filteredPaths.map((item) => (
               <div
@@ -158,8 +137,7 @@ export default function ZoningSystem({ project_id, initiallayer2 }: ZoningSystem
           )}
 
         </div>
-  {/* </TransformComponent>
-        </TransformWrapper> */}
+
 
       </div>
 

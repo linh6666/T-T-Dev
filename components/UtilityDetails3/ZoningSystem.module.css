@@ -12,29 +12,32 @@
 
 /* Wrapper để đặt SVG lên ảnh */
 .imageWrapper {
-  position: relative; /* ✅ để SVG có thể đặt lên ảnh */
+  position: relative; /* Để SVG có thể đặt lên ảnh */
+  width: 100%;
 }
 
 /* Ảnh full kích thước */
 .img {
   width: 100%;
-  height: 100%;
-  object-fit: cover; 
+  height: auto; /* Có thể thay đổi thành height: 100% nếu cần */
+  object-fit: cover;
   display: block;
+  z-index: 1; /* Đảm bảo ảnh nằm dưới SVG */
 }
 
-
+/* SVG overlay */
 .overlaySvg {
-  position: absolute;
-  top: 20px; 
-  left: 20px;
-  pointer-events: none; 
+  position: absolute; /* Để đặt SVG ở vị trí chính xác */
+  /* top: 20px; 
+  left: 20px;  */
+  /* z-index: 2;  */
+  pointer-events: none; /* Ngăn chặn sự kiện chuột trên SVG nếu không cần thiết */
 }
 
 /* Cột phải (text) */
 .right {
-  width: 240px;     
-  background-color:#FFFAEE;
+  width: 240px;
+  background-color: #fffaee;
   justify-content: center;
   color: #762f0b;
   font-size: 18px;
@@ -69,8 +72,8 @@
   .overlaySvg {
     top: 10px;
     left: 10px;
-    width: 40px;
-    height: 40px;
+    width: 40px; /* Kích thước SVG */
+    height: 40px; /* Kích thước SVG */
   }
 }
 
@@ -88,24 +91,33 @@
   .overlaySvg {
     top: 5px;
     left: 5px;
-    width: 30px;
-    height: 30px;
+    width: 30px; /* Kích thước SVG */
+    height: 30px; /* Kích thước SVG */
   }
 }
-.imageWrapper {
-  position: relative;
-  width: 100%;
-}
-
-.img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  display: block;
-}
-
-/* .overlaySvg {
+.legendBox {
   position: absolute;
-  pointer-events: none;
-  transform: translate(-50%, -50%); 
-} */
+    top: 690px;
+    left: 300px;
+  z-index: 10;
+  display: flex;
+  gap: 100px;
+  /* background: rgba(255, 255, 255, 0.8); */
+  padding: 8px 12px;
+  border-radius: 8px;
+  /* backdrop-filter: blur(4px); */
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.colorBox {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}

@@ -234,7 +234,7 @@ if (subzone.toLowerCase() === "skip") return;
                       ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
                       : undefined,
                 }}
-                // disabled={isMultiMode === "multi"}
+                disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>
