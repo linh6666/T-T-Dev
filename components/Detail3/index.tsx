@@ -179,21 +179,17 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
             <div className={styles.imageWrapper}>
               <Image src="/image/TIMES_HOME.png" alt="Ảnh" className={styles.img} />
 
-           {filteredPaths.length > 0 ? (
-                filteredPaths.map((item) => (
-                  <div
-                    key={item.id}
-                    className={styles.overlaySvg}
-                    style={{
-                      top: `${item.topPercent}%`,
-                      left: `${item.leftPercent}%`,
-                    }}
-                    dangerouslySetInnerHTML={{ __html: item.svg }}
-                  />
-                ))
-              ) : (
-                <p>Không có SVG nào để hiển thị.</p>
-              )}
+        {filteredPaths.map((item) => (
+  <div
+    key={item.id}
+    className={styles.overlaySvg}
+    style={{
+      top: `${item.topPercent}%`,
+      left: `${item.leftPercent}%`,
+    }}
+    dangerouslySetInnerHTML={{ __html: item.svg }}
+  />
+))}
             </div>
           </TransformComponent>
         </TransformWrapper>
