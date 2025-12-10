@@ -1,17 +1,76 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Image } from "@mantine/core";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { pathsData } from "./Data";
+import { pathsData,SvgItem } from "./Data";
 
 interface ZoningSystemProps {
   project_id: string | null;
 }
 
 export default function ZoningSystem({ project_id }: ZoningSystemProps) {
+ const [activeModels, setActiveModels] = useState<string[]>([]);
+  const [selectedModel] = useState<string | null>(null);
+
+  const filteredPaths = useMemo(() => {
+    if (!activeModels || activeModels.length === 0) {
+      console.log("❌ Không có activeModels → Không hiển thị SVG");
+      return [];
+    }
+  
+    console.log("👉 activeModels từ API:", activeModels);
+  
+    const result = pathsData.map((item: SvgItem) => {
+      console.log("🟦 SVG đang xử lý:", item.id);
+  
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
+  
+      Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
+        const elId = el.id || "";
+        const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
+  
+        // So sánh với activeModels → chuẩn hóa tên
+        const isMatch = activeModels.some((model) => {
+          const cleanModel = (model || "").replace(/\s+/g, "_").toUpperCase();
+          return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
+        });
+  
+        if (elId) {
+          console.log(
+            isMatch ? "✅ MATCH → SVG hiển thị:" : "⛔ HIDE →",
+            elId
+          );
+        }
+  
+        if (isMatch) {
+          el.removeAttribute("style");
+          if (selectedModel && cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())) {
+            el.setAttribute("fill", "#bb8d38");
+            el.setAttribute("stroke", "white");
+          } else {
+            const originalFill =
+              el.getAttribute("data-original-fill") || el.getAttribute("fill") || "#fff";
+            if (!el.hasAttribute("data-original-fill")) el.setAttribute("data-original-fill", originalFill);
+            el.setAttribute("fill", originalFill);
+            el.removeAttribute("stroke");
+          }
+        } else {
+          el.setAttribute("style", "display:none");
+        }
+      });
+  
+      return {
+        ...item,
+        svg: svgDoc.documentElement.outerHTML,
+      };
+    });
+  
+    return result;
+  }, [activeModels, selectedModel]);
   return (
     <div className={styles.box}>
       <div className={styles.left}>
@@ -35,28 +94,30 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
               />
 
               {/* ⬇️ Hiển thị toàn bộ SVG, không lọc */}
-              {pathsData.length > 0 ? (
-                pathsData.map((item) => (
-                  <div
-                    key={item.id}
-                    className={styles.overlaySvg}
-                    style={{
-                      top: `${item.topPercent}%`,
-                      left: `${item.leftPercent}%`,
-                    }}
-                    dangerouslySetInnerHTML={{ __html: item.svg }}
-                  />
-                ))
-              ) : (
-                <p>Không có SVG nào để hiển thị.</p>
-              )}
+           
+        {filteredPaths.map((item) => {
+  console.log("🟩 SVG được render lên UI:", item.id);
+
+  return (
+    <div
+      key={item.id}
+      className={styles.overlaySvg}
+      style={{
+        top: `${item.topPercent}%`,
+        left: `${item.leftPercent}%`,
+      }}
+      dangerouslySetInnerHTML={{ __html: item.svg }}
+    />
+  );
+})}
             </div>
           </TransformComponent>
         </TransformWrapper>
       </div>
 
       <div className={styles.right}>
-        <Menu project_id={project_id} />
+        <Menu project_id={project_id}
+        onModelsLoaded={setActiveModels} />
       </div>
     </div>
   );

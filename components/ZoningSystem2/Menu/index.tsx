@@ -10,6 +10,7 @@ import { NotificationExtension } from "../../../extension/NotificationExtension"
 
 interface MenuProps {
   project_id: string | null;
+  onModelsLoaded?: (models: string[]) => void;
 }
 
 interface MenuItem {
@@ -17,17 +18,19 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
+   building_code?: string; 
   phase_vi?: string;
   [key: string]: unknown;
 }
 
 interface ApiResponse {
+  
   message?: string;
   data?: NodeAttributeItem[];
   [key: string]: unknown;
 }
 
-export default function Menu({ project_id }: MenuProps) {
+export default function Menu({ project_id,onModelsLoaded }: MenuProps) {
   const router = useRouter();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,6 +54,11 @@ export default function Menu({ project_id }: MenuProps) {
         }
 
         if (data?.data && Array.isArray(data.data)) {
+
+  onModelsLoaded?.(
+  data.data.map((i) => i.building_code as string)
+);
+
           const allPhases: string[] = data.data.flatMap(
             (item: NodeAttributeItem) =>
               String(item.layer5 || "")
@@ -103,7 +111,7 @@ export default function Menu({ project_id }: MenuProps) {
     };
 
     fetchData();
-  }, [project_id]);
+  }, [project_id, onModelsLoaded]);
 
 const handleNavigate = (layer5: string) => {
   if (!project_id) return;
