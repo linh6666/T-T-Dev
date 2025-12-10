@@ -222,34 +222,7 @@ border-radius: 15px;
     /* border: 2px solid #fff; */
   }
 }
-/* .menuBtn {
-  display: inline-block;       
-  border: 1.5px solid #762f0b;
-  border-radius: 999px;         
-  background-color: #FFFAEE;
-  color: #762f0b;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 6px 18px;           
-  width: auto;                 
-  height: auto;                
-  transition: all 0.2s ease;
-  white-space: nowrap;          
-}
 
-.menuBtn:hover {
-  background-color: #f5e7df; 
-}
-
-.menuBtn:active,
-.menuBtn:focus {
-  background-color: #762f0b;
-  color: #fff;
-  border-color: #762f0b;
-} */
-/* -----------------------
-   nút 5 cái trên (giữ trạng thái trước)
-   ----------------------- */
 .menuBtn {
   /* nếu muốn giữ đều nhau, đặt width cụ thể, nếu muốn co giãn: chuyển sang width: fit-content */
   width: 170px;  

@@ -114,6 +114,9 @@ if (subzone.toLowerCase() === "skip") return;
       });
 
       console.log("✅ API trả về cho", layer1, data);
+      //   if (isMultiMode !== "multi") {
+      //   onSelectModel?.(layer1);
+      // }
     } catch (error) {
       console.error("❌ Lỗi khi gọi API:", error);
     }
@@ -137,7 +140,7 @@ if (subzone.toLowerCase() === "skip") return;
       console.log("🔥 MULTI MODE API:", res);
 
       if (res?.data && Array.isArray(res.data)) {
-        onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.layer3));
+        onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.layer1));
       }
     } catch (error) {
       console.error("❌ Lỗi MULTI MODE API:", error);

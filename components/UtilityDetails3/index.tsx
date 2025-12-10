@@ -5,7 +5,7 @@ import React, {useCallback, useMemo,useState} from "react";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index"; 
 import { pathsData,SvgItem } from "./Data";
-// import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
 
 
 interface ZoningSystemProps {
@@ -142,9 +142,9 @@ export default function ZoningSystem({ project_id, initiallayer2 }: ZoningSystem
       </div>
 
       <div className={styles.right}>
-        {/* 👇 Truyền project_id và initialBuildingType sang Menu */}
+ 
         <Menu project_id={project_id} initiallayer2={initiallayer2} 
-        //  onModelsLoaded={setActiveModels}
+      
          onSelectModel={handleModelSelect}
             onModelsLoaded={handleModelsLoaded}
          
