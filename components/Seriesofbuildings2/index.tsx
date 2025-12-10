@@ -109,24 +109,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     // setSelectedModel(modelName);
      setSelectedModel((prev) => (prev === modelName ? null : modelName));
   };
-//   const handleModelSelect = (modelName: string | null) => {
-//   setActiveMode("single");
 
-//   // Nếu click lại model đang chọn → tắt highlight
-//   if (selectedModel === modelName) {
-//     setSelectedModel(null);
-//     setActiveModels([]);
-//     return;
-//   }
-
-//   // Ngược lại, chọn mới
-//   setSelectedModel(modelName);
-//   setActiveModels([modelName]);
-// };
-
-  // ----------------------------------------
-  // ⭐ PAN TO PHASE
-  // ----------------------------------------
   const panToPhase = (phase: string) => {
     if (!transformRef.current) return;
 

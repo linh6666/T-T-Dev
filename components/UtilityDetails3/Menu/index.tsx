@@ -15,6 +15,7 @@ interface MenuProps {
   initiallayer2?: string | null;
   onModelsLoaded?: (models: string[]) => void;
   onSelectModel?: (modelName: string) => void;
+  
 }
 
 interface MenuItem {
@@ -67,7 +68,7 @@ export default function Menu({
 
         data.data.forEach((item: NodeAttributeItem) => {
           const subzone: string = item.layer1 || "";
-
+if (subzone.toLowerCase() === "skip") return;
           if (
             subzone.trim() &&
             !subzone.includes(";") &&
@@ -99,24 +100,24 @@ export default function Menu({
   }, [project_id, phaseFromQuery, onModelsLoaded]);
 
   // Khi nhấn 1 item
-  // const handleMenuClick = async (subzoneLabel: string) => {
-  //   if (!project_id || !phaseFromQuery) return;
+  const handleMenuClick = async (layer1: string) => {
+    if (!project_id || !phaseFromQuery) return;
 
-  //   try {
-  //     const data = await createNodeAttribute({
-  //       project_id,
-  //       filters: [
-  //         { label: "layer6", values: ["ti"] },
-  //         { label: "layer4", values: [phaseFromQuery] },
-  //         { label: "layer3", values: [subzoneLabel] },
-  //       ],
-  //     });
+    try {
+      const data = await createNodeAttribute({
+        project_id,
+        filters: [
+         {  values: ["ti"] },
+          { label: "layer2", values: [phaseFromQuery] },
+           { label: "layer1", values: [layer1] },
+        ],
+      });
 
-  //     console.log("✅ API trả về cho", subzoneLabel, data);
-  //   } catch (error) {
-  //     console.error("❌ Lỗi khi gọi API:", error);
-  //   }
-  // };
+      console.log("✅ API trả về cho", layer1, data);
+    } catch (error) {
+      console.error("❌ Lỗi khi gọi API:", error);
+    }
+  };
 
   // ❗❗ MULTI MODE API
   const handleMultiModeAPI = async () => {
@@ -127,8 +128,9 @@ export default function Menu({
       const res = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "layer6", values: ["ti"] },
-          { label: "layer4", values: [phaseFromQuery] },
+          { values: ["ti"] },
+         { label: "layer2", values: [phaseFromQuery] },
+         
         ],
       });
 
@@ -220,7 +222,7 @@ export default function Menu({
                 key={index}
                 className={styles.menuBtn}
                 onClick={() => {
-                  // handleMenuClick(item.label);
+                  handleMenuClick(item.label);
                   onSelectModel?.(item.label);
                 }}
                 variant="filled"
@@ -232,7 +234,7 @@ export default function Menu({
                       ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
                       : undefined,
                 }}
-                disabled={isMultiMode === "multi"}
+                // disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>
@@ -252,6 +254,7 @@ export default function Menu({
             activeMode={isMultiMode}
             setActiveMode={setIsMultiMode}
             onMultiModeClick={handleMultiModeAPI}
+            onSelectModel={onSelectModel}
           />
 
           <Group gap="xs">
