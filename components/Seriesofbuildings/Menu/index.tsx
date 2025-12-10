@@ -78,7 +78,7 @@ export default function Menu({
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
         const uniqueMap = new Map<string, MenuItem>();
                    onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.layer3)
+          data.data.map((i: NodeAttributeItem) => i.building_code)
         );
 
         data.data.forEach((item: NodeAttributeItem) => {
