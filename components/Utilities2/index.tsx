@@ -1,7 +1,7 @@
 "use client";
 
 import { Image } from "@mantine/core";
-import React, {useMemo,useState} from "react";
+import React, {useCallback, useMemo,useState} from "react";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index"; 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -15,72 +15,87 @@ interface ZoningSystemProps {
 export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
+   const [activeMode, setActiveMode] = useState<"single" | "multi" | null>(null);
    
 const filteredPaths = useMemo(() => {
-  if (!activeModels || activeModels.length === 0) {
-    console.log("❌ Không có activeModels → Không hiển thị SVG");
-    return [];
-  }
+    if (!activeModels || activeModels.length === 0) return [];
 
-  console.log("👉 activeModels từ API:", activeModels);
+    return pathsData.map((item: SvgItem) => {
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
 
-  const result = pathsData.map((item: SvgItem) => {
-    console.log("🟦 SVG đang xử lý:", item.id);
+      Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
+        const elId = el.id || "";
+        const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
 
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
+        const isMatch = activeModels.some((model) => {
+          const cleanModel = model.replace(/\s+/g, "_").toUpperCase();
+          return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
+        });
 
-    Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
-      const elId = el.id || "";
-      const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
+        if (isMatch) {
+          el.removeAttribute("style");
 
-      // So sánh với activeModels → chuẩn hóa tên
-      const isMatch = activeModels.some((model) => {
-        const cleanModel = (model || "").replace(/\s+/g, "_").toUpperCase();
-        return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
+          if (activeMode === "multi") {
+            el.setAttribute("fill", "#bb8d38");
+            el.setAttribute("stroke", "white");
+          } else if (
+            selectedModel &&
+            cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())
+          ) {
+            el.setAttribute("fill", "#bb8d38");
+            el.setAttribute("stroke", "white");
+          } else {
+            const originalFill =
+              el.getAttribute("data-original-fill") ||
+              el.getAttribute("fill") ||
+              "#fff";
+
+            if (!el.hasAttribute("data-original-fill"))
+              el.setAttribute("data-original-fill", originalFill);
+
+            el.setAttribute("fill", originalFill);
+            el.removeAttribute("stroke");
+          }
+        } else {
+          el.setAttribute("style", "display:none");
+        }
       });
 
-      if (elId) {
-        console.log(
-          isMatch ? "✅ MATCH → SVG hiển thị:" : "⛔ HIDE →",
-          elId
-        );
-      }
-
-      if (isMatch) {
-        el.removeAttribute("style");
-        if (selectedModel && cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())) {
-          el.setAttribute("fill", "#bb8d38");
-          el.setAttribute("stroke", "white");
-        } else {
-          const originalFill =
-            el.getAttribute("data-original-fill") || el.getAttribute("fill") || "#fff";
-          if (!el.hasAttribute("data-original-fill")) el.setAttribute("data-original-fill", originalFill);
-          el.setAttribute("fill", originalFill);
-          el.removeAttribute("stroke");
-        }
-      } else {
-        el.setAttribute("style", "display:none");
-      }
+      return { ...item, svg: svgDoc.documentElement.outerHTML };
     });
+  }, [activeModels, selectedModel, activeMode]);
 
-    return {
-      ...item,
-      svg: svgDoc.documentElement.outerHTML,
-    };
-  });
 
-  return result;
-}, [activeModels, selectedModel]);
 
 
           
-                const handleModelSelect = (modelName: string) => {
-    setSelectedModel((prev) => (prev === modelName ? null : modelName));
-
-    // Zoom vào vùng SVG tương ứng (giả sử có id là modelName)
- 
+   const handleModelSelect = (modelName: string | null) => {
+    setActiveMode("single");
+    if (!modelName) {
+      setSelectedModel(null);
+      setActiveModels([]);
+      return;
+    }
+    // setSelectedModel(modelName);
+     setSelectedModel((prev) => (prev === modelName ? null : modelName));
   };
+
+  // const handlePhaseChange = (newPhase: string) => {
+  //   setCurrentPhase(newPhase);
+  //   setCurrentLayer2(newPhase);
+  //   panToPhase(newPhase);
+  // };
+  
+
+  const handleModelsLoaded = useCallback((models: string[]) => {
+    setActiveMode("multi");
+    setActiveModels(models);
+    setSelectedModel(null);
+  }, []);
+
+
+
   return (
     <div className={styles.box}>
       <div className={styles.left}>
@@ -119,7 +134,8 @@ const filteredPaths = useMemo(() => {
         {/* 👇 Truyền project_id sang Menu */}
         <Menu project_id={project_id} 
           onSelectModel={handleModelSelect} 
-           onModelsLoaded={setActiveModels}
+         
+              onModelsLoaded={handleModelsLoaded}
         />
       </div>
     </div>
