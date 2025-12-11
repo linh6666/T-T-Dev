@@ -29,20 +29,24 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const [activeMode, setActiveMode] = useState<"single" | "multi" | null>(null);
 
   // ----------------------------------------
-  // ⭐ LẤY ẢNH THEO LAYER 2
+  // ⭐ LẤY ẢNH THEO LAYER 2 VÀ FALLBACK
   // ----------------------------------------
   const getImageByLayer = (layerName: string | null) => {
     if (!layerName) return "/image/TIMES_HOME.png";
-
     const clean = layerName.trim().toUpperCase();
     return `/TIMES SQUARE/${clean}.png`;
   };
 
-  const layerImage = useMemo(() => getImageByLayer(currentLayer2), [currentLayer2]);
+  const [imageSrc, setImageSrc] = useState("/image/TIMES_HOME.png");
 
-  const imageSrc = useMemo(() => {
-    return layerImage; // luôn giữ nguyên ảnh layer2
-  }, [layerImage]);
+  useEffect(() => {
+    const candidate = getImageByLayer(currentLayer2);
+    const img = new window.Image();
+    img.src = candidate;
+
+    img.onload = () => setImageSrc(candidate);
+    img.onerror = () => setImageSrc("/image/TIMES_HOME.png");
+  }, [currentLayer2]);
 
   // ----------------------------------------
   // ⭐ FILTER SVG
@@ -106,8 +110,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
       setActiveModels([]);
       return;
     }
-    // setSelectedModel(modelName);
-     setSelectedModel((prev) => (prev === modelName ? null : modelName));
+    setSelectedModel((prev) => (prev === modelName ? null : modelName));
   };
 
   const panToPhase = (phase: string) => {
@@ -152,41 +155,11 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
       {/* LEFT CONTENT */}
       <div className={styles.left}>
         <div className={styles.imageWrapper}>
-          {/* ⭐ 3 NÚT HIỂN THỊ TRÊN ẢNH */}
-          {/* <div className={styles.legendBox}>
-            <div className={styles.legendItem}>
-              <span
-                className={styles.colorBox}
-                style={{ background: "#67CDB8" }}
-              ></span>
-              <span>Căn hộ Studio</span>
-            </div>
-
-            <div className={styles.legendItem}>
-              <span
-                className={styles.colorBox}
-                style={{ background: "#FFE6B2" }}
-              ></span>
-              <span>Căn hộ 1 phòng ngủ</span>
-            </div>
-
-            <div className={styles.legendItem}>
-              <span
-                className={styles.colorBox}
-                style={{ background: "#CF8895" }}
-              ></span>
-              <span>Căn hộ 2 phòng ngủ</span>
-            </div>
-          </div> */}
-
           {/* ẢNH NỀN */}
           <Image
             src={imageSrc}
             alt="Ảnh"
             className={styles.img}
-            onError={(e) => {
-              e.currentTarget.src = "/image/TIMES_HOME.png";
-            }}
           />
 
           {/* SVG LỚP TRÊN */}
