@@ -34,7 +34,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     return pathsData.map((item: SvgItem) => {
       const parser = new DOMParser();
       const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
-      Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
+      Array.from(svgDoc.querySelectorAll("rect, path,circle")).forEach((el) => {
         const elId = el.id || "";
         const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
         const isMatch = activeModels.some((model) => {
