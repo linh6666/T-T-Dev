@@ -153,7 +153,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
       <div className={styles.left}>
         <div className={styles.imageWrapper}>
           {/* ⭐ 3 NÚT HIỂN THỊ TRÊN ẢNH */}
-          <div className={styles.legendBox}>
+          {/* <div className={styles.legendBox}>
             <div className={styles.legendItem}>
               <span
                 className={styles.colorBox}
@@ -177,7 +177,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
               ></span>
               <span>Căn hộ 2 phòng ngủ</span>
             </div>
-          </div>
+          </div> */}
 
           {/* ẢNH NỀN */}
           <Image
