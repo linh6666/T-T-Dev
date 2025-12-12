@@ -62,61 +62,66 @@ export default function Menu({
   }, [phaseValue, phase, onPhaseChange,valuelayer4]);
 
   // 📡 Gọi API danh sách nhà
-  const fetchData = useCallback(async () => {
-    if (!project_id || !phase) return;
-    setLoading(true);
-    try {
-      const data = await createNodeAttribute({
-        project_id,
-        filters: [
-          { label: "layer6", values: ["ct"] },
-          { label: "layer5", values: [phase] },
-           { label: "layer4", values: [layer4] },
-        ],
+ // 📡 Gọi API danh sách nhà
+const fetchData = useCallback(async () => {
+  if (!project_id || !phase) return;
+  setLoading(true);
+
+  try {
+    const data = await createNodeAttribute({
+      project_id,
+      filters: [
+        { label: "layer6", values: ["ct"] },
+        { label: "layer5", values: [phase] },
+        { label: "layer4", values: [layer4] },
+      ],
+    });
+
+    if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
+      const uniqueMap = new Map<string, MenuItem>();
+
+      onModelsLoaded?.(data.data.map((i: NodeAttributeItem) => i.building_code));
+
+      data.data.forEach((item: NodeAttributeItem) => {
+        const layer3 = item.layer3 || "";
+        const groupValue = item.group;
+
+        if (layer3.toLowerCase() === "skip") return;
+
+        if (
+          layer3.trim() &&
+          !layer3.includes(";") &&
+          groupValue !== "ct;ti" &&
+          !uniqueMap.has(layer3)
+        ) {
+          uniqueMap.set(layer3, {
+            label: layer3,
+            layer5: phase,
+            layer4: layer4,
+            layer3: layer3,
+          });
+        }
       });
 
-      if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
-        const uniqueMap = new Map<string, MenuItem>();
-                   onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
-        );
+      // 📌 SORT CHUẨN THEO SỐ — TỪ NHỎ → LỚN
+      const sortedItems = Array.from(uniqueMap.values()).sort((a, b) => {
+        const numA = parseInt(a.label.match(/\d+/)?.[0] ?? "0");
+        const numB = parseInt(b.label.match(/\d+/)?.[0] ?? "0");
+        return numA - numB;
+      });
 
-        data.data.forEach((item: NodeAttributeItem) => {
-          const layer3 = item.layer3
- || "";
-          const groupValue = item.group;
-
-          // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
-          if (layer3.toLowerCase() === "skip") {
-            return; 
-          }
-
-          if (
-            layer3.trim() &&
-            !layer3.includes(";") &&
-            groupValue !== "ct;ti" &&
-            !uniqueMap.has(layer3)
-          ) {
-            uniqueMap.set(layer3, {
-              label: layer3,
-              layer5: phase,
-              layer4: layer4,
-               layer3: layer3,
-            });
-          }
-        });
-
-        setMenuItems(Array.from(uniqueMap.values()));
-      } else {
-        setMenuItems([]);
-      }
-    } catch (error) {
-      console.error("❌ Lỗi khi gọi API:", error);
+      setMenuItems(sortedItems);
+    } else {
       setMenuItems([]);
-    } finally {
-      setLoading(false);
     }
-  }, [project_id, phase,layer4,onModelsLoaded]);
+  } catch (error) {
+    console.error("❌ Lỗi khi gọi API:", error);
+    setMenuItems([]);
+  } finally {
+    setLoading(false);
+  }
+}, [project_id, phase, layer4, onModelsLoaded]);
+
 
   useEffect(() => {
     fetchData();

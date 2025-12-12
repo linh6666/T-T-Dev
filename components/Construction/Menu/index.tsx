@@ -52,8 +52,8 @@ export default function Menu({
   const valuelayer3 = searchParams.get("layer3") || initialLayer3 || "";
 
   // ⚙️ State
-    const [isMultiMode, setIsMultiMode] =
-      useState<"single" | "multi" | null>(null);
+  const [isMultiMode, setIsMultiMode] =
+    useState<"single" | "multi" | null>(null);
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
   const [layer4, setlayer4] = useState<string>(valuelayer4 || "");
@@ -96,7 +96,12 @@ export default function Menu({
 
           if (layer2.toLowerCase() === "skip") return;
 
-          if (layer2.trim() && !layer2.includes(";") && groupValue !== "ct;ti" && !uniqueMap.has(layer2)) {
+          if (
+            layer2.trim() &&
+            !layer2.includes(";") &&
+            groupValue !== "ct;ti" &&
+            !uniqueMap.has(layer2)
+          ) {
             uniqueMap.set(layer2, {
               label: layer2,
               layer5: phase,
@@ -107,7 +112,12 @@ export default function Menu({
           }
         });
 
-        setMenuItems(Array.from(uniqueMap.values()));
+        // 🔹 Sắp xếp từ nhỏ đến lớn theo label
+        const sortedItems = Array.from(uniqueMap.values()).sort((a, b) =>
+          a.label.localeCompare(b.label, "vi", { numeric: true })
+        );
+
+        setMenuItems(sortedItems);
       } else {
         setMenuItems([]);
       }
@@ -177,41 +187,39 @@ export default function Menu({
     }
   };
 
+  const handleMultiModeAPI = async () => {
+    if (!project_id || !phase || !layer4 || !layer3) return;
 
+    try {
+      console.log("🔄 MULTI MODE → gọi lại API...");
 
-const handleMultiModeAPI = async () => {
-  if (!project_id || !phase || !layer4 || !layer3) return;
+      const res = await createNodeAttribute({
+        project_id,
+        filters: [
+          { label: "layer6", values: ["ct"] },
+          { label: "layer5", values: [phase] },
+          { label: "layer4", values: [layer4] },
+          { label: "layer3", values: [layer3] },
+        ],
+      });
 
-  try {
-    console.log("🔄 MULTI MODE → gọi lại API...");
+      console.log("🔥 MULTI MODE API:", res);
 
-    const res = await createNodeAttribute({
-      project_id,
-      filters: [
-        { label: "layer6", values: ["ct"] },
-        { label: "layer5", values: [phase] },
-        { label: "layer4", values: [layer4] },
-        { label: "layer3", values: [layer3] },
-      ],
-    });
+      // 🟢 Gửi layer2 về để SVG hiển thị
+      if (res?.data && Array.isArray(res.data)) {
+        const models = res.data
+          .map((i: NodeAttributeItem) => i.layer2)
+          .filter((v: string | undefined) => v && v !== "skip");
 
-    console.log("🔥 MULTI MODE API:", res);
+        console.log("🟢 MULTI MODE activeModels:", models);
 
-    // 🟢 Gửi layer2 về để SVG hiển thị
-    if (res?.data && Array.isArray(res.data)) {
-      const models = res.data
-        .map((i: NodeAttributeItem) => i.layer2)
-       .filter((v: string | undefined) => v && v !== "skip");
-
-      console.log("🟢 MULTI MODE activeModels:", models);
-
-      // cập nhật lại danh sách model để SVG map đúng
-      onModelsLoaded?.(models);
+        // cập nhật lại danh sách model để SVG map đúng
+        onModelsLoaded?.(models);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi MULTI MODE API:", error);
     }
-  } catch (error) {
-    console.error("❌ Lỗi MULTI MODE API:", error);
-  }
-};
+  };
 
   const getButtonStyle = (isActive: boolean) => ({
     width: 30,
@@ -223,7 +231,9 @@ const handleMultiModeAPI = async () => {
     justifyContent: "center",
     overflow: "hidden",
     transition: "background 0.3s",
-    background: isActive ? "linear-gradient(to top, #FFE09A,#FFF1D2)" : "#FFFAEE",
+    background: isActive
+      ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
+      : "#FFFAEE",
     color: "#752E0B",
     border: "1.5px solid #752E0B",
   });
@@ -231,7 +241,11 @@ const handleMultiModeAPI = async () => {
   return (
     <div className={styles.box}>
       <div className={styles.logo}>
-        <Image src="/Logo/TTHOMES logo-01.png" alt="Logo" className={styles.imgea} />
+        <Image
+          src="/Logo/TTHOMES logo-01.png"
+          alt="Logo"
+          className={styles.imgea}
+        />
       </div>
 
       <div className={styles.title}>
@@ -242,7 +256,7 @@ const handleMultiModeAPI = async () => {
         {loading ? (
           <Loader color="orange" />
         ) : menuItems.length > 0 ? (
-          <div className={styles.scroll} style={{ marginTop: "5px" }}>
+                    <div className={styles.scroll} style={{ marginTop: "5px" }}>
             {menuItems.map((item) => (
               <Button
                 key={item.label}
@@ -253,7 +267,7 @@ const handleMultiModeAPI = async () => {
                 }}
                 variant="filled"
                 color="orange"
-                 style={{
+                style={{
                   marginBottom: "10px",
                   background:
                     isMultiMode === "multi"
@@ -275,23 +289,27 @@ const handleMultiModeAPI = async () => {
 
       <div className={styles.footer}>
         <Stack align="center" gap="xs">
-           <Function
-                      activeMode={isMultiMode}
-                      setActiveMode={setIsMultiMode}
-                      onMultiModeClick={handleMultiModeAPI}
-                       onSelectModel={onSelectModel}
-                    />
+          <Function
+            activeMode={isMultiMode}
+            setActiveMode={setIsMultiMode}
+            onMultiModeClick={handleMultiModeAPI}
+            onSelectModel={onSelectModel}
+          />
           <Group gap="xs">
             <Button
               style={getButtonStyle(active === "on")}
-              onClick={() => (active !== "on" ? handleClickOn() : setActive(null))}
+              onClick={() =>
+                active !== "on" ? handleClickOn() : setActive(null)
+              }
             >
               <Text style={{ fontSize: "13px" }}>ON</Text>
             </Button>
 
             <Button
               style={getButtonStyle(active === "off")}
-              onClick={() => (active !== "off" ? handleClickOFF() : setActive(null))}
+              onClick={() =>
+                active !== "off" ? handleClickOFF() : setActive(null)
+              }
             >
               <Text style={{ fontSize: "12px" }}>OFF</Text>
             </Button>
