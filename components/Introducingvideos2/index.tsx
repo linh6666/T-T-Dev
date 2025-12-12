@@ -14,7 +14,7 @@ export default function VideoPage() {
 
   const handleBack = () => {
     if (!project_id) return;
-    router.push(`/Tuong-tac/Times-Square?id=${project_id}`);
+    router.push(`/Tuong-tac/Ca-mau?id=${project_id}`);
   };
 
   // 🟢 Khi trang vừa load, tự động gọi API
