@@ -13,7 +13,7 @@ interface WarehouseDetailProps {
 const folderImages = [
   "ttphuoctho.png",
   "ttcitymillennia.png",
-  "projectc.jpg",
+  "ttcamau.png",
   "projectd.jpg",
 ];
 
