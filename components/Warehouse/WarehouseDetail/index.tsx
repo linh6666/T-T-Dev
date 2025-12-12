@@ -14,7 +14,7 @@ export interface WarehouseItem {
   building_type: string;
   layer6:string;
   layer3:string;
-  description_vi:string;
+  describe_vi:string;
   status_unit:string;
   bedroom: number;
   bathroom: number;
@@ -31,7 +31,7 @@ export interface WarehouseItemdeltall {
   unit_code: string;
   name_vi: string;
   name_en: string;
-  description_vi: string;
+  describe_vi: string;
   description_en: string;
   url: string;
   id: string;
@@ -164,7 +164,7 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
           Giá: {item.price ? item.price.toLocaleString() + "đ" : "Chưa có"}
         </Text>
           <Text>
-                  <b>Mô tả:</b> {item.description_vi}
+                  <b>Mô tả:</b> {item.describe_vi}
                 </Text>
                    </>
               

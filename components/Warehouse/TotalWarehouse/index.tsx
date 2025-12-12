@@ -11,7 +11,7 @@ import {
   MultiSelect,
   Autocomplete,
 } from "@mantine/core";
-import { createWarehouse } from "../../../api/apiFilterWarehousebasic";
+import { createWarehouse } from "../../../api/apiFilterWarehouse"
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail";
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
@@ -31,7 +31,7 @@ export interface WarehouseItem {
   zone: string;
   status_unit: string;
   building_type: string;
-  description_vi: string;
+  describe_vi: string;
   bedroom: number;
   bathroom: number;
   direction: string;
@@ -54,28 +54,33 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
 
   // --- Fetch data ---
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const body = {
-          project_id: projectId,
-          filters: [{ label: "type_info", values: ["bh"] }],
-        };
-        const res = await createWarehouse( body);
-        const warehouseList = Array.isArray(res) ? res : res.data || [];
-        setItems(warehouseList);
-        setFilteredItems(warehouseList); // ban đầu hiển thị toàn bộ
-      } catch (error) {
-        console.error("Failed to fetch warehouse data:", error);
-        setItems([]);
-        setFilteredItems([]);
-      } finally {
-        setLoading(false);
-      }
+ useEffect(() => {
+  async function fetchData() {
+    try {
+      setLoading(true);
+
+      const body = {
+        project_id: projectId,
+        filters: [{ label: "type_info", values: ["bh"] }],
+      };
+
+      // 👉 createWarehouse cần (project_id, body)
+      const res = await createWarehouse(projectId as string, body);
+
+      const warehouseList = Array.isArray(res) ? res : res.data || [];
+      setItems(warehouseList);
+      setFilteredItems(warehouseList); // ban đầu hiển thị toàn bộ
+    } catch (error) {
+      console.error("Failed to fetch warehouse data:", error);
+      setItems([]);
+      setFilteredItems([]);
+    } finally {
+      setLoading(false);
     }
-    fetchData();
-  }, [projectId]);
+  }
+  fetchData();
+}, [projectId]);
+
 
   // --- Loading ---
   if (loading) {
