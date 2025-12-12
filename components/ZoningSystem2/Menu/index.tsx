@@ -18,19 +18,19 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-   building_code?: string; 
+  building_code?: string;
   phase_vi?: string;
+  layer5?: string; // thêm để tránh cảnh báo TS
   [key: string]: unknown;
 }
 
 interface ApiResponse {
-  
   message?: string;
   data?: NodeAttributeItem[];
   [key: string]: unknown;
 }
 
-export default function Menu({ project_id,onModelsLoaded }: MenuProps) {
+export default function Menu({ project_id, onModelsLoaded }: MenuProps) {
   const router = useRouter();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,31 +48,39 @@ export default function Menu({ project_id,onModelsLoaded }: MenuProps) {
 
         const data: ApiResponse = await createNodeAttribute(body);
 
-        // ✅ Kiểm tra nếu API có message
         if (data?.message) {
           NotificationExtension.Success(data.message);
         }
 
         if (data?.data && Array.isArray(data.data)) {
+          onModelsLoaded?.(data.data.map((i) => i.building_code as string));
 
-  onModelsLoaded?.(
-  data.data.map((i) => i.building_code as string)
-);
-
-          const allPhases: string[] = data.data.flatMap(
-            (item: NodeAttributeItem) =>
-              String(item.layer5 || "")
-                .split(";")
-                .map((z) => z.trim())
-                .filter(Boolean)
+          const allPhases: string[] = data.data.flatMap((item: NodeAttributeItem) =>
+            String(item.layer5 || "")
+              .split(";")
+              .map((z) => z.trim())
+              .filter(Boolean)
           );
 
-          // 🆕 BƯỚC LỌC MỚI: Loại bỏ các phase có giá trị là "skip" (không phân biệt chữ hoa/thường)
-          const filteredPhases = allPhases.filter((phase) => phase.toLowerCase() !== "skip");
+          const filteredPhases = allPhases.filter(
+            (phase) => phase.toLowerCase() !== "skip"
+          );
 
           const uniquePhases = Array.from(new Set(filteredPhases));
 
+          // 🆕 Sắp xếp ưu tiên
+          const priorityOrder = ["THE GATE", "COLMAR", "VENICE","SUNRISE","SUNSET","CHUNG CƯ VÀ NHÀ Ở XÃ HỘI"]; // chỉnh theo ý bạn
+
           const sortedPhases = uniquePhases.sort((a, b) => {
+            const indexA = priorityOrder.indexOf(a);
+            const indexB = priorityOrder.indexOf(b);
+
+            if (indexA !== -1 && indexB !== -1) {
+              return indexA - indexB;
+            }
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+
             const numA = a.match(/\d+/)?.[0];
             const numB = b.match(/\d+/)?.[0];
             if (numA && numB) return Number(numA) - Number(numB);
@@ -90,7 +98,6 @@ export default function Menu({ project_id,onModelsLoaded }: MenuProps) {
       } catch (error: unknown) {
         console.error("❌ Lỗi khi gọi API:", error);
 
-        // ✅ Nếu backend trả về lỗi có message hoặc detail
         let apiMessage = "Gọi API thất bại!";
         if (error && typeof error === "object") {
           const errObj = error as {
@@ -113,10 +120,14 @@ export default function Menu({ project_id,onModelsLoaded }: MenuProps) {
     fetchData();
   }, [project_id, onModelsLoaded]);
 
-const handleNavigate = (layer5: string) => {
-  if (!project_id) return;
-  router.push(`/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(layer5)}`);
-};
+  const handleNavigate = (layer5: string) => {
+    if (!project_id) return;
+    router.push(
+      `/Tuong-tac/Ca-mau/Mau-cong-trinh?id=${project_id}&layer5=${encodeURIComponent(
+        layer5
+      )}`
+    );
+  };
 
   const handleBack = () => {
     if (!project_id) return;
