@@ -61,7 +61,7 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
 
       const body = {
         project_id: projectId,
-        filters: [{ label: "type_info", values: ["bh"] }],
+        filters: [{ lable: "type_info", values: ["bh"] }],
       };
 
       // 👉 createWarehouse cần (project_id, body)

@@ -2,7 +2,7 @@ import { api } from "../libray/axios"; // ✅ file api em đã có sẵn
 import { API_ROUTE } from "../const/apiRouter";
 
 interface FilterItem {
-  label: string;
+  lable: string;
   values: string[];
 }
 
