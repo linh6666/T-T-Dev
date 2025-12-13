@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 
 const Camera = dynamic(
-  () => import('../../../../../components/Introducingvideos2'),
+  () => import('../../../../../components/Introducingvideos3'),
   { ssr: false } // chỉ render trên client
 );
 

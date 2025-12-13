@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -45,18 +44,16 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
 
-  // --- Pagination ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // --- Search ---
   const [searchText, setSearchText] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<{ value: string }[]>([]);
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
+  const [selectedBuildingTypes, setSelectedBuildingTypes] = useState<string[]>([]); // Trạng thái cho building_type đã chọn
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
 
-  // Meta map: tra cứu thông tin phụ theo unit_code
   const suggestionMeta = useMemo(() => {
     const map = new Map<string, { zone?: string; building_type?: string }>();
     for (const i of items) {
@@ -65,7 +62,6 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
     return map;
   }, [items]);
 
-  // --- Fetch data ---
   useEffect(() => {
     async function fetchData() {
       try {
@@ -101,12 +97,33 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
     fetchData();
   }, [projectId, target]);
 
-  // --- Loading ---
+  useEffect(() => {
+    handleFilterByBuildingType(); // Gọi hàm lọc khi selectedBuildingTypes thay đổi
+  }, [selectedBuildingTypes]);
+
+  const handleFilterByBuildingType = () => {
+    if (selectedBuildingTypes.length === 0) {
+      setFilteredItems(items); // Reset về tất cả
+    } else {
+      const filtered = items.filter(item => selectedBuildingTypes.includes(item.building_type));
+      setFilteredItems(filtered);
+    }
+    setCurrentPage(1);
+  };
+
+  const toggleFilterSidebar = () => {
+    setShowFilterSidebar(prev => {
+      if (prev) {
+        setSelectedBuildingTypes([]); // Reset lựa chọn khi đóng sidebar
+      }
+      return !prev;
+    });
+  };
+
   if (loading) {
     return <Loader style={{ marginTop: 50, display: "block" }} />;
   }
 
-  // --- Detail view ---
   if (selectedItem) {
     return (
       <WarehouseDetail
@@ -117,10 +134,8 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
     );
   }
 
-  // --- Search handlers ---
   const handleInputChange = (value: string) => {
     setSearchText(value);
-
     if (!value || value.trim().length < 1) {
       setSearchSuggestions([]);
       return;
@@ -148,10 +163,9 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
     setCurrentPage(1);
   };
 
-  // --- Filter by status ---
   const handleFilterStatus = (status?: string) => {
     if (!status) {
-      setFilteredItems(items); // reset về tất cả
+      setFilteredItems(items); // Reset về tất cả
     } else {
       const filtered = items.filter(item => item.status_unit === status);
       setFilteredItems(filtered);
@@ -159,7 +173,6 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
     setCurrentPage(1);
   };
 
-  // --- Pagination calculation ---
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
@@ -176,26 +189,24 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
             width: 300,
           }}
         >
-          <h1
-            style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}
-          >
+          <h1 style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}>
             Bộ lọc sản phẩm
           </h1>
-          <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-            {/* <MultiSelect
-              label="Phân Khu"
-              placeholder="Chọn phân khu"
-              data={["React", "Angular", "Vue", "Svelte"]}
-            /> */}
-            <MultiSelect
-              label="Loại công trình"
-              placeholder="Chọn loại công trình"
-              data={["React", "Angular", "Vue", "Svelte"]}
-            />
+          
+          {/* MultiSelect cho building_type */}
+          <MultiSelect
+            label="Loại công trình"
+            placeholder="Chọn loại công trình"
+            data={Array.from(new Set(items.map(item => item.building_type)))}
+            value={selectedBuildingTypes}
+            onChange={setSelectedBuildingTypes}
+          />
+          
+          <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
             <MultiSelect
               label="Hướng"
               placeholder="Chọn hướng"
-              data={["React", "Angular", "Vue", "Svelte"]}
+              data={["North", "South", "East", "West"]} // Các hướng mẫu
             />
           </div>
 
@@ -205,9 +216,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
           >
             {["Số lượng tầng", "Phòng ngủ", "Phòng tắm"].map((label, idx) => (
               <div key={idx}>
-                <label
-                  style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}
-                >
+                <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
                   {label}
                 </label>
                 <div style={{ display: "flex", gap: "10px" }}>
@@ -249,7 +258,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
                 root: { borderColor: "#762f0b", color: "#762f0b" },
                 icon: { color: "#762f0b" },
               }}
-              onClick={() => setShowFilterSidebar((prev) => !prev)}
+              onClick={toggleFilterSidebar}
             >
               <IconFilter2 size={20} />
             </ActionIcon>
@@ -291,7 +300,6 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
 
           {/* Status buttons */}
           <Group gap="sm" style={{ marginTop: 16 }}>
-           
             <button
               style={{ backgroundColor: "#c99945", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
               onClick={() => handleFilterStatus("Quan tâm")}
@@ -320,41 +328,39 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
         </div>
 
         {/* List cards */}
-       {/* List cards */}
-<div className={styles.container}>
-  {currentItems.length === 0 ? (
-    <Text ta="center" style={{ marginTop: 20, fontSize: "14px", color: "#888" }}>
-      Không có dữ liệu
-    </Text>
-  ) : (
-    <SimpleGrid
-      cols={{ base: 1, sm: 2, md: 3, lg: 4, xl: showFilterSidebar ? 4 : 5 }}
-      spacing="xl"
-    >
-      {currentItems.map((item) => (
-        <Card
-          key={item.id}
-          shadow="md"
-          radius="lg"
-          className={styles.card}
-          style={{ cursor: "pointer" }}
-          onClick={() => setSelectedItem(item)}
-        >
-          <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
-            {item.unit_code}
-          </Text>
-          <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
-          <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
-          <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
-          <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
-          <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
-          <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
-        </Card>
-      ))}
-    </SimpleGrid>
-  )}
-</div>
-
+        <div className={styles.container}>
+          {currentItems.length === 0 ? (
+            <Text ta="center" style={{ marginTop: 20, fontSize: "14px", color: "#888" }}>
+              Không có dữ liệu
+            </Text>
+          ) : (
+            <SimpleGrid
+              cols={{ base: 1, sm: 2, md: 3, lg: 4, xl: showFilterSidebar ? 4 : 5 }}
+              spacing="xl"
+            >
+              {currentItems.map((item) => (
+                <Card
+                  key={item.id}
+                  shadow="md"
+                  radius="lg"
+                  className={styles.card}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setSelectedItem(item)}
+                >
+                  <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
+                    {item.unit_code}
+                  </Text>
+                  <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
+                  <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
+                  <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
+                  <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
+                  <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
+                  <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
+                </Card>
+              ))}
+            </SimpleGrid>
+          )}
+        </div>
 
         {/* Pagination */}
         <div
