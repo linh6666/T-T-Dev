@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Group,
   Card,
@@ -8,10 +9,10 @@ import {
   SimpleGrid,
   Loader,
   ActionIcon,
-  MultiSelect,
   Autocomplete,
+  MultiSelect,
 } from "@mantine/core";
-import { createWarehouse } from "../../../api/apiFilterWarehouse"
+import { createWarehouse } from "../../../api/apiFilterWarehouse";
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail";
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
@@ -38,7 +39,7 @@ export interface WarehouseItem {
   price: number;
 }
 
-export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
+export default function TotalWarehouse({ projectId, target }: TotalWarehouseProps) {
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null);
@@ -50,37 +51,55 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
 
   // --- Search ---
   const [searchText, setSearchText] = useState("");
-  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [searchSuggestions, setSearchSuggestions] = useState<{ value: string }[]>([]);
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
 
-  // --- Fetch data ---
- useEffect(() => {
-  async function fetchData() {
-    try {
-      setLoading(true);
+  const normalize = (value?: string) => value?.trim().toLowerCase();
 
-      const body = {
-        project_id: projectId,
-        filters: [{ lable: "type_info", values: ["bh"] }],
-      };
-
-      // 👉 createWarehouse cần (project_id, body)
-      const res = await createWarehouse(projectId as string, body);
-
-      const warehouseList = Array.isArray(res) ? res : res.data || [];
-      setItems(warehouseList);
-      setFilteredItems(warehouseList); // ban đầu hiển thị toàn bộ
-    } catch (error) {
-      console.error("Failed to fetch warehouse data:", error);
-      setItems([]);
-      setFilteredItems([]);
-    } finally {
-      setLoading(false);
+  // Meta map: tra cứu thông tin phụ theo unit_code
+  const suggestionMeta = useMemo(() => {
+    const map = new Map<string, { zone?: string; building_type?: string }>();
+    for (const i of items) {
+      map.set(i.unit_code, { zone: i.zone, building_type: i.building_type });
     }
-  }
-  fetchData();
-}, [projectId]);
+    return map;
+  }, [items]);
 
+  // --- Fetch data ---
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+
+        const body = {
+          project_id: projectId,
+          filters: [{ lable: "type_info", values: ["bh"] }],
+        };
+
+        const res = await createWarehouse(projectId as string, body);
+        const warehouseList: WarehouseItem[] = Array.isArray(res) ? res : res.data || [];
+
+        const finalList = target
+          ? warehouseList.filter(item => {
+              if (!item.zone) return false;
+              return normalize(item.zone) === normalize(target);
+            })
+          : warehouseList;
+
+        setItems(finalList);
+        setFilteredItems(finalList);
+        setCurrentPage(1);
+      } catch (error) {
+        console.error("Failed to fetch warehouse data:", error);
+        setItems([]);
+        setFilteredItems([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [projectId, target]);
 
   // --- Loading ---
   if (loading) {
@@ -102,24 +121,42 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
   const handleInputChange = (value: string) => {
     setSearchText(value);
 
+    if (!value || value.trim().length < 1) {
+      setSearchSuggestions([]);
+      return;
+    }
+
     const suggestions = items
-      .map(
-        (item) =>
-          `${item.unit_code} ${item.layer6} ${item.layer3} `
+      .filter((item) =>
+        `${item.unit_code} ${item.zone} ${item.building_type}`
+          .toLowerCase()
+          .includes(value.toLowerCase())
       )
-      .filter((text) => text.toLowerCase().includes(value.toLowerCase()));
+      .slice(0, 10)
+      .map((item) => ({ value: item.unit_code }));
 
     setSearchSuggestions(suggestions);
   };
 
   const handleSearch = () => {
     const filtered = items.filter((item) =>
-      `${item.unit_code} ${item.layer6} ${item.layer3} ${item.direction}`
+      `${item.unit_code} ${item.building_type} ${item.zone} ${item.direction}`
         .toLowerCase()
         .includes(searchText.toLowerCase())
     );
     setFilteredItems(filtered);
-    setCurrentPage(1); // reset page về đầu
+    setCurrentPage(1);
+  };
+
+  // --- Filter by status ---
+  const handleFilterStatus = (status?: string) => {
+    if (!status) {
+      setFilteredItems(items); // reset về tất cả
+    } else {
+      const filtered = items.filter(item => item.status_unit === status);
+      setFilteredItems(filtered);
+    }
+    setCurrentPage(1);
   };
 
   // --- Pagination calculation ---
@@ -129,7 +166,6 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
 
   return (
     <div style={{ display: "flex" }}>
-      {/* --- Sidebar --- */}
       {showFilterSidebar && (
         <div
           style={{
@@ -146,11 +182,11 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
             Bộ lọc sản phẩm
           </h1>
           <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-            <MultiSelect
+            {/* <MultiSelect
               label="Phân Khu"
               placeholder="Chọn phân khu"
               data={["React", "Angular", "Vue", "Svelte"]}
-            />
+            /> */}
             <MultiSelect
               label="Loại công trình"
               placeholder="Chọn loại công trình"
@@ -201,10 +237,8 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
           </div>
         </div>
       )}
-
-      {/* --- Main content --- */}
       <div style={{ flex: 1, padding: 20 }}>
-        {/* Header: filter icon + search + trạng thái */}
+        {/* Header */}
         <div>
           <Group gap="md">
             <ActionIcon
@@ -221,73 +255,64 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
             </ActionIcon>
 
             {/* Autocomplete search */}
-         <Autocomplete
-  placeholder="Tìm kiếm...."
-  value={searchText}
-  data={searchSuggestions}
-  onChange={handleInputChange}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") handleSearch();
-  }}
-  leftSection={
-    <IconSearch
-      onClick={handleSearch}
-      size={16}
-      color="#762f0b"
-      style={{ cursor: "pointer" }}
-    />
-  }
-  styles={{
-    input: {
-      paddingLeft: 36, // thêm padding để placeholder không bị che
-    },
-  }}
-  style={{ width: 240 }}
-/>
+            <Autocomplete
+              placeholder="Tìm kiếm...."
+              value={searchText}
+              data={searchSuggestions}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
+              leftSection={
+                <IconSearch
+                  onClick={handleSearch}
+                  size={16}
+                  color="#762f0b"
+                  style={{ cursor: "pointer" }}
+                />
+              }
+              renderOption={({ option }) => {
+                const meta = suggestionMeta.get(option.value);
+                return (
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <strong>{option.value}</strong>
+                    <span style={{ fontSize: "12px", color: "#666" }}>
+                      {meta?.zone ?? "—"} • {meta?.building_type ?? "—"}
+                    </span>
+                  </div>
+                );
+              }}
+              styles={{
+                input: { paddingLeft: 36 },
+              }}
+              style={{ width: 300 }}
+            />
           </Group>
 
+          {/* Status buttons */}
           <Group gap="sm" style={{ marginTop: 16 }}>
+           
             <button
-              style={{
-                backgroundColor: "#c99945",
-                color: "#fff",
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: 20,
-              }}
+              style={{ backgroundColor: "#c99945", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
+              onClick={() => handleFilterStatus("Quan tâm")}
             >
               Quan tâm
             </button>
             <button
-              style={{
-                backgroundColor: "#3d6985",
-                color: "#fff",
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: 20,
-              }}
+              style={{ backgroundColor: "#3d6985", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
+              onClick={() => handleFilterStatus("Đang bán")}
             >
               Đang bán
             </button>
             <button
-              style={{
-                backgroundColor: "#e56a3e",
-                color: "#fff",
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: 20,
-              }}
+              style={{ backgroundColor: "#e56a3e", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
+              onClick={() => handleFilterStatus("Đã đặt cọc")}
             >
               Đã đặt cọc
             </button>
             <button
-              style={{
-                backgroundColor: "#d73a24",
-                color: "#fff",
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: 20,
-              }}
+              style={{ backgroundColor: "#d73a24", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
+              onClick={() => handleFilterStatus("Đã bán")}
             >
               Đã bán
             </button>
@@ -295,33 +320,41 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
         </div>
 
         {/* List cards */}
-        <div className={styles.container}>
-          <SimpleGrid
-            cols={{ base: 1, sm: 2, md: 3, lg: 4, xl: showFilterSidebar ? 4 : 5 }}
-            spacing="xl"
-          >
-            {currentItems.map((item) => (
-              <Card
-                key={item.id}
-                shadow="md"
-                radius="lg"
-                className={styles.card}
-                style={{ cursor: "pointer" }}
-                onClick={() => setSelectedItem(item)}
-              >
-                <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
-                  {item.unit_code}
-                </Text>
-                <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
-                <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
-                <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
-                <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
-                <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
-                <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
-              </Card>
-            ))}
-          </SimpleGrid>
-        </div>
+       {/* List cards */}
+<div className={styles.container}>
+  {currentItems.length === 0 ? (
+    <Text ta="center" style={{ marginTop: 20, fontSize: "14px", color: "#888" }}>
+      Không có dữ liệu
+    </Text>
+  ) : (
+    <SimpleGrid
+      cols={{ base: 1, sm: 2, md: 3, lg: 4, xl: showFilterSidebar ? 4 : 5 }}
+      spacing="xl"
+    >
+      {currentItems.map((item) => (
+        <Card
+          key={item.id}
+          shadow="md"
+          radius="lg"
+          className={styles.card}
+          style={{ cursor: "pointer" }}
+          onClick={() => setSelectedItem(item)}
+        >
+          <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
+            {item.unit_code}
+          </Text>
+          <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
+          <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
+          <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
+          <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
+          <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
+          <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
+        </Card>
+      ))}
+    </SimpleGrid>
+  )}
+</div>
+
 
         {/* Pagination */}
         <div
