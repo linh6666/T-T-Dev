@@ -312,8 +312,8 @@ export default function TotalWarehouse({ projectId }: TotalWarehouseProps) {
                 <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
                   {item.unit_code}
                 </Text>
-                <Text style={{ fontSize: "13px" }}>Phân khu: {item.layer6}</Text>
-                <Text style={{ fontSize: "13px" }}>Loại công trình: {item.layer3}</Text>
+                <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
+                <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
                 <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
                 <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
                 <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>

@@ -154,8 +154,8 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
                      <Text fw={700} mb={12} style={{ fontSize: "18px" }}>
           Chi tiết căn hộ: {item.unit_code}
         </Text>
-        <Text style={{ fontSize: "15px" }}>Phân khu: {item.layer6}</Text>
-        <Text style={{ fontSize: "15px" }}>Loại công trình: {item.layer3}</Text>
+        <Text style={{ fontSize: "15px" }}>Phân khu: {item.zone}</Text>
+        <Text style={{ fontSize: "15px" }}>Loại công trình: {item.building_type}</Text>
         <Text style={{ fontSize: "15px" }}>Phòng ngủ: {item.bedroom}</Text>
         <Text style={{ fontSize: "15px" }}>Phòng tắm: {item.bathroom}</Text>
         <Text style={{ fontSize: "15px" }}>Hướng: {item.direction}</Text>
