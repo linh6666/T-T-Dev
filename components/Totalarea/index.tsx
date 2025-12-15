@@ -41,7 +41,11 @@ export default function Totalarea({
 
   const handleSvgClick = (target: string) => {
     // Ví dụ: chuyển sang trang /details/[target]
-    router.push(`/quan-ly-ban-hang/Kho-hang/${projectId}?target=${encodeURIComponent(target)}`);
+  router.push(
+  `/quan-ly-ban-hang/Kho-hang/${projectId}?target=${encodeURIComponent(target)}&name=${encodeURIComponent(projectName || "")}`
+);
+
+
   };
 
 const handleBack = () => {
