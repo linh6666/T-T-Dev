@@ -50,7 +50,8 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [searchText, setSearchText] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<{ value: string }[]>([]);
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
-  const [selectedBuildingTypes, setSelectedBuildingTypes] = useState<string[]>([]); // Trạng thái cho building_type đã chọn
+  const [selectedBuildingTypes, setSelectedBuildingTypes] = useState<string[]>([]);
+const [activeStatus, setActiveStatus] = useState<string | null>(null);
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
 
@@ -299,32 +300,76 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
           </Group>
 
           {/* Status buttons */}
-          <Group gap="sm" style={{ marginTop: 16 }}>
-            <button
-              style={{ backgroundColor: "#c99945", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
-              onClick={() => handleFilterStatus("Quan tâm")}
-            >
-              Quan tâm
-            </button>
-            <button
-              style={{ backgroundColor: "#3d6985", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
-              onClick={() => handleFilterStatus("Đang bán")}
-            >
-              Đang bán
-            </button>
-            <button
-              style={{ backgroundColor: "#e56a3e", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
-              onClick={() => handleFilterStatus("Đã đặt cọc")}
-            >
-              Đã đặt cọc
-            </button>
-            <button
-              style={{ backgroundColor: "#d73a24", color: "#fff", padding: "8px 16px", border: "none", borderRadius: 20 }}
-              onClick={() => handleFilterStatus("Đã bán")}
-            >
-              Đã bán
-            </button>
-          </Group>
+ <Group gap="sm" style={{ marginTop: 16 }}>
+  <button
+    style={{
+      backgroundColor: activeStatus === "Quan tâm" ? "#b8893c" : "#c99945",
+      color: "#fff",
+      padding: "8px 16px",
+      border: activeStatus === "Quan tâm" ? "2px solid #000" : "none",
+      borderRadius: 20,
+    }}
+    onClick={() => {
+      const status = "Quan tâm";
+      setActiveStatus(activeStatus === status ? null : status);
+      handleFilterStatus(status);
+    }}
+  >
+    Quan tâm
+  </button>
+
+  <button
+    style={{
+      backgroundColor: activeStatus === "Đang bán" ? "#2f566d" : "#3d6985",
+      color: "#fff",
+      padding: "8px 16px",
+      border: activeStatus === "Đang bán" ? "2px solid #000" : "none",
+      borderRadius: 20,
+    }}
+    onClick={() => {
+      const status = "Đang bán";
+      setActiveStatus(activeStatus === status ? null : status);
+      handleFilterStatus(status);
+    }}
+  >
+    Đang bán
+  </button>
+
+  <button
+    style={{
+      backgroundColor: activeStatus === "Đã đặt cọc" ? "#cc5c34" : "#e56a3e",
+      color: "#fff",
+      padding: "8px 16px",
+      border: activeStatus === "Đã đặt cọc" ? "2px solid #000" : "none",
+      borderRadius: 20,
+    }}
+    onClick={() => {
+      const status = "Đã đặt cọc";
+      setActiveStatus(activeStatus === status ? null : status);
+      handleFilterStatus(status);
+    }}
+  >
+    Đã đặt cọc
+  </button>
+
+  <button
+    style={{
+      backgroundColor: activeStatus === "Đã bán" ? "#b32f1f" : "#d73a24",
+      color: "#fff",
+      padding: "8px 16px",
+      border: activeStatus === "Đã bán" ? "2px solid #000" : "none",
+      borderRadius: 20,
+    }}
+    onClick={() => {
+      const status = "Đã bán";
+      setActiveStatus(activeStatus === status ? null : status);
+      handleFilterStatus(status);
+    }}
+  >
+    Đã bán
+  </button>
+</Group>
+
         </div>
 
         {/* List cards */}
