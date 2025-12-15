@@ -82,7 +82,7 @@ export default function LargeFixedTable() {
     { title: "Loai dự án", dataIndex: "type_vi", key: "type_vi", width: 30 },
   
    
-    { title: "Loai dự án (Tiếng Anh)", dataIndex: "type_en", key: "type_en", width: 100 },
+    // { title: "Loai dự án (Tiếng Anh)", dataIndex: "type_en", key: "type_en", width: 100 },
     {
       title: "Hành Động",
       width: 30,

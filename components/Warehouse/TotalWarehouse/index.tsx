@@ -214,7 +214,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
           <div
             style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}
           >
-            {["Số lượng tầng", "Phòng ngủ", "Phòng tắm"].map((label, idx) => (
+            {[,"Phòng ngủ", "Phòng tắm"].map((label, idx) => (
               <div key={idx}>
                 <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
                   {label}
