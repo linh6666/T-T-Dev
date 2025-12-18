@@ -103,7 +103,18 @@ export default function Menu({
           }
         });
 
-        setMenuItems(Array.from(uniqueMap.values()));
+        // 👉 Thêm đoạn sắp xếp theo số 1-10
+        const sortedItems = Array.from(uniqueMap.values()).sort((a, b) => {
+          const numA = parseInt(a.label, 10);
+          const numB = parseInt(b.label, 10);
+
+          if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+          }
+          return a.label.localeCompare(b.label);
+        });
+
+        setMenuItems(sortedItems);
       } else {
         setMenuItems([]);
       }
@@ -257,7 +268,7 @@ export default function Menu({
                       ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
                       : undefined,
                 }}
-                     disabled={isMultiMode === "multi"}
+                disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>

@@ -14,7 +14,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     <div className={styles.box}>
       <div className={styles.left}>
         <div className={styles.imageWrapper}>
-          <Image src="/image/ca-mau.jpg" alt="Ảnh" className={styles.img} />
+          <Image src="/image/TIMES_HOME.png" alt="Ảnh" className={styles.img} />
 
 
 

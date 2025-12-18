@@ -40,7 +40,7 @@ export default function Menu({ project_id }: MenuProps) {
   // 🧭 Quay lại trang điều khiển
   const handleBack = () => {
     if (!project_id) return;
-    router.push(`/Tuong-tac/Ca-mau?id=${project_id}`);
+    router.push(`/Tuong-tac/Times-Square?id=${project_id}`);
   };
 
   // 🧠 Khi nhấp nút — gọi API
