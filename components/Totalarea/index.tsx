@@ -14,7 +14,7 @@ const folderImages = [
   "ttphuoctho.png",
   "ttcitymillennia.png",
   "ttcamau.png",
-  "projectd.jpg",
+  "tttimessquare.png",
 ];
 
 function normalizeText(text: string) {
@@ -308,6 +308,44 @@ fill="rgba(238,75,55,0.6)"
 </svg>
 
 )}
+  {matchedImage === "tttimessquare.png" && (
+  <svg
+    className={styles.overlaySvg4}
+    xmlns="http://www.w3.org/2000/svg"
+    width="1100"
+    height="1200"
+    viewBox="0 0 1684.079 1212.689"
+    // style={{ position: "absolute", top: 0, left: 0 }}
+  >
+   
+     <path 
+     id="KHỐI_ĐẾ" 
+     data-name="KHỐI ĐẾ" 
+     d="M-17784.523-17412.955v107.744l160.613,13.391s55.816,6.32,80.74,0,70.91-18.605,70.91-18.605v-100.049l-93.729-4.213Z" 
+     transform="translate(17786.162 18181.943)" 
+     fill="#df4a00" 
+     opacity="0.6"
+        onClick={() => handleSvgClick("Khối Đế")}
+     />
+  <path 
+  id="TT1"
+  d="M-17644.158-18090.324v675.768h79.207l92.33,3.367-.346-569.74-5.162-64.453-42.441-77.582-27.838-52.48-40.158-10.5-41.986,23.732Z" 
+  transform="translate(17786.523 18185.943)" 
+  fill="#f49a33" 
+  opacity="0.6"
+   onClick={() => handleSvgClick("TT1")}
+  />
+  <path 
+  id="TT2" 
+  d="M-17783.908-17413.336l-2.254-600.049,10.086-59.92,32.629-17.2,37.375,8.3,61.7,68.818.594,600.049Z" 
+  transform="translate(17786.162 18181.943)" 
+  fill="#e2a325" 
+  opacity="0.6"
+  onClick={() => handleSvgClick("TT2")}
+  />
+  </svg>
+)}
+
 
         </div>
       ) : (
