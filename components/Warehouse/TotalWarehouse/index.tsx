@@ -204,13 +204,7 @@ const handleSearch = () => { const filtered = items.filter((item) => ` ${item.un
           </h1>
           
           {/* MultiSelect cho building_type */}
-          <MultiSelect
-            label="Loại công trình"
-            placeholder="Chọn loại công trình"
-            data={uniqueBuildingTypes}
-            value={selectedBuildingTypes}
-            onChange={setSelectedBuildingTypes}
-          />
+     {uniqueBuildingTypes.length > 0 && ( <> {/* MultiSelect cho building_type */} <MultiSelect label="Loại công trình" placeholder="Chọn loại công trình" data={uniqueBuildingTypes} value={selectedBuildingTypes} onChange={setSelectedBuildingTypes} /> </> )}
           
           <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
             <MultiSelect
