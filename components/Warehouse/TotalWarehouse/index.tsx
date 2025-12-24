@@ -58,14 +58,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [activeStatus, setActiveStatus] = useState<string | null>(null);
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
-
-  const suggestionMeta = useMemo(() => {
-    const map = new Map<string, { zone?: string; building_type?: string }>();
-    for (const i of items) {
-      map.set(i.unit_code, { zone: i.zone, building_type: i.building_type });
-    }
-    return map;
-  }, [items]);
+const suggestionMeta = useMemo(() => { const map = new Map< string, { zone?: string; building_type?: string; bedroom?: number|string; bathroom?: number|string; direction?: string; main_door_direction?: string; balcony_direction?: string; status_unit?: string; } >(); for (const i of items) { map.set(i.unit_code, { zone: i.zone, building_type: i.building_type, bedroom: i.bedroom, bathroom: i.bathroom, direction: i.direction, main_door_direction: i.main_door_direction, balcony_direction: i.balcony_direction, status_unit: i.status_unit, }); } return map; }, [items]);
 
   useEffect(() => {
     async function fetchData() {
@@ -153,26 +146,29 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
 
     const suggestions = items
       .filter((item) => 
-        `${item.unit_code} ${item.zone} ${item.building_type}`
+       `
+        ${item.unit_code ?? ""}
+        ${item.zone ?? ""}
+        ${item.layer3 ?? ""}
+        ${item.building_type ?? ""}
+        ${item.layer2 ?? ""}
+        ${item.bedroom ?? ""}
+        ${item.bathroom ?? ""}
+        ${item.direction ?? ""}
+        ${item.main_door_direction ?? ""}
+        ${item.balcony_direction ?? ""}
+        ${item.status_unit ?? ""}
+      `
           .toLowerCase()
           .includes(value.toLowerCase())
       )
       .slice(0, 10)
-      .map((item) => ({ value: item.unit_code }));
-
+      .map((item) => ({ value: item.unit_code, // vẫn giữ làm "value" chính 
+      zone: item.zone, layer3: item.layer3, building_type: item.building_type, layer2: item.layer2, bedroom: item.bedroom, bathroom: item.bathroom, direction: item.direction, main_door_direction: item.main_door_direction, balcony_direction: item.balcony_direction, status_unit: item.status_unit, }));
     setSearchSuggestions(suggestions);
   };
 
-  const handleSearch = () => {
-    const filtered = items.filter((item) =>
-      `${item.unit_code} ${item.building_type} ${item.zone} ${item.direction}`
-        .toLowerCase()
-        .includes(searchText.toLowerCase())
-    );
-    setFilteredItems(filtered);
-    setCurrentPage(1);
-  };
-
+const handleSearch = () => { const filtered = items.filter((item) => ` ${item.unit_code ?? ""} ${item.zone ?? ""} ${item.layer3 ?? ""} ${item.building_type ?? ""} ${item.layer2 ?? ""} ${item.bedroom ?? ""} ${item.bathroom ?? ""} ${item.direction ?? ""} ${item.main_door_direction ?? ""} ${item.balcony_direction ?? ""} ${item.status_unit ?? ""} ` .toLowerCase() .includes(searchText.toLowerCase()) ); setFilteredItems(filtered); setCurrentPage(1); };
   const handleFilterStatus = (status?: string) => {
     if (!status) {
       setFilteredItems(items); // Reset về tất cả
@@ -284,6 +280,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
               value={searchText}
               data={searchSuggestions}
               onChange={handleInputChange}
+                    filter={({ options }) => options}
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSearch();
               }}
@@ -295,17 +292,33 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
                   style={{ cursor: "pointer" }}
                 />
               }
-              renderOption={({ option }) => {
-                const meta = suggestionMeta.get(option.value);
-                return (
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <strong>{option.value}</strong>
-                    <span style={{ fontSize: "12px", color: "#666" }}>
-                      {meta?.zone ?? "—"} • {meta?.building_type ?? "—"}
-                    </span>
-                  </div>
-                );
-              }}
+           renderOption={({ option }) => {
+  const meta = suggestionMeta.get(option.value);
+
+  // Gom các trường có dữ liệu thành mảng, bỏ qua null/undefined
+  const details = [
+    meta?.zone,
+    meta?.building_type,
+    meta?.bedroom ? `${meta.bedroom} PN` : null,
+    meta?.bathroom ? `${meta.bathroom} WC` : null,
+    meta?.direction,
+    meta?.main_door_direction,
+    meta?.balcony_direction,
+    meta?.status_unit,
+  ].filter(Boolean);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <strong>{option.value}</strong>
+      {details.length > 0 && (
+        <span style={{ fontSize: "12px", color: "#666" }}>
+          {details.join(" • ")}
+        </span>
+      )}
+    </div>
+  );
+}}
+
               styles={{
                 input: { paddingLeft: 36 },
               }}
