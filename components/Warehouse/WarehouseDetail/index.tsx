@@ -14,10 +14,14 @@ export interface WarehouseItem {
   building_type: string;
   layer6:string;
   layer3:string;
+  layer2:string;
+  main_door_direction: string;
+  balcony_direction: string;
+  describe:string;
   describe_vi:string;
   status_unit:string;
-  bedroom: number;
-  bathroom: number;
+  bedroom: string| number;
+  bathroom: string| number;
   direction: string;
   price: number;
 }
@@ -37,7 +41,7 @@ export interface WarehouseItemdeltall {
   id: string;
   direction?: string;
   bedroom?: number;
-  bathroom?: number;
+  bathroom?: string;
   price?: number;
 }
 
@@ -154,18 +158,55 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
                      <Text fw={700} mb={12} style={{ fontSize: "18px" }}>
           Chi tiết căn hộ: {item.unit_code}
         </Text>
-        <Text style={{ fontSize: "15px" }}>Phân khu: {item.zone}</Text>
-        <Text style={{ fontSize: "15px" }}>Loại công trình: {item.building_type}</Text>
+      <Text style={{ fontSize: "15px" }}>
+  {item.zone
+    ? `Phân khu: ${item.zone}`
+    : `Tòa: ${item.layer3}`}
+</Text>
+           <Text style={{ fontSize: "15px" }}>
+  {item.building_type
+    ? `Loại công trình: ${item.building_type}`
+    : `Vị trí: ${item.layer2}`}
+</Text>
         <Text style={{ fontSize: "15px" }}>Phòng ngủ: {item.bedroom}</Text>
-        <Text style={{ fontSize: "15px" }}>Phòng tắm: {item.bathroom}</Text>
-        <Text style={{ fontSize: "15px" }}>Hướng: {item.direction}</Text>
+       <Text style={{ fontSize: "13px" }}>
+  Phòng tắm: {
+    typeof item.bathroom === "string" &&
+    item.bathroom.trim().toLowerCase() === "skip"
+      ? "chưa có"
+      : item.bathroom
+  }
+</Text>
+       {item.direction && item.direction.trim() !== "" && (
+  <Text style={{ fontSize: "15px" }}>
+    Hướng: {item.direction.trim().toLowerCase() === "skip"
+      ? "chưa có"
+      : item.direction}
+  </Text>
+)}
+
+{item.main_door_direction && item.main_door_direction.trim() !== "" && (
+  <Text style={{ fontSize: "15px" }}>
+    Hướng cửa chính: {item.main_door_direction.trim().toLowerCase() === "skip"
+      ? "chưa có"
+      : item.main_door_direction}
+  </Text>
+)}
+
+{item.balcony_direction && item.balcony_direction.trim() !== "" && (
+  <Text style={{ fontSize: "15px" }}>
+    Hướng ban công: {item.balcony_direction.trim().toLowerCase() === "skip"
+      ? "chưa có"
+      : item.balcony_direction}
+  </Text>
+)}
               <Text style={{ fontSize: "15px" }}>Trạng thái: {item.status_unit}</Text>
         <Text style={{ fontSize: "15px" }}>
           Giá: {item.price ? item.price.toLocaleString() + "đ" : "Chưa có"}
         </Text>
-          <Text>
-                  <b>Mô tả:</b> {item.describe_vi}
-                </Text>
+         <Text>
+  <b>Mô tả:</b> {item.describe_vi || item.describe}
+</Text>
                    </>
               
      

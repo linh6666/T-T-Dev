@@ -26,14 +26,18 @@ export interface WarehouseItem {
   id: string;
   unit_code: string;
   layer6: string;
+  describe: string;
+  layer2: string;
   layer3: string;
   color: string;
   zone: string;
   status_unit: string;
   building_type: string;
   describe_vi: string;
-  bedroom: number;
-  bathroom: number;
+  main_door_direction: string;
+  balcony_direction: string;
+  bedroom: string| number;
+  bathroom: string | number;
   direction: string;
   price: number;
 }
@@ -51,7 +55,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [searchSuggestions, setSearchSuggestions] = useState<{ value: string }[]>([]);
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
   const [selectedBuildingTypes, setSelectedBuildingTypes] = useState<string[]>([]);
-const [activeStatus, setActiveStatus] = useState<string | null>(null);
+  const [activeStatus, setActiveStatus] = useState<string | null>(null);
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
 
@@ -78,8 +82,13 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
 
         const finalList = target
           ? warehouseList.filter(item => {
-              if (!item.zone) return false;
-              return normalize(item.zone) === normalize(target);
+              if (item.zone) {
+                return normalize(item.zone) === normalize(target);
+              }
+              if (item.layer3) {
+                return normalize(item.layer3) === normalize(target);
+              }
+              return false;
             })
           : warehouseList;
 
@@ -106,7 +115,7 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
     if (selectedBuildingTypes.length === 0) {
       setFilteredItems(items); // Reset về tất cả
     } else {
-      const filtered = items.filter(item => selectedBuildingTypes.includes(item.building_type));
+      const filtered = items.filter(item => item && selectedBuildingTypes.includes(item.building_type));
       setFilteredItems(filtered);
     }
     setCurrentPage(1);
@@ -143,7 +152,7 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
     }
 
     const suggestions = items
-      .filter((item) =>
+      .filter((item) => 
         `${item.unit_code} ${item.zone} ${item.building_type}`
           .toLowerCase()
           .includes(value.toLowerCase())
@@ -168,7 +177,7 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
     if (!status) {
       setFilteredItems(items); // Reset về tất cả
     } else {
-      const filtered = items.filter(item => item.status_unit === status);
+      const filtered = items.filter(item => item && item.status_unit === status);
       setFilteredItems(filtered);
     }
     setCurrentPage(1);
@@ -177,6 +186,10 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  const uniqueBuildingTypes = Array.from(
+    new Set(items.map(item => item.building_type).filter(type => type !== undefined && type !== null))
+  );
 
   return (
     <div style={{ display: "flex" }}>
@@ -198,7 +211,7 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
           <MultiSelect
             label="Loại công trình"
             placeholder="Chọn loại công trình"
-            data={Array.from(new Set(items.map(item => item.building_type)))}
+            data={uniqueBuildingTypes}
             value={selectedBuildingTypes}
             onChange={setSelectedBuildingTypes}
           />
@@ -215,7 +228,7 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
           <div
             style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}
           >
-            {[,"Phòng ngủ", "Phòng tắm"].map((label, idx) => (
+            {["Phòng ngủ", "Phòng tắm"].map((label, idx) => (
               <div key={idx}>
                 <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
                   {label}
@@ -247,6 +260,7 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
           </div>
         </div>
       )}
+
       <div style={{ flex: 1, padding: 20 }}>
         {/* Header */}
         <div>
@@ -300,76 +314,75 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
           </Group>
 
           {/* Status buttons */}
- <Group gap="sm" style={{ marginTop: 16 }}>
-  <button
-    style={{
-      backgroundColor: activeStatus === "Quan tâm" ? "#b8893c" : "#c99945",
-      color: "#fff",
-      padding: "8px 16px",
-      border: activeStatus === "Quan tâm" ? "2px solid #000" : "none",
-      borderRadius: 20,
-    }}
-    onClick={() => {
-      const status = "Quan tâm";
-      setActiveStatus(activeStatus === status ? null : status);
-      handleFilterStatus(status);
-    }}
-  >
-    Quan tâm
-  </button>
+          <Group gap="sm" style={{ marginTop: 16 }}>
+            <button
+              style={{
+                backgroundColor: activeStatus === "Quan tâm" ? "#b8893c" : "#c99945",
+                color: "#fff",
+                padding: "8px 16px",
+                border: activeStatus === "Quan tâm" ? "2px solid #000" : "none",
+                borderRadius: 20,
+              }}
+              onClick={() => {
+                const status = "Quan tâm";
+                setActiveStatus(activeStatus === status ? null : status);
+                handleFilterStatus(status);
+              }}
+            >
+              Quan tâm
+            </button>
 
-  <button
-    style={{
-      backgroundColor: activeStatus === "Đang bán" ? "#2f566d" : "#3d6985",
-      color: "#fff",
-      padding: "8px 16px",
-      border: activeStatus === "Đang bán" ? "2px solid #000" : "none",
-      borderRadius: 20,
-    }}
-    onClick={() => {
-      const status = "Đang bán";
-      setActiveStatus(activeStatus === status ? null : status);
-      handleFilterStatus(status);
-    }}
-  >
-    Đang bán
-  </button>
+            <button
+              style={{
+                backgroundColor: activeStatus === "Đang bán" ? "#2f566d" : "#3d6985",
+                color: "#fff",
+                padding: "8px 16px",
+                border: activeStatus === "Đang bán" ? "2px solid #000" : "none",
+                borderRadius: 20,
+              }}
+              onClick={() => {
+                const status = "Đang bán";
+                setActiveStatus(activeStatus === status ? null : status);
+                handleFilterStatus(status);
+              }}
+            >
+              Đang bán
+            </button>
 
-  <button
-    style={{
-      backgroundColor: activeStatus === "Đã đặt cọc" ? "#cc5c34" : "#e56a3e",
-      color: "#fff",
-      padding: "8px 16px",
-      border: activeStatus === "Đã đặt cọc" ? "2px solid #000" : "none",
-      borderRadius: 20,
-    }}
-    onClick={() => {
-      const status = "Đã đặt cọc";
-      setActiveStatus(activeStatus === status ? null : status);
-      handleFilterStatus(status);
-    }}
-  >
-    Đã đặt cọc
-  </button>
+            <button
+              style={{
+                backgroundColor: activeStatus === "Đã đặt cọc" ? "#cc5c34" : "#e56a3e",
+                color: "#fff",
+                padding: "8px 16px",
+                border: activeStatus === "Đã đặt cọc" ? "2px solid #000" : "none",
+                borderRadius: 20,
+              }}
+              onClick={() => {
+                const status = "Đã đặt cọc";
+                setActiveStatus(activeStatus === status ? null : status);
+                handleFilterStatus(status);
+              }}
+            >
+              Đã đặt cọc
+            </button>
 
-  <button
-    style={{
-      backgroundColor: activeStatus === "Đã bán" ? "#b32f1f" : "#d73a24",
-      color: "#fff",
-      padding: "8px 16px",
-      border: activeStatus === "Đã bán" ? "2px solid #000" : "none",
-      borderRadius: 20,
-    }}
-    onClick={() => {
-      const status = "Đã bán";
-      setActiveStatus(activeStatus === status ? null : status);
-      handleFilterStatus(status);
-    }}
-  >
-    Đã bán
-  </button>
-</Group>
-
+            <button
+              style={{
+                backgroundColor: activeStatus === "Đã bán" ? "#b32f1f" : "#d73a24",
+                color: "#fff",
+                padding: "8px 16px",
+                border: activeStatus === "Đã bán" ? "2px solid #000" : "none",
+                borderRadius: 20,
+              }}
+              onClick={() => {
+                const status = "Đã bán";
+                setActiveStatus(activeStatus === status ? null : status);
+                handleFilterStatus(status);
+              }}
+            >
+              Đã bán
+            </button>
+          </Group>
         </div>
 
         {/* List cards */}
@@ -395,11 +408,56 @@ const [activeStatus, setActiveStatus] = useState<string | null>(null);
                   <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
                     {item.unit_code}
                   </Text>
-                  <Text style={{ fontSize: "13px" }}>Phân khu: {item.zone}</Text>
-                  <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text>
-                  <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
-                  <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
-                  <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text>
+                        <Text style={{ fontSize: "15px" }}>
+  {item.zone
+    ? `Phân khu: ${item.zone}`
+    : `Tòa: ${item.layer3}`}
+</Text>
+                    <Text style={{ fontSize: "15px" }}>
+  {item.building_type
+    ? `Loại công trình: ${item.building_type}`
+    : `Vị trí: ${item.layer2}`}
+</Text>
+                  {/* <Text style={{ fontSize: "13px" }}>Loại công trình: {item.building_type}</Text> */}
+                  <Text style={{ fontSize: "13px" }}>
+  Phòng ngủ: {typeof item.bedroom === "string" && item.bedroom.trim().toLowerCase() === "skip"
+    ? "Không có"
+    : item.bedroom}
+</Text>
+<Text style={{ fontSize: "13px" }}>
+  Phòng tắm: {
+    typeof item.bathroom === "string" &&
+    item.bathroom.trim().toLowerCase() === "skip"
+      ? "Không có"
+      : item.bathroom
+  }
+</Text>
+                  {/* <Text style={{ fontSize: "13px" }}>Hướng: {item.direction}</Text> */}
+{item.direction && item.direction.trim() !== "" && (
+  <Text style={{ fontSize: "15px" }}>
+    Hướng: {item.direction.trim().toLowerCase() === "skip"
+      ? "Không có"
+      : item.direction}
+  </Text>
+)}
+
+{item.main_door_direction && item.main_door_direction.trim() !== "" && (
+  <Text style={{ fontSize: "15px" }}>
+    Hướng cửa chính: {item.main_door_direction.trim().toLowerCase() === "skip"
+      ? "Không có"
+      : item.main_door_direction}
+  </Text>
+)}
+
+{item.balcony_direction && item.balcony_direction.trim() !== "" && (
+  <Text style={{ fontSize: "15px" }}>
+    Hướng ban công: {item.balcony_direction.trim().toLowerCase() === "skip"
+      ? "Không có "
+      : item.balcony_direction}
+  </Text>
+)}
+
+
                   <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
                 </Card>
               ))}
