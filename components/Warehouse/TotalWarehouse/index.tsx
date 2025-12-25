@@ -36,7 +36,7 @@ export interface WarehouseItem {
   describe_vi: string;
   main_door_direction: string;
   balcony_direction: string;
-  bedroom: string| number;
+  bedroom: string | number;
   bathroom: string | number;
   direction: string;
   price: number;
@@ -56,9 +56,39 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
   const [selectedBuildingTypes, setSelectedBuildingTypes] = useState<string[]>([]);
   const [activeStatus, setActiveStatus] = useState<string | null>(null);
+  const [activeBedroom, setActiveBedroom] = useState<string | null>(null);
+
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
-const suggestionMeta = useMemo(() => { const map = new Map< string, { zone?: string; building_type?: string; bedroom?: number|string; bathroom?: number|string; direction?: string; main_door_direction?: string; balcony_direction?: string; status_unit?: string; } >(); for (const i of items) { map.set(i.unit_code, { zone: i.zone, building_type: i.building_type, bedroom: i.bedroom, bathroom: i.bathroom, direction: i.direction, main_door_direction: i.main_door_direction, balcony_direction: i.balcony_direction, status_unit: i.status_unit, }); } return map; }, [items]);
+
+  const suggestionMeta = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        zone?: string;
+        building_type?: string;
+        bedroom?: number | string;
+        bathroom?: number | string;
+        direction?: string;
+        main_door_direction?: string;
+        balcony_direction?: string;
+        status_unit?: string;
+      }
+    >();
+    for (const i of items) {
+      map.set(i.unit_code, {
+        zone: i.zone,
+        building_type: i.building_type,
+        bedroom: i.bedroom,
+        bathroom: i.bathroom,
+        direction: i.direction,
+        main_door_direction: i.main_door_direction,
+        balcony_direction: i.balcony_direction,
+        status_unit: i.status_unit,
+      });
+    }
+    return map;
+  }, [items]);
 
   useEffect(() => {
     async function fetchData() {
@@ -74,7 +104,7 @@ const suggestionMeta = useMemo(() => { const map = new Map< string, { zone?: str
         const warehouseList: WarehouseItem[] = Array.isArray(res) ? res : res.data || [];
 
         const finalList = target
-          ? warehouseList.filter(item => {
+          ? warehouseList.filter((item) => {
               if (item.zone) {
                 return normalize(item.zone) === normalize(target);
               }
@@ -101,41 +131,29 @@ const suggestionMeta = useMemo(() => { const map = new Map< string, { zone?: str
   }, [projectId, target]);
 
   useEffect(() => {
-    handleFilterByBuildingType(); // Gọi hàm lọc khi selectedBuildingTypes thay đổi
+    handleFilterByBuildingType();
   }, [selectedBuildingTypes]);
 
   const handleFilterByBuildingType = () => {
     if (selectedBuildingTypes.length === 0) {
-      setFilteredItems(items); // Reset về tất cả
+      setFilteredItems(items);
     } else {
-      const filtered = items.filter(item => item && selectedBuildingTypes.includes(item.building_type));
+      const filtered = items.filter(
+        (item) => item && selectedBuildingTypes.includes(item.building_type)
+      );
       setFilteredItems(filtered);
     }
     setCurrentPage(1);
   };
 
   const toggleFilterSidebar = () => {
-    setShowFilterSidebar(prev => {
+    setShowFilterSidebar((prev) => {
       if (prev) {
-        setSelectedBuildingTypes([]); // Reset lựa chọn khi đóng sidebar
+        setSelectedBuildingTypes([]);
       }
       return !prev;
     });
   };
-
-  if (loading) {
-    return <Loader style={{ marginTop: 50, display: "block" }} />;
-  }
-
-  if (selectedItem) {
-    return (
-      <WarehouseDetail
-        item={selectedItem}
-        projectId={projectId}
-        onBack={() => setSelectedItem(null)}
-      />
-    );
-  }
 
   const handleInputChange = (value: string) => {
     setSearchText(value);
@@ -145,8 +163,8 @@ const suggestionMeta = useMemo(() => { const map = new Map< string, { zone?: str
     }
 
     const suggestions = items
-      .filter((item) => 
-       `
+      .filter((item) =>
+        `
         ${item.unit_code ?? ""}
         ${item.zone ?? ""}
         ${item.layer3 ?? ""}
@@ -163,29 +181,122 @@ const suggestionMeta = useMemo(() => { const map = new Map< string, { zone?: str
           .includes(value.toLowerCase())
       )
       .slice(0, 10)
-      .map((item) => ({ value: item.unit_code, // vẫn giữ làm "value" chính 
-      zone: item.zone, layer3: item.layer3, building_type: item.building_type, layer2: item.layer2, bedroom: item.bedroom, bathroom: item.bathroom, direction: item.direction, main_door_direction: item.main_door_direction, balcony_direction: item.balcony_direction, status_unit: item.status_unit, }));
+      .map((item) => ({
+        value: item.unit_code,
+        zone: item.zone,
+        layer3: item.layer3,
+        building_type: item.building_type,
+        layer2: item.layer2,
+        bedroom: item.bedroom,
+        bathroom: item.bathroom,
+        direction: item.direction,
+        main_door_direction: item.main_door_direction,
+        balcony_direction: item.balcony_direction,
+        status_unit: item.status_unit,
+      }));
     setSearchSuggestions(suggestions);
   };
 
-const handleSearch = () => { const filtered = items.filter((item) => ` ${item.unit_code ?? ""} ${item.zone ?? ""} ${item.layer3 ?? ""} ${item.building_type ?? ""} ${item.layer2 ?? ""} ${item.bedroom ?? ""} ${item.bathroom ?? ""} ${item.direction ?? ""} ${item.main_door_direction ?? ""} ${item.balcony_direction ?? ""} ${item.status_unit ?? ""} ` .toLowerCase() .includes(searchText.toLowerCase()) ); setFilteredItems(filtered); setCurrentPage(1); };
+  const handleSearch = () => {
+    const filtered = items.filter((item) =>
+      `
+        ${item.unit_code ?? ""}
+        ${item.zone ?? ""}
+        ${item.layer3 ?? ""}
+        ${item.building_type ?? ""}
+        ${item.layer2 ?? ""}
+        ${item.bedroom ?? ""}
+        ${item.bathroom ?? ""}
+        ${item.direction ?? ""}
+        ${item.main_door_direction ?? ""}
+        ${item.balcony_direction ?? ""}
+        ${item.status_unit ?? ""}
+      `
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    );
+    setFilteredItems(filtered);
+    setCurrentPage(1);
+  };
+
   const handleFilterStatus = (status?: string) => {
     if (!status) {
-      setFilteredItems(items); // Reset về tất cả
+      setFilteredItems(items);
     } else {
-      const filtered = items.filter(item => item && item.status_unit === status);
+      const filtered = items.filter((item) => item && item.status_unit === status);
       setFilteredItems(filtered);
     }
     setCurrentPage(1);
   };
+
+  // Lọc theo phòng ngủ
+  const handleFilterBedroom = (num: string | number) => {
+    const filtered = items.filter((item) => item.bedroom === num);
+    setFilteredItems(filtered);
+    setCurrentPage(1);
+  };
+
+  // Lọc theo phòng tắm
+  // const handleFilterBathroom = (num: string | number) => {
+  //   const filtered = items.filter((item) => item.bathroom === num);
+  //   setFilteredItems(filtered);
+  //   setCurrentPage(1);
+  // };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
   const uniqueBuildingTypes = Array.from(
-    new Set(items.map(item => item.building_type).filter(type => type !== undefined && type !== null))
+    new Set(items.map((item) => item.building_type).filter((type) => type !== undefined && type !== null))
   );
+
+// Lấy danh sách phòng ngủ duy nhất, ép về string và bỏ "Skip"
+const uniqueBedrooms: string[] = Array.from(
+  new Set(
+    items
+      .map((item) => item.bedroom)
+      .filter(
+        (num): num is string | number =>
+          num !== undefined &&
+          num !== null &&
+          String(num).toLowerCase() !== "skip" // loại bỏ "Skip" bất kể viết hoa/thường
+      )
+      .map((num) => String(num))
+  )
+);
+
+const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
+  const isNumA = !isNaN(Number(a));
+  const isNumB = !isNaN(Number(b));
+
+  if (isNumA && isNumB) {
+    return Number(a) - Number(b);
+  }
+  if (isNumA) return -1;
+  if (isNumB) return 1;
+  return a.localeCompare(b);
+});
+
+
+
+  // const uniqueBathrooms = Array.from(
+  //   new Set(items.map((item) => item.bathroom).filter((num) => num !== undefined && num !== null))
+  // );
+
+  if (loading) {
+    return <Loader style={{ marginTop: 50, display: "block" }} />;
+  }
+
+  if (selectedItem) {
+    return (
+      <WarehouseDetail
+        item={selectedItem}
+        projectId={projectId}
+        onBack={() => setSelectedItem(null)}
+      />
+    );
+  }
 
   return (
     <div style={{ display: "flex" }}>
@@ -202,52 +313,128 @@ const handleSearch = () => { const filtered = items.filter((item) => ` ${item.un
           <h1 style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}>
             Bộ lọc sản phẩm
           </h1>
-          
-          {/* MultiSelect cho building_type */}
-     {uniqueBuildingTypes.length > 0 && ( <> {/* MultiSelect cho building_type */} <MultiSelect label="Loại công trình" placeholder="Chọn loại công trình" data={uniqueBuildingTypes} value={selectedBuildingTypes} onChange={setSelectedBuildingTypes} /> </> )}
-          
+
+                    {uniqueBuildingTypes.length > 0 && (
+            <MultiSelect
+              label="Loại công trình"
+              placeholder="Chọn loại công trình"
+              data={uniqueBuildingTypes}
+              value={selectedBuildingTypes}
+              onChange={setSelectedBuildingTypes}
+            />
+          )}
+
           <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
             <MultiSelect
               label="Hướng"
               placeholder="Chọn hướng"
-              data={["North", "South", "East", "West"]} // Các hướng mẫu
+              data={["North", "South", "East", "West"]}
             />
           </div>
 
-          {/* Số lượng tầng, Phòng ngủ, Phòng tắm */}
-          <div
-            style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}
-          >
-            {["Phòng ngủ", "Phòng tắm"].map((label, idx) => (
-              <div key={idx}>
-                <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
-                  {label}
-                </label>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  {[1, 2, 3, 4].map((num) => (
-                    <button
-                      key={num}
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        border: "1px solid #762f0b",
-                        borderRadius: "50%",
-                        cursor: "pointer",
-                        backgroundColor: "#fff",
-                        color: "#762f0b",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Phòng ngủ */}
+ <div
+  style={{
+    marginTop: "20px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  }}
+>
+  <label
+    style={{
+      fontWeight: "bold",
+      display: "block",
+      marginBottom: "5px",
+    }}
+  >
+    Phòng ngủ
+  </label>
+
+  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+    {sortedBedrooms.map((num) => {
+      const isActive = activeBedroom === String(num);
+
+      return (
+        <button
+          key={num}
+          onClick={() => {
+            if (isActive) {
+              // 👉 CLICK LẦN 2: BỎ ACTIVE + RESET LIST
+              setActiveBedroom(null);
+              setFilteredItems(items);
+              setCurrentPage(1);
+            } else {
+              // 👉 CLICK LẦN 1: SET ACTIVE + FILTER
+              setActiveBedroom(String(num));
+              handleFilterBedroom(num);
+            }
+          }}
+          style={{
+            padding: "8px 16px",
+            border: "1px solid #762f0b",
+            borderRadius: "20px",
+            backgroundColor: isActive ? "#762f0b" : "#fff",
+            color: isActive ? "#fff" : "#762f0b",
+            fontWeight: "bold",
+            fontSize: "14px",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            if (!isActive) {
+              e.currentTarget.style.backgroundColor = "#762f0b";
+              e.currentTarget.style.color = "#fff";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive) {
+              e.currentTarget.style.backgroundColor = "#fff";
+              e.currentTarget.style.color = "#762f0b";
+            }
+          }}
+        >
+          {num}
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+
+
+          {/* Phòng tắm */}
+          {/* <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+            <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
+              Phòng tắm
+            </label>
+            <div style={{ display: "flex", gap: "10px" }}>
+              {uniqueBathrooms.map((num) => (
+                <button
+                  key={num}
+                  onClick={() => handleFilterBathroom(num)}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    border: "1px solid #762f0b",
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    backgroundColor: "#fff",
+                    color: "#762f0b",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+          </div> */}
+
+
+          
         </div>
       )}
 
