@@ -47,7 +47,7 @@ export default function VideoPage() {
     <Container className={styles.videoContainer}>
       <iframe
         className={styles.videoIframe}
-        src="https://www.youtube.com/embed/PFOUDdT_eDA?autoplay=1&mute=1"
+        src="https://www.youtube.com/embed/FbvLxeUz6bo?autoplay=1&mute=1"
         title="Video giới thiệu"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
