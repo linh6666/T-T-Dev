@@ -28,6 +28,7 @@ export interface WarehouseItem {
   layer6: string;
   describe: string;
   layer2: string;
+  view: string;
   layer3: string;
   color: string;
   zone: string;
@@ -55,6 +56,9 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [searchSuggestions, setSearchSuggestions] = useState<{ value: string }[]>([]);
   const [filteredItems, setFilteredItems] = useState<WarehouseItem[]>([]);
   const [selectedBuildingTypes, setSelectedBuildingTypes] = useState<string[]>([]);
+  const [selectedMainDoorDirections, setSelectedMainDoorDirections] = useState<string[]>([]);
+  const [selectedBalconyDirections, setSelectedBalconyDirections] = useState<string[]>([]);
+  const [selectedDirections, setSelectedDirections] = useState<string[]>([]);
   const [activeStatus, setActiveStatus] = useState<string | null>(null);
   const [activeBedroom, setActiveBedroom] = useState<string | null>(null);
 
@@ -130,21 +134,50 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
     fetchData();
   }, [projectId, target]);
 
-  useEffect(() => {
-    handleFilterByBuildingType();
-  }, [selectedBuildingTypes]);
+useEffect(() => {
+  let filtered = items;
 
-  const handleFilterByBuildingType = () => {
-    if (selectedBuildingTypes.length === 0) {
-      setFilteredItems(items);
-    } else {
-      const filtered = items.filter(
-        (item) => item && selectedBuildingTypes.includes(item.building_type)
-      );
-      setFilteredItems(filtered);
-    }
-    setCurrentPage(1);
-  };
+  // Filter theo loại building
+  if (selectedBuildingTypes.length > 0) {
+    filtered = filtered.filter(
+      (item) =>
+        item && selectedBuildingTypes.includes(item.building_type)
+    );
+  }
+  // Filter theo hướng 
+   if (selectedDirections.length > 0) {
+    filtered = filtered.filter(
+      (item) =>
+        item && selectedDirections.includes(item.direction)
+    );
+  }
+
+  // Filter theo hướng cửa chính
+  if (selectedMainDoorDirections.length > 0) {
+    filtered = filtered.filter(
+      (item) =>
+        item && selectedMainDoorDirections.includes(item.main_door_direction)
+    );
+  }
+
+  // Filter theo hướng ban công
+  if (selectedBalconyDirections.length > 0) {
+    filtered = filtered.filter(
+      (item) =>
+        item && selectedBalconyDirections.includes(item.balcony_direction)
+    );
+  }
+
+  setFilteredItems(filtered);
+  setCurrentPage(1);
+}, [
+  items,
+  selectedBuildingTypes,
+  selectedMainDoorDirections,
+  selectedBalconyDirections,
+]);
+
+
 
   const toggleFilterSidebar = () => {
     setShowFilterSidebar((prev) => {
@@ -154,6 +187,9 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
       return !prev;
     });
   };
+  
+
+
 
   const handleInputChange = (value: string) => {
     setSearchText(value);
@@ -246,10 +282,57 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+const uniqueBuildingTypes = Array.from(
+  new Set(
+    items
+      .map((item) => item.building_type)
+      .filter(
+        (type) =>
+          type !== undefined &&
+          type !== null &&
+          type !== "skip"
+      )
+  )
+);
 
-  const uniqueBuildingTypes = Array.from(
-    new Set(items.map((item) => item.building_type).filter((type) => type !== undefined && type !== null))
-  );
+const uniqueDirections = Array.from(
+  new Set(
+    items
+      .map((item) => item.direction)
+      .filter(
+        (type) =>
+          type !== undefined &&
+          type !== null &&
+          type !== "skip"
+      )
+  )
+);
+
+const uniqueMainDoorDirections = Array.from(
+  new Set(
+    items
+      .map((item) => item.main_door_direction)
+      .filter(
+        (type) =>
+          type !== undefined &&
+          type !== null &&
+          type !== "skip"
+      )
+  )
+);
+
+const uniqueBalconyDirections = Array.from(
+  new Set(
+    items
+      .map((item) => item.balcony_direction)
+      .filter(
+        (type) =>
+          type !== undefined &&
+          type !== null &&
+          type !== "skip"
+      )
+  )
+);
 
 // Lấy danh sách phòng ngủ duy nhất, ép về string và bỏ "Skip"
 const uniqueBedrooms: string[] = Array.from(
@@ -324,117 +407,141 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
             />
           )}
 
-          <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
-            <MultiSelect
-              label="Hướng"
-              placeholder="Chọn hướng"
-              data={["North", "South", "East", "West"]}
-            />
-          </div>
-
-          {/* Phòng ngủ */}
- <div
-  style={{
-    marginTop: "20px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-  }}
->
-  <label
+          {uniqueDirections.length > 0 && (
+  <div
     style={{
-      fontWeight: "bold",
-      display: "block",
-      marginBottom: "5px",
+      marginTop: "20px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
     }}
   >
-    Phòng ngủ
-  </label>
-
-  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-    {sortedBedrooms.map((num) => {
-      const isActive = activeBedroom === String(num);
-
-      return (
-        <button
-          key={num}
-          onClick={() => {
-            if (isActive) {
-              // 👉 CLICK LẦN 2: BỎ ACTIVE + RESET LIST
-              setActiveBedroom(null);
-              setFilteredItems(items);
-              setCurrentPage(1);
-            } else {
-              // 👉 CLICK LẦN 1: SET ACTIVE + FILTER
-              setActiveBedroom(String(num));
-              handleFilterBedroom(num);
-            }
-          }}
-          style={{
-            padding: "8px 16px",
-            border: "1px solid #762f0b",
-            borderRadius: "20px",
-            backgroundColor: isActive ? "#762f0b" : "#fff",
-            color: isActive ? "#fff" : "#762f0b",
-            fontWeight: "bold",
-            fontSize: "14px",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-          }}
-          onMouseEnter={(e) => {
-            if (!isActive) {
-              e.currentTarget.style.backgroundColor = "#762f0b";
-              e.currentTarget.style.color = "#fff";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isActive) {
-              e.currentTarget.style.backgroundColor = "#fff";
-              e.currentTarget.style.color = "#762f0b";
-            }
-          }}
-        >
-          {num}
-        </button>
-      );
-    })}
+    <MultiSelect
+      label="Hướng"
+      placeholder="Chọn hướng"
+      data={uniqueDirections}
+      value={selectedDirections}
+      onChange={setSelectedDirections}
+    />
   </div>
-</div>
+)}
 
 
 
-          {/* Phòng tắm */}
-          {/* <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
-            <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
-              Phòng tắm
-            </label>
-            <div style={{ display: "flex", gap: "10px" }}>
-              {uniqueBathrooms.map((num) => (
-                <button
-                  key={num}
-                  onClick={() => handleFilterBathroom(num)}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    border: "1px solid #762f0b",
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                    backgroundColor: "#fff",
-                    color: "#762f0b",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </div> */}
+
+         {uniqueMainDoorDirections.length > 0 && (
+  <div
+    style={{
+      marginTop: "20px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+    }}
+  >
+    <MultiSelect
+      label="Hướng cửa chính"
+      placeholder="Chọn hướng cửa chính"
+      data={uniqueMainDoorDirections}
+      value={selectedMainDoorDirections}
+      onChange={setSelectedMainDoorDirections}
+    />
+  </div>
+)}
 
 
-          
+
+
+          {uniqueBalconyDirections.length > 0 && (
+  <div
+    style={{
+      marginTop: "20px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+    }}
+  >
+    <MultiSelect
+      label="Hướng ban công"
+      placeholder="Chọn hướng ban công"
+      data={uniqueBalconyDirections}
+      value={selectedBalconyDirections}
+      onChange={setSelectedBalconyDirections}
+    />
+  </div>
+)}
+
+
+{sortedBedrooms.length > 0 && (
+  <div
+    style={{
+      marginTop: "20px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+    }}
+  >
+    <label
+      style={{
+        fontWeight: "bold",
+        display: "block",
+        marginBottom: "5px",
+      }}
+    >
+      Phòng ngủ
+    </label>
+
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      {sortedBedrooms.map((num) => {
+        const isActive = activeBedroom === String(num);
+
+        return (
+          <button
+            key={num}
+            onClick={() => {
+              if (isActive) {
+                // 👉 CLICK LẦN 2: BỎ ACTIVE + RESET LIST
+                setActiveBedroom(null);
+                setFilteredItems(items);
+                setCurrentPage(1);
+              } else {
+                // 👉 CLICK LẦN 1: SET ACTIVE + FILTER
+                setActiveBedroom(String(num));
+                handleFilterBedroom(num);
+              }
+            }}
+            style={{
+              padding: "8px 16px",
+              border: "1px solid #762f0b",
+              borderRadius: "20px",
+              backgroundColor: isActive ? "#762f0b" : "#fff",
+              color: isActive ? "#fff" : "#762f0b",
+              fontWeight: "bold",
+              fontSize: "14px",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = "#762f0b";
+                e.currentTarget.style.color = "#fff";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = "#fff";
+                e.currentTarget.style.color = "#762f0b";
+              }
+            }}
+          >
+            {num}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+       
         </div>
       )}
 

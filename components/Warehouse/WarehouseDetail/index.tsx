@@ -13,6 +13,7 @@ export interface WarehouseItem {
   zone: string;
   building_type: string;
   layer6:string;
+  view:string;
   layer3:string;
   layer2:string;
   main_door_direction: string;
@@ -200,6 +201,8 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
       : item.balcony_direction}
   </Text>
 )}
+
+  <Text style={{ fontSize: "15px" }}>Cảnh quang: {item.view}</Text>
               <Text style={{ fontSize: "15px" }}>Trạng thái: {item.status_unit}</Text>
         <Text style={{ fontSize: "15px" }}>
           Giá: {item.price ? item.price.toLocaleString() + "đ" : "Chưa có"}
