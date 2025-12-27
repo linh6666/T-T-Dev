@@ -66,7 +66,7 @@ export default function Managent({ projectId,target,projectName }: AppProps) {
   style={{ marginLeft: "auto", cursor: "pointer", color: "#1c7ed6" }}
 onClick={() =>
   router.push(
-    `/Thong-tin-san-pham/tong-mat-bang/${projectId}?name=${encodeURIComponent(projectName || "")}`
+    `/quan-ly-ban-hang/tong-mat-bang/${projectId}?name=${encodeURIComponent(projectName || "")}`
   )
 }
 >

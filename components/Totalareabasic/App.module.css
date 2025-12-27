@@ -46,7 +46,24 @@
   position: absolute;
   
   left: 150px;
+
   /* width: 100%;
   height: 100%; */
   /* pointer-events: none;  */
+}
+.overlaySvg2 {
+  position: absolute;
+  
+top: 27.8%;
+    left: 12.9%;
+
+  /* width: 100%;
+  height: 100%; */
+  /* pointer-events: none;  */
+}
+.overlaySvg4 {
+  position: absolute;
+  
+top: -18%;
+    left: 41%;
 }

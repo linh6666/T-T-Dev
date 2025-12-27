@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import Managent from "../../../../../components/Warehouse";
+import Managent from "../../../../../components/Warehouse1";
 
 interface PageProps {
   params: {
