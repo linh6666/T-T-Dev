@@ -5,36 +5,54 @@
   display: flex;
 }
 
-/* Cột trái (ảnh) */
+/* ===================== */
+/* CỘT TRÁI (ẢNH + SVG) */
+/* ===================== */
 .left {
   flex: 3;
 }
 
 /* Wrapper để đặt SVG lên ảnh */
 .imageWrapper {
-  position: relative; /* Để SVG có thể đặt lên ảnh */
+  position: relative;
   width: 100%;
 }
 
-/* Ảnh full kích thước */
+/* ẢNH NỀN */
 .img {
   width: 100%;
-  height: auto; /* Có thể thay đổi thành height: 100% nếu cần */
+  height: auto;
   object-fit: cover;
   display: block;
-  z-index: 1; /* Đảm bảo ảnh nằm dưới SVG */
+  z-index: 1;
+  position: relative;
 }
 
-/* SVG overlay */
+/* ===================== */
+/* SVG OVERLAY (QUAN TRỌNG) */
+/* ===================== */
 .overlaySvg {
-  position: absolute; /* Để đặt SVG ở vị trí chính xác */
-  /* top: 20px; 
-  left: 20px;  */
-  /* z-index: 2;  */
-  pointer-events: none; /* Ngăn chặn sự kiện chuột trên SVG nếu không cần thiết */
+  position: absolute;
+  z-index: 5;              /* 🔥 BẮT BUỘC: SVG LUÔN NẰM TRÊN ẢNH */
+  pointer-events: none;    /* ❌ div KHÔNG bắt click */
 }
 
-/* Cột phải (text) */
+/* 🔥 CHỈ SVG + PATH + RECT ĐƯỢC CLICK */
+.overlaySvg svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: all;
+}
+
+.overlaySvg path,
+.overlaySvg rect {
+  pointer-events: all;
+  cursor: pointer;
+}
+
+/* ===================== */
+/* CỘT PHẢI (MENU) */
+/* ===================== */
 .right {
   width: 240px;
   background-color: #fffaee;
@@ -45,7 +63,9 @@
   padding: 10px;
 }
 
-/* 📱 Mobile responsive */
+/* ===================== */
+/* 📱 MOBILE RESPONSIVE */
+/* ===================== */
 @media (max-width: 768px) {
   .box {
     flex-direction: column;
@@ -55,7 +75,7 @@
   .left {
     flex: none;
     width: 100%;
-    height: 300px;
+    height: auto;
   }
 
   .right {
@@ -66,22 +86,17 @@
   }
 
   .img {
-    height: 100%;
+    height: auto;
   }
 
+  /* ❌ KHÔNG ĐƯỢC BÓP SVG THÀNH ICON */
   .overlaySvg {
-    top: 10px;
-    left: 10px;
-    width: 40px; /* Kích thước SVG */
-    height: 40px; /* Kích thước SVG */
+    width: 100%;
+    height: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .left {
-    height: 220px;
-  }
-
   .right {
     font-size: 14px;
     padding: 15px;
@@ -89,23 +104,23 @@
   }
 
   .overlaySvg {
-    top: 5px;
-    left: 5px;
-    width: 30px; /* Kích thước SVG */
-    height: 30px; /* Kích thước SVG */
+    width: 100%;
+    height: 100%;
   }
 }
+
+/* ===================== */
+/* LEGEND */
+/* ===================== */
 .legendBox {
   position: absolute;
-    top: 690px;
-    left: 300px;
+  top: 690px;
+  left: 300px;
   z-index: 10;
   display: flex;
   gap: 100px;
-  /* background: rgba(255, 255, 255, 0.8); */
   padding: 8px 12px;
   border-radius: 8px;
-  /* backdrop-filter: blur(4px); */
 }
 
 .legendItem {

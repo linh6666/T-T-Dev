@@ -1,12 +1,12 @@
 "use client";
 
 import { Image } from "@mantine/core";
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index";
-import { ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { useSearchParams } from "next/navigation";
 import { pathsData, SvgItem } from "./Data";
+import InfoModal from "./Infomodal/index";
 
 interface ZoningSystemProps {
   project_id: string | null;
@@ -22,14 +22,17 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const [currentLayer2, setCurrentLayer2] = useState<string>(urlLayer2 || "");
   const [currentPhase, setCurrentPhase] = useState<string>(urlPhase || "");
 
-  const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
-
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<"single" | "multi" | null>(null);
 
+  // ===== POPUP STATE =====
+  const [opened, setOpened] = useState(false);
+  const [clickedModel, setClickedModel] = useState<string | null>(null);
+const [selectedProjectId, setSelectedProjectId] = useState<string | null>(project_id);
+
   // ----------------------------------------
-  // ⭐ LẤY ẢNH THEO LAYER 2 VÀ FALLBACK
+  // ⭐ LẤY ẢNH THEO LAYER 2 + FALLBACK
   // ----------------------------------------
   const getImageByLayer = (layerName: string | null) => {
     if (!layerName) return "/image/TIMES_HOME.png";
@@ -59,40 +62,51 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
       const svgDoc = parser.parseFromString(item.svg, "image/svg+xml");
 
       Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
-        const elId = el.id || "";
+        const svgEl = el as SVGElement;
+
+        const elId = svgEl.id || "";
         const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
+
+        svgEl.setAttribute("data-model", elId);
+        svgEl.style.cursor = "pointer";
 
         const isMatch = activeModels.some((model) => {
           const cleanModel = model.replace(/\s+/g, "_").toUpperCase();
-          return cleanElId.includes(cleanModel) || cleanModel.includes(cleanElId);
+          return (
+            cleanElId.includes(cleanModel) ||
+            cleanModel.includes(cleanElId)
+          );
         });
 
         if (isMatch) {
-          el.removeAttribute("style");
+          svgEl.removeAttribute("style");
 
           if (activeMode === "multi") {
-            el.setAttribute("fill", "#bb8d38");
-            el.setAttribute("stroke", "white");
+            svgEl.setAttribute("fill", "#bb8d38");
+            svgEl.setAttribute("stroke", "white");
           } else if (
             selectedModel &&
-            cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())
+            cleanElId.includes(
+              selectedModel.replace(/\s+/g, "_").toUpperCase()
+            )
           ) {
-            el.setAttribute("fill", "#bb8d38");
-            el.setAttribute("stroke", "white");
+            svgEl.setAttribute("fill", "#bb8d38");
+            svgEl.setAttribute("stroke", "white");
           } else {
             const originalFill =
-              el.getAttribute("data-original-fill") ||
-              el.getAttribute("fill") ||
+              svgEl.getAttribute("data-original-fill") ||
+              svgEl.getAttribute("fill") ||
               "#fff";
 
-            if (!el.hasAttribute("data-original-fill"))
-              el.setAttribute("data-original-fill", originalFill);
+            if (!svgEl.hasAttribute("data-original-fill")) {
+              svgEl.setAttribute("data-original-fill", originalFill);
+            }
 
-            el.setAttribute("fill", originalFill);
-            el.removeAttribute("stroke");
+            svgEl.setAttribute("fill", originalFill);
+            svgEl.removeAttribute("stroke");
           }
         } else {
-          el.setAttribute("style", "display:none");
+          svgEl.setAttribute("style", "display:none");
         }
       });
 
@@ -101,49 +115,50 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   }, [activeModels, selectedModel, activeMode]);
 
   // ----------------------------------------
-  // ⭐ MODEL SELECT
+  // ⭐ CLICK SVG → MỞ POPUP
+  // ----------------------------------------
+  const handleSvgClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as SVGElement;
+    const model = target.getAttribute("data-model");
+
+    if (!model) return;
+
+    setOpened(false);
+    setClickedModel(null);
+
+    requestAnimationFrame(() => {
+      setClickedModel(model);
+      setSelectedProjectId(project_id); // gán project_id hiện tại
+      setOpened(true);
+    });
+  };
+
+  // ----------------------------------------
+  // ⭐ MODEL SELECT (SINGLE)
   // ----------------------------------------
   const handleModelSelect = (modelName: string | null) => {
     setActiveMode("single");
+
     if (!modelName) {
       setSelectedModel(null);
       setActiveModels([]);
       return;
     }
+
     setSelectedModel((prev) => (prev === modelName ? null : modelName));
   };
 
-  const panToPhase = (phase: string) => {
-    if (!transformRef.current) return;
-
-    switch (phase) {
-      case "THE MARINA":
-        transformRef.current.setTransform(-117, -81, 1.2);
-        break;
-      case "THE STELLA":
-        transformRef.current.setTransform(-50, -20, 1.2);
-        break;
-      case "THE HERITAGE":
-        transformRef.current.setTransform(-200, -150, 1.3);
-        break;
-      case "THE OPERA":
-        transformRef.current.setTransform(-172, -157, 1.2);
-        break;
-    }
-  };
-
-  useEffect(() => {
-    if (!transformRef.current || !urlPhase) return;
-    const timer = setTimeout(() => panToPhase(urlPhase), 150);
-    return () => clearTimeout(timer);
-  }, [urlPhase]);
-
+  // ----------------------------------------
+  // ⭐ PHASE CHANGE
+  // ----------------------------------------
   const handlePhaseChange = (newPhase: string) => {
     setCurrentPhase(newPhase);
     setCurrentLayer2(newPhase);
-    panToPhase(newPhase);
   };
 
+  // ----------------------------------------
+  // ⭐ LOAD MULTI MODELS
+  // ----------------------------------------
   const handleModelsLoaded = useCallback((models: string[]) => {
     setActiveMode("multi");
     setActiveModels(models);
@@ -151,47 +166,52 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   }, []);
 
   return (
-    <div className={styles.box}>
-      {/* LEFT CONTENT */}
-      <div className={styles.left}>
-        <div className={styles.imageWrapper}>
-          {/* ẢNH NỀN */}
-          <Image
-            src={imageSrc}
-            alt="Ảnh"
-            className={styles.img}
-          />
+    <>
+      {/* ===== POPUP ===== */}
+      <InfoModal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        clickedModel={clickedModel}
+        projectId={selectedProjectId}
+            initialPhase={currentPhase}
+            initialLayer2={currentLayer2}
+      />
 
-          {/* SVG LỚP TRÊN */}
-          {filteredPaths.length > 0 ? (
-            filteredPaths.map((item) => (
-              <div
-                key={item.id}
-                className={styles.overlaySvg}
-                style={{
-                  top: `${item.topPercent}%`,
-                  left: `${item.leftPercent}%`,
-                }}
-                dangerouslySetInnerHTML={{ __html: item.svg }}
-              />
-            ))
-          ) : (
-            <p>Không có SVG nào để hiển thị.</p>
-          )}
+      <div className={styles.box}>
+        <div className={styles.left}>
+          <div className={styles.imageWrapper}>
+            <Image src={imageSrc} alt="Ảnh" className={styles.img} />
+
+            {filteredPaths.length > 0 ? (
+              filteredPaths.map((item) => (
+                <div
+                  key={item.id}
+                  className={styles.overlaySvg}
+                  style={{
+                    top: `${item.topPercent}%`,
+                    left: `${item.leftPercent}%`,
+                  }}
+                  onClick={handleSvgClick}
+                  dangerouslySetInnerHTML={{ __html: item.svg }}
+                />
+              ))
+            ) : (
+              <p>Không có SVG nào để hiển thị.</p>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.right}>
+          <Menu
+            project_id={project_id}
+            initialPhase={currentPhase}
+            initialLayer2={currentLayer2}
+            onModelsLoaded={handleModelsLoaded}
+            onSelectModel={handleModelSelect}
+            onPhaseChange={handlePhaseChange}
+          />
         </div>
       </div>
-
-      {/* RIGHT MENU */}
-      <div className={styles.right}>
-        <Menu
-          project_id={project_id}
-          initialPhase={currentPhase}
-          initialLayer2={currentLayer2}
-          onModelsLoaded={handleModelsLoaded}
-          onSelectModel={handleModelSelect}
-          onPhaseChange={handlePhaseChange}
-        />
-      </div>
-    </div>
+    </>
   );
 }

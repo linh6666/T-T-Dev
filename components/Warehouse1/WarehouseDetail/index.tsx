@@ -120,36 +120,6 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
        {loading && <p>Đang tải dữ liệu...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Card hiển thị chi tiết */}
-      {/* <Card shadow="md" radius="lg" padding="lg">
-        <Text fw={700} mb={12} style={{ fontSize: "18px" }}>
-          Chi tiết căn hộ: {item.unit_code}
-        </Text>
-        <Text style={{ fontSize: "15px" }}>Phân khu: {item.zone}</Text>
-        <Text style={{ fontSize: "15px" }}>Loại công trình: {item.building_type}</Text>
-        <Text style={{ fontSize: "15px" }}>Phòng ngủ: {item.bedroom}</Text>
-        <Text style={{ fontSize: "15px" }}>Phòng tắm: {item.bathroom}</Text>
-        <Text style={{ fontSize: "15px" }}>Hướng: {item.direction}</Text>
-              <Text style={{ fontSize: "15px" }}>Trạng thái: {item.status_unit}</Text>
-        <Text style={{ fontSize: "15px" }}>
-          Giá: {item.price ? item.price.toLocaleString() + "đ" : "Chưa có"}
-        </Text>
-          <Text>
-                  <b>Mô tả:</b> {item.description_vi}
-                </Text>
-           {pdfData.map(pdf => (
-              <div key={pdf.id} style={{ marginTop: "10px" }}>
-                <a
-                  href={pdf.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: "flex", textDecoration: "underline" }}
-                >
-                  <IconClipboardText /> Xem tài liệu: {pdf.name_vi || pdf.name_en || pdf.id}
-                </a>
-              </div>
-            ))}
-      </Card> */}
         <div style={{ display: "flex", gap: "20px", height: "80vh" }}>
                {/* Cột trái */}
                <div style={{ flex: 1 }}>
