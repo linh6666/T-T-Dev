@@ -9,6 +9,7 @@ import { createNodeAttribute } from "../../../api/apifilter3";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
 import Function from "./Function";
+import ModalItem from "./ModalItem"; // 👉 import modal riêng
 
 interface MenuProps {
   project_id: string | null;
@@ -28,7 +29,35 @@ interface MenuItem {
 interface NodeAttributeItem {
   layer1?: string;
   group?: string;
+  description?: string;
+  id?: number;
   [key: string]: unknown;
+}
+
+// 👉 Kiểu dữ liệu chi tiết để truyền vào Modal
+interface DataDetail {
+ id: number;
+  unit_code: string;
+  layer1?: string;
+  layer2?: string;
+  layer3?: string;
+  zone?: string;
+  building_type?: string;
+  bedroom?: number | string;
+  bathroom?: number | string;
+  view?: string;
+  status_unit?: string;
+  price?: number;
+  describe?: string;
+  describe_vi?: string;
+  main_door_direction?: string;
+  balcony_direction?: string;
+  direction?: string;
+  url?: string;
+  name_vi?: string;
+  name_en?: string;
+  description_en?: string;
+ 
 }
 
 export default function Menu({
@@ -52,6 +81,10 @@ export default function Menu({
   const [layer2, setLayer2] = useState<string>(valuelayer2 || "");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // 👉 State cho Modal (object thay vì string)
+  const [opened, setOpened] = useState(false);
+  const [selectedData, setSelectedData] = useState<DataDetail | null>(null);
 
   // Cập nhật phase khi user đổi URL
   useEffect(() => {
@@ -103,7 +136,6 @@ export default function Menu({
           }
         });
 
-        // 👉 Thêm đoạn sắp xếp theo số 1-10
         const sortedItems = Array.from(uniqueMap.values()).sort((a, b) => {
           const numA = parseInt(a.label, 10);
           const numB = parseInt(b.label, 10);
@@ -131,29 +163,38 @@ export default function Menu({
   }, [fetchData]);
 
   // Khi bấm 1 item
-  const handleMenuClick = async (layer1: string) => {
-    if (!project_id) return;
+ const handleMenuClick = async (layer1: string) => {
+  if (!project_id) return;
 
-    try {
-      const data = await createNodeAttribute({
-        project_id,
-        filters: [
-          { values: ["ct"] },
-          { label: "layer3", values: [phase] },
-          { label: "layer2", values: [layer2] },
-          { label: "layer1", values: [layer1] },
-        ],
-      });
+  try {
+    const res = await createNodeAttribute({
+      project_id,
+      filters: [
+        { values: ["ct"] },
+        { label: "layer3", values: [phase] },
+        { label: "layer2", values: [layer2] },
+        { label: "layer1", values: [layer1] },
+      ],
+    });
 
-      console.log("✅ API trả về cho", layer1, data);
+    console.log("✅ API trả về cho", layer1, res);
+
+    // Chỉ cần lấy dữ liệu đầu tiên trả về từ API
+    const itemData = res?.data?.[0] ?? null;
+
+    if (itemData) {
+      setSelectedData(itemData); // truyền trực tiếp vào modal
+      setOpened(true);
 
       if (isMultiMode !== "multi") {
         onSelectModel?.(layer1);
       }
-    } catch (error) {
-      console.error("❌ Lỗi khi gọi API:", error);
     }
-  };
+  } catch (error) {
+    console.error("❌ Lỗi khi gọi API:", error);
+  }
+};
+
 
   // MULTI MODE – Lấy toàn bộ model thuộc tầng
   const handleMultiModeAPI = async () => {
@@ -329,6 +370,14 @@ export default function Menu({
           </Group>
         </Stack>
       </div>
+
+      {/* 👉 Modal hiển thị dữ liệu nút */}
+      <ModalItem
+        opened={opened}
+        onClose={() => setOpened(false)}
+        data={selectedData}
+        projectId={project_id}
+      />
     </div>
   );
 }
