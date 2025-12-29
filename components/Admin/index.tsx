@@ -39,7 +39,8 @@ const mockdata = [
     label: 'Cấu hình dự án',
     icon: IconUser,
     initiallyOpened: true,
-    links: [{ label: 'Định danh vai trò người trong dự án', link: 'Roles' },
+    links: [
+      { label: 'Định danh vai trò người trong dự án', link: 'Roles' },
       { label: 'Cấu hình vai trò trong dự án', link: 'RolePermission' },
       { label: 'Phân quyền người dùng trong dự án', link: 'UserProjectRole' },
       // { label: 'Quản lý RolePermission', link: 'user_project_role' },

@@ -5,9 +5,8 @@ import { Pagination, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import AppSearch from "../../../common/AppSearch";
 import AppAction from "../../../common/AppAction";
-
 import { modals } from "@mantine/modals";
-import { getListRoles } from "../../../api/apiUserProjectRole";
+import { getListRoles } from "../../../api/getlistrole";
 import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
 import { Group } from "@mantine/core";
 import CreateView from "./CreateView";
@@ -15,22 +14,20 @@ import EditView from "./EditView";
 import DeleteView from "./DeleteView";
 
 interface DataType {
-  id:string;
-     system_id: string;
-      project_id:string;
-  user_id?: string;
-  role_id?: string;
-  // description_en: string;
+  id: string; 
+  name: string;
+  rank: number;
+  description_vi: string;
+  description_en: string;
 }
 
 export default function LargeFixedTable() {
   const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-    const [total, setTotal] = useState<number>(0);
-     const [currentPage, setCurrentPage] = useState<number>(1);
-      const pageSize = 10; 
-   console.error("Lỗi khi tải dữ liệu:", error); // ✅ thêm console.error(error)
+  const [total, setTotal] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
 
   const token = localStorage.getItem("access_token") || "YOUR_TOKEN_HERE";
 
@@ -45,53 +42,50 @@ export default function LargeFixedTable() {
     }
 
     try {
-         const skip = (currentPage - 1) * pageSize;
+      const skip = (currentPage - 1) * pageSize;
       const result = await getListRoles({ token, skip, limit: pageSize });
       const users = result.data.map((user: DataType) => ({
-   // ✅ map thêm id
-    ...user,
+        ...user,
         key: user.id,
       }));
       setData(users);
       setTotal(result.total);
-
-////
-   const totalPages = Math.ceil(result.total / pageSize);
+      const totalPages = Math.ceil(result.total / pageSize);
       if (currentPage > totalPages && totalPages > 0) {
         setCurrentPage(totalPages);
       }
-
-///
-
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("Đã xảy ra lỗi khi tải dữ liệu.");
     } finally {
       setLoading(false);
     }
-  }, [token,currentPage]);
+  }, [token, currentPage]); // Thêm currentPage vào đây
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // ✅ Hàm mở modal chỉnh sửa
   const openEditUserModal = (role: DataType) => {
     modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa người dùng</div>,
-      children: <EditView id={role.id} onSearch={fetchData} />, // ✅ đổi fetchRoles → fetchData
+      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa vai trò </div>,
+      children: <EditView id={role.id} onSearch={fetchData} />,
       confirmProps: { display: "none" },
       cancelProps: { display: "none" },
     });
   };
 
-  // ✅ Định nghĩa cột bảng
   const columns: ColumnsType<DataType> = [
-      { title: "Tên hệ thống", dataIndex: "system_id", key: "system_id", width: 30 },
-    { title: "Dự án", dataIndex: "project_id", key: "project_id", width: 30 },
-    { title: "Email người dùng", dataIndex: "user_id", key: "user_id", width: 90 },
-    { title: "Vai trò", dataIndex: "role_id", key: "role_id", width: 100 },
-    // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
+    { title: "Tên vai trò", dataIndex: "name", key: "name", width: 30 },
+    {
+      title: "Cấp Bậc",
+      dataIndex: "rank",
+      key: "rank",
+      width: 90,
+      sorter: (a, b) => a.rank - b.rank,
+    },
+    { title: "Mô Tả ", dataIndex: "description_vi", key: "description_vi", width: 100 },
+    { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
     {
       title: "Hành Động",
       width: 30,
@@ -99,7 +93,6 @@ export default function LargeFixedTable() {
       render: (user: DataType) => (
         <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
           <EuiFlexItem grow={false}>
-            {/* ✅ truyền đúng user vào onClick */}
             <EuiButtonIcon
               iconType="documentEdit"
               aria-label="Chỉnh sửa"
@@ -115,10 +108,9 @@ export default function LargeFixedTable() {
     },
   ];
 
-  // ✅ Modal thêm người dùng
   const openModal = () => {
     modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Thêm người dùng mới</div>,
+      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Thêm vai trò mới</div>,
       children: <CreateView onSearch={fetchData} />,
       size: "lg",
       radius: "md",
@@ -127,7 +119,7 @@ export default function LargeFixedTable() {
     });
   };
 
-    const openDeleteUserModal = (role: DataType) => {
+  const openDeleteUserModal = (role: DataType) => {
     modals.openConfirmModal({
       title: <div style={{ fontWeight: 600, fontSize: 18 }}>Xóa vai trò</div>,
       children: <DeleteView idItem={[role.id]} onSearch={fetchData} />,
@@ -149,9 +141,11 @@ export default function LargeFixedTable() {
         loading={loading}
         pagination={false}
         bordered
-        rowKey="id" // ✅ thêm key cho mỗi hàng
+        rowKey="id"
       />
 
+      {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+      
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
         <Pagination
           total={total}

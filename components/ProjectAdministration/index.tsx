@@ -10,23 +10,38 @@ import { LinksGroup } from './NavbarLinksGroup/NavbarLinksGroup';
 import classes from './NavbarSimple.module.css';
 import Project from './Project'; 
 import JionProject from './JionProject'; 
-// import System from './System'; 
-// import Users from './Users'; 
+import System from './System'; 
+import User from './User'; 
+import Roles from './Roles'; 
+import UserProjectRole from './UserProjectRole';
 // import ListProject from './ListProject'; 
 // import UserProjectRole from './UserProjectRole';
-// import HomeAdmin from '../HomeAdmin/index';  
+import HomeAdmin from '../HomeAdmin/index';  
 // import ProjectManagere from './ProjectManagere'; 
 
 const mockdata = [
   { label: 'Báo cáo tổng quan', icon: IconGauge, link: 'home' },
+   {
+    label: 'Quản trị hệ thống',
+    icon: IconNotes,
+    initiallyOpened: true,
+    links: [
+      { label: 'Định danh trong vai trò hệ thống', link: 'System' },
+       { label: 'Phân Quyền người dùng trong hệ thống', link: 'User' },
+     
+    ],
+  },
+
  {
     label: 'Quản lý dự án',
     icon: IconNotes,
     initiallyOpened: true,
     links: [
       { label: 'Danh sách dự án', link: 'project' },
-      { label: 'Dự án MILLENNIA', link: 'project-1' },
-      { label: 'Dự án khu Dân Cư Phước Thọ', link: 'project-list' },
+      
+      { label: 'Định danh vai trò người trong dự án', link: 'Roles' },
+       { label: 'Phân quyền người dùng trong dự án', link: 'UserProjectRole' },
+     
     ],
   },
   {
@@ -49,8 +64,17 @@ export function ProjectManagement() {
   // Hàm render nội dung tương ứng với menu
   const renderContent = () => {
     switch (active) {
+       case 'System':
+              return <System/>;
+               case 'User':
+                      return <User/>;
+
       case 'project':
         return <Project/>;
+          case 'UserProjectRole':
+                return <UserProjectRole/>;
+           case 'Roles':
+                return <Roles/>;
       case 'user-role-project':
         return <div>Đây là trang dự án</div>;
       case 'permission':
@@ -63,7 +87,7 @@ export function ProjectManagement() {
       //   return <UserProjectRole/>;
          
       default:
-         return<div>Đây là trang dự án</div>;
+         return <HomeAdmin/>;
     }
   };
 
