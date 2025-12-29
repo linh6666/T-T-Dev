@@ -2,11 +2,13 @@
 
 import { Image, Modal, Text } from "@mantine/core";
 import React, { useCallback, useEffect, useState } from "react";
-import { createNodeAttribute } from "../../../api/apifilter3";
 import { useSearchParams } from "next/navigation";
+
+import { createNodeAttribute } from "../../../api/apifilter3";
 import { Getlisthome } from "../../../api/apiGetListHome";
 
-// Interface cho dữ liệu từ createNodeAttribute
+/* ===================== INTERFACES ===================== */
+
 export interface NodeAttributeItem {
   id: string;
   unit_code: string;
@@ -31,7 +33,6 @@ export interface NodeAttributeItem {
   description_en?: string;
 }
 
-// Interface cho dữ liệu từ Getlisthome
 export interface HomeDetailItem {
   id: string;
   unit_code: string;
@@ -55,6 +56,8 @@ interface InfoModalProps {
   initialLayer2?: string | null;
 }
 
+/* ===================== COMPONENT ===================== */
+
 export default function InfoModal({
   opened,
   onClose,
@@ -65,45 +68,56 @@ export default function InfoModal({
 }: InfoModalProps) {
   const searchParams = useSearchParams();
 
-  const phaseValue = searchParams.get("layer3") || initialPhase || "";
-  const valuelayer2 = searchParams.get("layer2") || initialLayer2 || "";
+  /* ====== LAYER PARAM ====== */
+  const phase =
+    searchParams.get("layer3") || initialPhase || "";
+  const layer2 =
+    searchParams.get("layer2") || initialLayer2 || "";
 
-  const [phase] = useState<string>(phaseValue);
-  const [layer2] = useState<string>(valuelayer2);
+  /* ====== STATE ====== */
   const [apiData, setApiData] = useState<NodeAttributeItem[]>([]);
   const [homeData, setHomeData] = useState<HomeDetailItem[]>([]);
   const [index, setIndex] = useState(0);
 
-  // Hàm gọi API createNodeAttribute
-  const fetchNodeData = useCallback(async () => {
-    if (!projectId) return;
-    try {
-      const data = await createNodeAttribute({
-        project_id: projectId,
-        filters: [
-          { values: ["ct"] },
-          { label: "layer3", values: [phase] },
-          { label: "layer2", values: [layer2] },
-        ],
-      });
+  /* ===================== API CALLS ===================== */
 
-      if (Array.isArray(data)) {
-        setApiData(data as NodeAttributeItem[]);
-      } else if (Array.isArray(data?.data)) {
-        setApiData(data.data as NodeAttributeItem[]);
-      } else {
+  // 🔹 createNodeAttribute
+  const fetchNodeData = useCallback(
+    async (layer1: string) => {
+      if (!projectId) return;
+
+      try {
+        const data = await createNodeAttribute({
+          project_id: projectId,
+          filters: [
+            { values: ["ct"] },
+            { label: "layer3", values: [phase] },
+            { label: "layer2", values: [layer2] },
+            { label: "layer1", values: [layer1] },
+          ],
+        });
+
+        if (Array.isArray(data)) {
+          setApiData(data);
+        } else if (Array.isArray(data?.data)) {
+          setApiData(data.data);
+        } else {
+          setApiData([]);
+        }
+
+        setIndex(0);
+      } catch (error) {
+        console.error("❌ createNodeAttribute error:", error);
         setApiData([]);
       }
-      setIndex(0);
-    } catch (error) {
-      console.error("❌ Lỗi khi gọi API createNodeAttribute:", error);
-      setApiData([]);
-    }
-  }, [projectId, phase, layer2]);
+    },
+    [projectId, phase, layer2]
+  );
 
-  // Hàm gọi API Getlisthome
+  // 🔹 Getlisthome
   const fetchHomeData = useCallback(async () => {
     if (!projectId || !clickedModel) return;
+
     try {
       const response = await Getlisthome({
         project_id: projectId,
@@ -111,173 +125,199 @@ export default function InfoModal({
       });
       setHomeData(response as HomeDetailItem[]);
     } catch (error) {
-      console.error("❌ Lỗi khi gọi API Getlisthome:", error);
+      console.error("❌ Getlisthome error:", error);
       setHomeData([]);
     }
   }, [projectId, clickedModel]);
 
+  /* ===================== EFFECT ===================== */
+
   useEffect(() => {
-    if (opened) {
-      fetchNodeData();
-      fetchHomeData();
-    }
-  }, [opened, fetchNodeData, fetchHomeData]);
+    if (!opened || !clickedModel) return;
 
-  // Lọc dữ liệu theo clickedModel
-  const filteredData = Array.isArray(apiData)
-    ? apiData.filter((item) => item.layer1 === clickedModel)
-    : [];
+    fetchNodeData(clickedModel); // ✅ FIX LỖI
+    fetchHomeData();
+  }, [opened, clickedModel, fetchNodeData, fetchHomeData]);
 
-  // Tách ảnh và PDF
+  /* ===================== DATA PROCESS ===================== */
+
+  const filteredData = apiData.filter(
+    (item) => item.layer1 === clickedModel
+  );
+
   const imageData = filteredData.filter((item) =>
     item.url?.match(/\.(jpg|jpeg|png|gif)$/i)
   );
-  const pdfData = filteredData.filter((item) => item.url?.match(/\.pdf$/i));
 
-  const current = imageData[index];
+  const pdfData = filteredData.filter((item) =>
+    item.url?.match(/\.pdf$/i)
+  );
+
+  const currentImage = imageData[index];
+
+  /* ===================== SLIDER HANDLER ===================== */
 
   const goNext = () => {
-    if (index < imageData.length - 1) setIndex(index + 1);
+    if (index < imageData.length - 1) {
+      setIndex((prev) => prev + 1);
+    }
   };
+
   const goPrev = () => {
-    if (index > 0) setIndex(index - 1);
+    if (index > 0) {
+      setIndex((prev) => prev - 1);
+    }
   };
+
+  /* ===================== RENDER ===================== */
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Thông Tin Chi Tiết" size="70%">
-      {filteredData.length > 0 ? (
-        filteredData.map((item, idx) => (
-          <div key={idx} style={{ display: "flex", gap: "20px", height: "80vh" }}>
-            {/* Cột trái */}
-            <div style={{ flex: 1 }}>
-              <Text fw={700} mb={12} style={{ fontSize: "18px" }}>
-                Chi tiết căn hộ: {item.unit_code}
-              </Text>
-              <Text style={{ fontSize: "15px" }}>Tòa: {item.layer3}</Text>
-              <Text style={{ fontSize: "15px" }}>
-                {item.building_type
-                  ? `Loại công trình: ${item.building_type}`
-                  : `Vị trí: ${item.layer2}`}
-              </Text>
-              <Text style={{ fontSize: "15px" }}>Phòng ngủ: {item.bedroom}</Text>
-              <Text style={{ fontSize: "13px" }}>
-                Phòng tắm:{" "}
-                {item.bathroom?.toString().trim().toLowerCase() === "skip"
-                  ? "chưa có"
-                  : item.bathroom}
-              </Text>
-              <Text style={{ fontSize: "15px" }}>Cảnh quang: {item.view}</Text>
-              <Text style={{ fontSize: "15px" }}>Trạng thái: {item.status_unit}</Text>
-              <Text style={{ fontSize: "15px" }}>
-                Giá: {item.price ? item.price.toLocaleString() + "đ" : "Chưa có"}
-              </Text>
-              <Text>
-                <b>Mô tả:</b> {item.describe_vi || item.describe}
-              </Text>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title="Thông Tin Chi Tiết"
+      size="70%"
+    >
+      {filteredData.length === 0 ? (
+        <Text>Không có dữ liệu phù hợp</Text>
+      ) : (
+        <div style={{ display: "flex", gap: "20px", height: "80vh" }}>
+          {/* ================= LEFT ================= */}
+          <div style={{ flex: 1 }}>
+            {filteredData.map((item) => (
+              <div key={item.id}>
+                <Text fw={700} mb={12} fz={18}>
+                  Chi tiết căn hộ: {item.unit_code}
+                </Text>
 
-              {/* Hiển thị dữ liệu từ Getlisthome */}
-              {homeData.length > 0 && (
-                <div style={{ marginTop: "10px" }}>
-                  <Text fw={600}>Thông tin bổ sung từ Getlisthome:</Text>
-                  {homeData.map((h) => (
-                    <Text key={h.id}>👉 {h.name_vi || h.name_en}</Text>
-                  ))}
-                </div>
-              )}
+                <Text>Tòa: {item.layer3}</Text>
 
-              {/* Hiển thị PDF */}
-              {pdfData.map((pdf) => (
-                <div key={pdf.id} style={{ marginTop: "10px" }}>
-                  <a
-                    href={pdf.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "underline" }}
-                  >
-                    Xem tài liệu: {pdf.name_vi || pdf.name_en || pdf.id}
-                  </a>
-                </div>
-              ))}
-            </div>
+                <Text>
+                  {item.building_type
+                    ? `Loại công trình: ${item.building_type}`
+                    : `Vị trí: ${item.layer2}`}
+                </Text>
 
-            {/* Cột phải: slider ảnh */}
-            <div
-              style={{
-                flex: 2,
-                paddingLeft: "20px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              {current && (
-                <div
+                <Text>Phòng ngủ: {item.bedroom}</Text>
+
+                <Text>
+                  Phòng tắm:{" "}
+                  {item.bathroom?.toString().trim().toLowerCase() === "skip"
+                    ? "chưa có"
+                    : item.bathroom}
+                </Text>
+
+                <Text>Cảnh quan: {item.view}</Text>
+                <Text>Trạng thái: {item.status_unit}</Text>
+
+                <Text>
+                  Giá:{" "}
+                  {item.price
+                    ? `${item.price.toLocaleString()}đ`
+                    : "Chưa có"}
+                </Text>
+
+                <Text mt={8}>
+                  <b>Mô tả:</b> {item.describe_vi || item.describe}
+                </Text>
+              </div>
+            ))}
+
+            {/* ====== Getlisthome ====== */}
+            {homeData.length > 0 && (
+              <div style={{ marginTop: "12px" }}>
+                <Text fw={600}>Thông tin bổ sung:</Text>
+                {homeData.map((h) => (
+                  <Text key={h.id}>
+                    👉 {h.name_vi || h.name_en}
+                  </Text>
+                ))}
+              </div>
+            )}
+
+            {/* ====== PDF ====== */}
+            {pdfData.map((pdf) => (
+              <div key={pdf.id} style={{ marginTop: "10px" }}>
+                <a
+                  href={pdf.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  📄 {pdf.name_vi || pdf.name_en || pdf.id}
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* ================= RIGHT ================= */}
+          <div
+            style={{
+              flex: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {currentImage && (
+              <div style={{ position: "relative", marginBottom: "20px" }}>
+                <Image
+                  src={currentImage.url || ""}
+                  alt={currentImage.description_en || ""}
+                  width={800}
+                  height={600}
                   style={{
-                    width: "100%",
-                    textAlign: "center",
-                    marginBottom: "20px",
-                    position: "relative",
+                    maxWidth: "100%",
+                    height: "auto",
+                    borderRadius: "8px",
+                  }}
+                />
+
+                <button
+                  onClick={goPrev}
+                  disabled={index === 0}
+                  style={{ position: "absolute", left: 10, top: "50%" }}
+                >
+                  ◀
+                </button>
+
+                <button
+                  onClick={goNext}
+                  disabled={index === imageData.length - 1}
+                  style={{ position: "absolute", right: 10, top: "50%" }}
+                >
+                  ▶
+                </button>
+              </div>
+            )}
+
+            {/* ====== THUMBNAIL ====== */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {imageData.map((img, i) => (
+                <div
+                  key={img.id}
+                  onClick={() => setIndex(i)}
+                  style={{
+                    border:
+                      i === index
+                        ? "2px solid blue"
+                        : "1px solid #ccc",
+                    cursor: "pointer",
+                    borderRadius: "4px",
                   }}
                 >
                   <Image
-                    src={current.url || ""}
-                    alt={current.description_en || ""}
-                    width={800}
-                    height={600}
-                    style={{ borderRadius: "8px", maxWidth: "100%", height: "auto" }}
+                    src={img.url || ""}
+                    width={80}
+                    height={60}
+                    alt=""
+                    style={{ objectFit: "cover" }}
                   />
-                  <button
-                    onClick={goPrev}
-                    disabled={index === 0}
-                    style={{ position: "absolute", top: "50%", left: "10px" }}
-                  >
-                    ◀
-                  </button>
-                  <button
-                    onClick={goNext}
-                    disabled={index === imageData.length - 1}
-                    style={{ position: "absolute", top: "50%", right: "10px" }}
-                  >
-                    ▶
-                  </button>
                 </div>
-              )}
-              <div
-                style={{
-                  marginTop: "10px",
-                  display: "flex",
-                  gap: "10px",
-                  justifyContent: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                {imageData.map((img, i) => (
-                  <div
-                    key={img.id}
-                    onClick={() => setIndex(i)}
-                    style={{
-                      border: i === index ? "2px solid blue" : "1px solid #ccc",
-                      cursor: "pointer",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <Image
-                      src={img.url || ""}
-                      alt={img.description_en || ""}
-                      width={80}
-                      height={60}
-                      style={{ objectFit: "cover", borderRadius: "4px" }}
-                    />
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
-        ))
-      ) : (
-        <Text>Không có dữ liệu phù hợp</Text>
+        </div>
       )}
     </Modal>
   );
 }
-
