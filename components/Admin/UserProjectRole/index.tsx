@@ -7,7 +7,8 @@ import AppSearch from "../../../common/AppSearch";
 import AppAction from "../../../common/AppAction";
 
 import { modals } from "@mantine/modals";
-import { getListRoles } from "../../../api/apiUserProjectRole";
+import { getListRoless } from "../../../api/apiUserProjectRole";
+// import { getListRoles } from "../../../api/getlistrole";
 import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
 import { Group } from "@mantine/core";
 import CreateView from "./CreateView";
@@ -16,12 +17,16 @@ import DeleteView from "./DeleteView";
 
 interface DataType {
   id:string;
-     system_id: string;
-      project_id:string;
-  user_id?: string;
+     role_name: string;
+      project_name:string;
+  user_email?: string;
   role_id?: string;
   // description_en: string;
 }
+// interface Role {
+//   id: string;
+//   name: string;
+// }
 
 export default function LargeFixedTable() {
   const [data, setData] = useState<DataType[]>([]);
@@ -46,8 +51,8 @@ export default function LargeFixedTable() {
 
     try {
          const skip = (currentPage - 1) * pageSize;
-      const result = await getListRoles({ token, skip, limit: pageSize });
-      const users = result.data.map((user: DataType) => ({
+      const result = await getListRoless({ token, skip, limit: pageSize });
+      const users = result.assignments.map((user: DataType) => ({
    // ✅ map thêm id
     ...user,
         key: user.id,
@@ -87,9 +92,9 @@ export default function LargeFixedTable() {
 
   // ✅ Định nghĩa cột bảng
   const columns: ColumnsType<DataType> = [
-      { title: "Tên hệ thống", dataIndex: "system_id", key: "system_id", width: 30 },
-    { title: "Dự án", dataIndex: "project_id", key: "project_id", width: 30 },
-    { title: "Email người dùng", dataIndex: "user_id", key: "user_id", width: 90 },
+      { title: "Tên hệ thống", dataIndex: "role_name", key: "role_name", width: 30 },
+    { title: "Dự án", dataIndex: "project_name", key: "project_name", width: 30 },
+    { title: "Email người dùng", dataIndex: "user_email", key: "user_email", width: 90 },
     { title: "Vai trò", dataIndex: "role_id", key: "role_id", width: 100 },
     // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
     {
