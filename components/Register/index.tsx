@@ -56,10 +56,10 @@ const RegisterForm = () => {
         value && value.trim() ? null : "Họ và tên không được để trống",
       phone: (value) =>
         /^\d{10}$/.test(value.trim()) ? null : "Số điện thoại nhập đúng 10 số!",
-      password: (value) =>
-        value && value.length >= 5 && value.length <= 100
-          ? null
-          : "Mật khẩu phải chứa từ 5 đến 100 kí tự",
+    password: (value) =>
+  value && value.length >= 8
+    ? null
+    : "Mật khẩu phải có ít nhất 8 ký tự",
       email: (value) =>
         /^\S+@\S+\.\S+$/.test(value) ? null : "Email không hợp lệ",
       detal_address: (value) =>
