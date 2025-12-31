@@ -12,9 +12,9 @@ interface CreateNodeAttributeBody {
 }
 
 // 🧩 Hàm call API POST
-export const createNodeAttributee = async (
+export const createNodeAttribute = async (
   body: CreateNodeAttributeBody,
-  params: { type_control: string; value: string | number; } // Thêm params
+  params: { type_control: string; value: number | string;  id: number } // Thêm params
 ) => {
   try {
     const response = await api.post(API_ROUTE.CREATE_NODEATTRIBUTE, body, {

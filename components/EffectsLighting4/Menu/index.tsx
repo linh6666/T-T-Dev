@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Menu.module.css";
 import { Button, Group, Image, Stack, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft } from "@tabler/icons-react";
 
 // ✅ Import các API
-import { createNodeAttribute } from "../../../api/apiLighting";      // API 1 cho Bắt đầu
+import { createNodeAttribute } from "../../../api/apiLighting2";      // API 1 cho Bắt đầu
 import { createON } from "../../../api/apiON"; 
 import { createOFF } from "../../../api/apiOFF"; 
 import { createNodeAttributee } from "../../../api/apiLightinggame"; // API 2 cho Trái/Xoay/Phải/Xuống
@@ -16,28 +16,10 @@ interface MenuProps {
   project_id: string | null;
 }
 
-interface MenuItem {
-  id?: number;      // chỉ dùng cho nút Bắt đầu
-  ctrl?: string;    // dùng cho Trái/Xoay/Phải/Xuống
-  label: string;
-}
-
 export default function Menu({ project_id }: MenuProps) {
   const router = useRouter();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [loadingOn, setLoadingOn] = useState(false);
-
-  // 🧩 Khởi tạo danh sách menu
-  useEffect(() => {
-    setMenuItems([
-      { id: 9, label: "Bắt đầu" },   // gọi API 1
-      { ctrl: "L", label: "Trái" },  // gọi API 2
-      { ctrl: "ROT", label: "Xoay" },// gọi API 2
-      { ctrl: "R", label: "Phải" },  // gọi API 2
-      { ctrl: "D", label: "Xuống" }, // gọi API 2
-    ]);
-  }, []);
 
   // 🧭 Quay lại trang điều khiển
   const handleBack = () => {
@@ -46,20 +28,16 @@ export default function Menu({ project_id }: MenuProps) {
   };
 
   // ✅ Call API 1: chỉ dành cho nút "Bắt đầu"
-  const handleStart = async (id: number, label: string) => {
+  const handleStart = async () => {
     if (!project_id) return;
     try {
       const body = { project_id };
       const response = await createNodeAttribute(body, {
         type_control: "eff",
-        value: id,
-        rs: 0,
-        id,
+        value: 1,
+        id:9,
       });
-      console.log(`✅ API1: ${label} (ID: ${id})`, response);
-    } catch (error) {
-      console.error(`❌ Lỗi API1: ${label}`, error);
-    }
+      console.log("✅ API1: Bắt đầu (ID: 1)", response); } catch (error) { console.error("❌ Lỗi API1: Bắt đầu", error); }
   };
 
   // ✅ Call API 2: dành cho Trái/Xoay/Phải/Xuống
@@ -69,7 +47,7 @@ export default function Menu({ project_id }: MenuProps) {
       const body = { project_id };
       const response = await createNodeAttributee(body, {
         type_control: "control",
-        value: ctrl,   // truyền ctrl (string)
+        value: JSON.stringify({ ctrl }),
       });
       console.log(`✅ API2: ${label} (CTRL: ${ctrl})`, response);
     } catch (error) {
@@ -139,28 +117,49 @@ export default function Menu({ project_id }: MenuProps) {
 
       {/* Các nút chức năng */}
       <div className={styles.Function}>
-        {menuItems.length > 0 ? (
-          <Stack align="center" style={{ gap: "20px", marginTop: "30px" }}>
-            {menuItems.map((item) => (
-              <Button
-                key={item.id ?? item.ctrl}
-                className={styles.menuBtn}
-                variant="outline"
-                onClick={() => {
-                  if (item.id && item.id === 9) {
-                    handleStart(item.id, item.label); // API 1
-                  } else if (item.ctrl) {
-                    handleMove(item.ctrl, item.label); // API 2
-                  }
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </Stack>
-        ) : (
-          <Text mt="md" c="dimmed">Không có dữ liệu hiển thị</Text>
-        )}
+        <div className={styles.crossLayout}>
+          {/* Hàng trên: Bắt đầu */}
+          <div className={styles.rowTop}>
+            <div
+              className={styles.squareBtn}
+                 onClick={handleStart}
+            >
+              Bắt đầu
+            </div>
+          </div>
+
+          {/* Hàng giữa: Trái - Xoay - Phải */}
+          <div className={styles.rowMiddle}>
+            <div
+              className={styles.squareBtn}
+              onClick={() => handleMove("L", "Trái")}
+            >
+              Trái
+            </div>
+            <div
+              className={styles.centerBtn}
+              onClick={() => handleMove("ROT", "Xoay")}
+            >
+              Xoay
+            </div>
+            <div
+              className={styles.squareBtn}
+              onClick={() => handleMove("R", "Phải")}
+            >
+              Phải
+            </div>
+          </div>
+
+          {/* Hàng dưới: Xuống */}
+          <div className={styles.rowBottom}>
+            <div
+              className={styles.squareBtn}
+              onClick={() => handleMove("D", "Xuống")}
+            >
+              Xuống
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Footer: ON/OFF + Back */}
