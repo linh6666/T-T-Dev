@@ -1,12 +1,23 @@
 "use client";
 
 import { Image } from "@mantine/core";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import styles from "./ZoningSystem.module.css";
 import Menu from "./Menu/index";
 import { useSearchParams } from "next/navigation";
 import { pathsData, SvgItem } from "./Data";
 import InfoModal from "./Infomodal/index";
+import {
+  TransformWrapper,
+  TransformComponent,
+  ReactZoomPanPinchRef,
+} from "react-zoom-pan-pinch";
 
 interface ZoningSystemProps {
   project_id: string | null;
@@ -25,18 +36,15 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<"single" | "multi" | null>(null);
-
-  // ⭐ QUAN TRỌNG: phân biệt load & click
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  // ===== POPUP =====
   const [opened, setOpened] = useState(false);
   const [clickedModel, setClickedModel] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState(project_id);
 
-  // ----------------------------------------
-  // IMAGE
-  // ----------------------------------------
+  // ✅ Không dùng any nữa
+  const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
+
   const getImageByLayer = (layerName: string | null) => {
     if (!layerName) return "/image/TIMES_HOME.png";
     return `/TIMES SQUARE/${layerName.trim().toUpperCase()}.png`;
@@ -52,9 +60,6 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     img.onerror = () => setImageSrc("/image/TIMES_HOME.png");
   }, [currentLayer2]);
 
-  // ----------------------------------------
-  // SVG FILTER (KHÔNG TÔ KHI CHƯA CLICK)
-  // ----------------------------------------
   const filteredPaths = useMemo(() => {
     if (!activeModels.length) return [];
 
@@ -64,7 +69,6 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
 
       Array.from(svgDoc.querySelectorAll("rect, path")).forEach((el) => {
         const svgEl = el as SVGElement;
-
         const elId = svgEl.id || "";
         const cleanElId = elId.replace(/\s+/g, "_").toUpperCase();
 
@@ -83,7 +87,6 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
 
         svgEl.removeAttribute("style");
 
-        // ⭐ CHƯA CLICK → CHỈ HIỆN SVG GỐC
         if (!hasUserInteracted) {
           const original =
             svgEl.getAttribute("data-original-fill") ||
@@ -96,7 +99,6 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
           return;
         }
 
-        // ⭐ SAU CLICK → MỚI TÔ
         if (
           activeMode === "multi" ||
           (selectedModel &&
@@ -113,26 +115,54 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     });
   }, [activeModels, selectedModel, activeMode, hasUserInteracted]);
 
-  // ----------------------------------------
-  // CLICK SVG
-  // ----------------------------------------
+  /* ===========================
+     ZOOM FUNCTION
+  ============================ */
+  const zoomToModel = (modelId: string) => {
+    // ✅ ép kiểu về HTMLElement để giữ zoom tự động
+    const el = document.querySelector(
+      `[data-model="${modelId}"]`
+    ) as HTMLElement | null;
+
+    if (el && transformRef.current) {
+      transformRef.current.zoomToElement(el, 1.5, 300);
+    }
+  };
+
+  /* ===========================
+     AUTO ZOOM SAU KHI SVG RENDER
+  ============================ */
+  useEffect(() => {
+    if (!transformRef.current) return;
+
+    if (selectedModel) {
+      requestAnimationFrame(() => {
+        zoomToModel(selectedModel);
+      });
+      return;
+    }
+
+    if (!selectedModel && activeModels.length > 0) {
+      requestAnimationFrame(() => {
+        zoomToModel(activeModels[0]);
+      });
+    }
+  }, [filteredPaths, selectedModel, activeModels]);
+
   const handleSvgClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const model = (e.target as SVGElement).getAttribute("data-model");
     if (!model) return;
 
-    // setHasUserInteracted(true);
-
     setOpened(false);
+
     requestAnimationFrame(() => {
       setClickedModel(model);
       setSelectedProjectId(project_id);
       setOpened(true);
+      zoomToModel(model);
     });
   };
 
-  // ----------------------------------------
-  // SINGLE SELECT
-  // ----------------------------------------
   const handleModelSelect = (modelName: string | null) => {
     setHasUserInteracted(true);
     setActiveMode("single");
@@ -146,18 +176,12 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     setSelectedModel((prev) => (prev === modelName ? null : modelName));
   };
 
-  // ----------------------------------------
-  // PHASE
-  // ----------------------------------------
   const handlePhaseChange = (phase: string) => {
     setCurrentPhase(phase);
     setCurrentLayer2(phase);
-    setHasUserInteracted(false); // reset màu khi đổi tầng
+    setHasUserInteracted(false);
   };
 
-  // ----------------------------------------
-  // MULTI LOAD (❌ KHÔNG set user interacted)
-  // ----------------------------------------
   const handleModelsLoaded = useCallback((models: string[]) => {
     setActiveMode("multi");
     setActiveModels(models);
@@ -177,22 +201,33 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
 
       <div className={styles.box}>
         <div className={styles.left}>
-          <div className={styles.imageWrapper}>
-            <Image src={imageSrc} className={styles.img} alt="Ảnh" />
+          <TransformWrapper
+            ref={transformRef}
+            initialScale={1}
+            minScale={1}
+            maxScale={5}
+            wheel={{ step: 0.2 }}
+            doubleClick={{ disabled: true }}
+          >
+            <TransformComponent>
+              <div className={styles.imageWrapper}>
+                <Image src={imageSrc} className={styles.img} alt="Ảnh" />
 
-            {filteredPaths.map((item) => (
-              <div
-                key={item.id}
-                className={styles.overlaySvg}
-                style={{
-                  top: `${item.topPercent}%`,
-                  left: `${item.leftPercent}%`,
-                }}
-                onClick={handleSvgClick}
-                dangerouslySetInnerHTML={{ __html: item.svg }}
-              />
-            ))}
-          </div>
+                {filteredPaths.map((item) => (
+                  <div
+                    key={item.id}
+                    className={styles.overlaySvg}
+                    style={{
+                      top: `${item.topPercent}%`,
+                      left: `${item.leftPercent}%`,
+                    }}
+                    onClick={handleSvgClick}
+                    dangerouslySetInnerHTML={{ __html: item.svg }}
+                  />
+                ))}
+              </div>
+            </TransformComponent>
+          </TransformWrapper>
         </div>
 
         <div className={styles.right}>
