@@ -95,7 +95,7 @@ export default function LargeFixedTable() {
       { title: "Tên hệ thống", dataIndex: "role_name", key: "role_name", width: 30 },
     { title: "Dự án", dataIndex: "project_name", key: "project_name", width: 30 },
     { title: "Email người dùng", dataIndex: "user_email", key: "user_email", width: 90 },
-    { title: "Vai trò", dataIndex: "role_id", key: "role_id", width: 100 },
+    // { title: "Vai trò", dataIndex: "role_id", key: "role_id", width: 100 },
     // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
     {
       title: "Hành Động",

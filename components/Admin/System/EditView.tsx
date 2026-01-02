@@ -137,7 +137,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   withAsterisk
   mt="md"
   data={[
-    { value: "1", label: "Cấp 1" },
+   { value: "1", label: "Cấp 1" },
     { value: "2", label: "Cấp 2" },
     { value: "3", label: "Cấp 3" },
     { value: "4", label: "Cấp 4" },
@@ -145,6 +145,18 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     { value: "6", label: "Cấp 6" },
     { value: "7", label: "Cấp 7" },
     { value: "8", label: "Cấp 8" },
+    { value: "9", label: "Cấp 9" },
+    { value: "10", label: "Cấp 10" },
+    { value: "11", label: "Cấp 11" },
+    { value: "12", label: "Cấp 12" },
+    { value: "13", label: "Cấp 13" },
+    { value: "14", label: "Cấp 14" },
+    { value: "15", label: "Cấp 15" },
+    { value: "16", label: "Cấp 16" },
+    { value: "17", label: "Cấp 17" },
+    { value: "18", label: "Cấp 18" },
+    { value: "19", label: "Cấp 19" },
+    { value: "20", label: "Cấp 20" },
   ]}
   {...form.getInputProps("rank_total")}
 />

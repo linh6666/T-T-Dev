@@ -184,6 +184,7 @@ export default function LargeFixedTable({}) {
 
   const columns: ColumnsType<DataType> = [
     { title: "Họ và Tên", dataIndex: "full_name", key: "full_name", width: 150, fixed: "left" },
+     { title: "Chức vụ", dataIndex: "system_name", key: "system_name", width: 130 },
     { title: "Email", dataIndex: "email", key: "email", width: 130 },
     { title: "Điện Thoại", dataIndex: "phone", key: "phone", width: 130 },
     { title: "Kích Hoạt", dataIndex: "is_active", key: "is_active", width: 80, render: (text) => (text ? "Có" : "Không") },
