@@ -36,6 +36,9 @@ export const API_ROUTE = {
     CREATE_PROJECTS:"/api/v1/projects/",
     UPDATE_PROJECTS:"/api/v1/projects/{project_id}",
     DELETE_PROJECTS:"/api/v1/projects/{project_id}",
+///Control
+    GET_LIST_CONTROL:"/api/v1/projects/control/",
+
 
 //RolePermission
     GET_LIST_ROLEPERMISSION:"/api/v1/RolePermission/permission",
