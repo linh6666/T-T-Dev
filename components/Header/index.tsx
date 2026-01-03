@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Image } from "@mantine/core";
 import { jwtDecode } from "jwt-decode";
-import {  IconPhoneCall, IconShoppingCart } from "@tabler/icons-react";
+import {  IconHeart, IconPhoneCall, } from "@tabler/icons-react";
 import LoginButton from "./ButtonLogin/index";
 import Notification from "./Notification/index";
+
 import styles from "./Header.module.css";
 
 // 🧭 Danh sách menu gốc
@@ -158,19 +159,22 @@ const isActive = (href: string, highlight?: boolean) => {
           >
             <IconPhoneCall size={17} color="#752E0B" stroke={1.5} />
           </div>
-          <div
-            style={{
-              border: "1px solid #752E0B",
-              borderRadius: "50%",
-              width: 26,
-              height: 26,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <IconShoppingCart size={17} color="#752E0B" stroke={1.5} />
-          </div>
+          <Link href="/yeu-thich">
+  <div
+    style={{
+      border: "1px solid #752E0B",
+      borderRadius: "50%",
+      width: 26,
+      height: 26,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+    }}
+  >
+    <IconHeart size={17} color="#752E0B" stroke={1.5} />
+  </div>
+</Link>
           
 <Notification />
 

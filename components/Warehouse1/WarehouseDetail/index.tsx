@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Text, Button, Image } from "@mantine/core";
-import { IconArrowLeft, IconClipboardText } from "@tabler/icons-react";
+import { IconArrowLeft, IconClipboardText, IconHeart } from "@tabler/icons-react";
 import { Getlisthome } from "../../../api/apiGetListHome";
 import styles from "./App.module.css";
 import { AxiosError } from "axios";
@@ -199,6 +199,7 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
                </div>
      
                {/* Cột phải: SLIDER */}
+           
                <div
                  style={{
                    flex: 2,
@@ -206,8 +207,25 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
                    display: "flex",
                    flexDirection: "column",
                    alignItems: "center",
+                   position: "relative"
                  }}
                >
+     <IconHeart
+  style={{
+    position: "absolute",
+
+    top: 0,
+    right: 0,
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.25)",
+    borderRadius: "50%",
+    backgroundColor: "#fff",
+    padding: "1px",
+  }}
+   color="#752E0B" 
+/>
+
+
                  {current && (
                    <div
                      style={{

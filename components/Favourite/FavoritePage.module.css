@@ -1,0 +1,31 @@
+.wrapper {
+  padding-top: 40px;
+  padding-bottom: 60px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.title {
+  color: #752e0b;
+  font-weight: 600;
+}
+
+.content {
+  border: 1px dashed #e0d5cf;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  background-color: #fffaf7;
+}
+
+/* Dùng sau khi có data */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
