@@ -39,7 +39,7 @@ export default function DetailInteractive() {
     async function fetchProjects() {
       try {
         const [listProjectRes] = await Promise.all([
-          getListProject({ token, skip: 0, limit: 20 }),
+          getListProject({ token, skip: 0, limit: 100 }),
         ]);
 
         const projectData = listProjectRes.data;
