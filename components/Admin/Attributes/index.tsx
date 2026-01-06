@@ -19,7 +19,7 @@ interface DataType {
   label: string;
   data_type: string;
   display_label_vi: string;
-  parent_attribute_id: string | null;
+  parent_attributes_id: string | null;
 }
 
 // Interface API trả về, dùng total thay vì count
@@ -112,7 +112,7 @@ export default function LargeFixedTable() {
     { title: "Định danh thuộc tính", dataIndex: "label", key: "label", width: 30 },
     { title: "Kiểu dữ liệu", dataIndex: "data_type", key: "data_type", width: 90 },
     { title: "Tên hiển thị", dataIndex: "display_label_vi", key: "display_label_vi", width: 100 },
-    { title: "Tên dữ liệu cha", dataIndex: "parent_attribute_id", key: "parent_attribute_id", width: 100 },
+    { title: "Tên dữ liệu cha", dataIndex: "parent_attributes_id", key: "parent_attributes_id", width: 100 },
     {
       title: "Hành Động",
       width: 30,

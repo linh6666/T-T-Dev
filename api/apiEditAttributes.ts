@@ -5,7 +5,7 @@ import { API_ROUTE } from "../const/apiRouter"; // ✅ import đúng object ch�
 export interface CreateUserPayload {
  label: string;
   data_type: string;
-  parent_attribute_id: string | null;
+  parent_attributes_id: string | null;
   display_label_vi: string;
 }
 

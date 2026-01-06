@@ -38,7 +38,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     initialValues: {
    label: "",
       data_type: "",
-      parent_attribute_id: "",
+      parent_attributes_id: "",
       display_label_vi: "",
     },
     validate: {
@@ -79,7 +79,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       formRef.current.setValues({
         label: userData.label || "",
         data_type: userData.data_type || "",
-       parent_attribute_id: userData.parent_attribute_id || "",
+        parent_attributes_id: userData.parent_attributes_id || "",
        display_label_vi:userData.display_label_vi || "",
     
         
@@ -161,7 +161,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
              placeholder="Nhập tên dữ liệu cha"
              withAsterisk
              mt="md"
-             {...form.getInputProps("parent_attribute_id")}
+             {...form.getInputProps("parent_attributes_id")}
            />
      
        

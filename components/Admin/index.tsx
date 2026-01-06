@@ -25,22 +25,23 @@ import HomeAdmin from '../HomeAdmin/index';
 const mockdata = [
   { label: 'Báo cáo tổng quan', icon: IconGauge, link: 'home' },
   {
-    label: 'Cấu hình',
+    label: 'CẤU HÌNH HỆ THÔNG',
     icon: IconNotes,
     initiallyOpened: true,
     links: [
         { label: 'Cấu hình chức năng trong hệ thống', link: 'permission' },
       { label: 'Định danh vai trò trong hệ thống', link: 'System' },
       { label: 'Cấu hình vai trò trong hệ thống', link: 'SystemPermission' },
-      { label: 'Phân Quyền người dùng trong hệ thống', link: 'User' },
+      { label: 'Phân quyền người dùng trong hệ thống', link: 'User' },
     ],
   },
   {
-    label: 'Cấu hình dự án',
+    label: 'CẤU HÌNH DỰ ÁN',
     icon: IconUser,
     initiallyOpened: true,
     links: [
-      { label: 'Định danh vai trò người trong dự án', link: 'Roles' },
+       { label: 'Cấu hình chức năng trong dự án', link: 'tesst' },
+      { label: 'Định danh vai trò trong dự án', link: 'Roles' },
       { label: 'Cấu hình vai trò trong dự án', link: 'RolePermission' },
       { label: 'Phân quyền người dùng trong dự án', link: 'UserProjectRole' },
       // { label: 'Quản lý RolePermission', link: 'user_project_role' },
@@ -48,10 +49,10 @@ const mockdata = [
     ],
   },
     {
-    label: 'Dự án',
+    label: 'DỰ ÁN',
     icon: IconNotes,
     initiallyOpened: true,
-    links: [{ label: 'Tạo loại thuộc tính', link: 'Attributes' },
+    links: [{ label: 'Cấu hình loại thuộc tính', link: 'Attributes' },
       { label: 'Tạo loại dự án', link: 'Project_Templates' },
       { label: 'Cấu hình loại dự án', link: 'Template_Attributes_Link' },
       { label: 'Tạo dự án', link: 'project' },

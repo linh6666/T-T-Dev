@@ -182,62 +182,101 @@ export default function LargeFixedTable({}) {
     });
   };
 
-  const columns: ColumnsType<DataType> = [
-    { title: "Họ và Tên", dataIndex: "full_name", key: "full_name", width: 150, fixed: "left" },
-     { title: "Chức vụ", dataIndex: "system_name", key: "system_name", width: 130 },
-    { title: "Email", dataIndex: "email", key: "email", width: 130 },
-    { title: "Điện Thoại", dataIndex: "phone", key: "phone", width: 130 },
-    { title: "Kích Hoạt", dataIndex: "is_active", key: "is_active", width: 80, render: (text) => (text ? "Có" : "Không") },
-    { title: "Quản Trị Viên", dataIndex: "is_superuser", key: "is_superuser", width: 100, render: (text) => (text ? "Có" : "Không") },
-    {
-      title: "Tỉnh/Thành Phố",
-      dataIndex: "province_id",
-      key: "province_id",
-      width: 100,
-      render: (id) => provinceOptions.find(p => p.value === id)?.label || "Chưa có"
-    },
-    {
-      title: "Phường/Xã",
-      dataIndex: "ward_id",
-      key: "ward_id",
-      width: 100,
-      render: (id) => wardOptions.find(w => w.value === id)?.label || "Chưa có"
-    },
-    {
-      title: "Thời Gian Tạo",
-      dataIndex: "creation_time",
-      key: "creation_time",
-      width: 140,
-      render: (text: string) => dayjs(text).format("DD/MM/YYYY HH:mm"),
-    },
-    { title: "Lần Đăng Nhập Cuối", dataIndex: "last_login", key: "last_login", width: 140 },
-    { title: "Lần Đăng Xuất Cuối", dataIndex: "last_logout", key: "last_logout", width: 140 },
-    {
-      title: "Hành Động",
-      width: 100,
-      fixed: "right",
-      render: (record: DataType) => (
-        <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="documentEdit"
-              aria-label="Chỉnh sửa"
-              color="success"
-              onClick={() => openEditUserModal(record)}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="trash"
-              aria-label="Xóa"
-              color="danger"
-              onClick={() => openDeleteUserModal(record)}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
-    },
-  ];
+const columns: ColumnsType<DataType> = [
+  {
+    title: "Họ và tên",
+    dataIndex: "full_name",
+    key: "full_name",
+    width: 150,
+    fixed: "left",
+  },
+  {
+    title: "Chức vụ",
+    dataIndex: "system_name",
+    key: "system_name",
+    width: 130,
+  },
+  {
+    title: "Email",
+    dataIndex: "email",
+    key: "email",
+    width: 130,
+  },
+  {
+    title: "Điện thoại",
+    dataIndex: "phone",
+    key: "phone",
+    width: 130,
+  },
+  {
+    title: "Kích hoạt",
+    dataIndex: "is_active",
+    key: "is_active",
+    width: 80,
+    render: (text) => (text ? "Có" : "Không"),
+  },
+  {
+    title: "Tỉnh/thành phố",
+    dataIndex: "province_id",
+    key: "province_id",
+    width: 100,
+    render: (id) =>
+      provinceOptions.find((p) => p.value === id)?.label || "Chưa có",
+  },
+  {
+    title: "Phường/xã",
+    dataIndex: "ward_id",
+    key: "ward_id",
+    width: 100,
+    render: (id) =>
+      wardOptions.find((w) => w.value === id)?.label || "Chưa có",
+  },
+  {
+    title: "Thời gian tạo",
+    dataIndex: "creation_time",
+    key: "creation_time",
+    width: 140,
+    render: (text: string) => dayjs(text).format("DD/MM/YYYY HH:mm"),
+  },
+  // {
+  //   title: "Lần đăng nhập cuối",
+  //   dataIndex: "last_login",
+  //   key: "last_login",
+  //   width: 140,
+  // },
+  // {
+  //   title: "Lần đăng xuất cuối",
+  //   dataIndex: "last_logout",
+  //   key: "last_logout",
+  //   width: 140,
+  // },
+  {
+    title: "Hành động",
+    width: 100,
+    fixed: "right",
+    render: (record: DataType) => (
+      <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            iconType="documentEdit"
+            aria-label="Chỉnh sửa"
+            color="success"
+            onClick={() => openEditUserModal(record)}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            iconType="trash"
+            aria-label="Xóa"
+            color="danger"
+            onClick={() => openDeleteUserModal(record)}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    ),
+  },
+];
+
 
   return (
     <>

@@ -29,7 +29,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     initialValues: {
       label: "",
       data_type: "",
-      parent_attribute_id: "",
+      parent_attributes_id: "",
       display_label_vi: "",
      
  
@@ -37,7 +37,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     validate: {
       label: isNotEmpty(" không được để trống"),
       data_type: isNotEmpty(" không được để trống"),
-      parent_attribute_id: isNotEmpty("không được để trống"),
+      parent_attributes_id: isNotEmpty("không được để trống"),
       display_label_vi: isNotEmpty("không được để trống"),
      
     },
@@ -49,7 +49,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
       const userData = {
         label: values.label,
            data_type: values.data_type, 
-          parent_attribute_id: values.parent_attribute_id,
+          parent_attributes_id: values.parent_attributes_id,
         display_label_vi: values.display_label_vi,
        
       };
@@ -98,7 +98,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
         placeholder="Nhập tên dữ liệu cha"
         withAsterisk
         mt="md"
-        {...form.getInputProps("parent_attribute_id")}
+        {...form.getInputProps("parent_attributes_id")}
       />
 
 

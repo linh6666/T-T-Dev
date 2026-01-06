@@ -42,9 +42,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     initialValues: {
       email: "",
       is_active: false,
-      // is_superuser: false,
       system_id:"",
-      // introducer_id: "",
     },
   });
 
@@ -96,8 +94,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         email: userData.email || "",
         system_id: userData.system_id ||"",
         is_active: userData.is_active || false,
-        // is_superuser: userData.is_superuser || false,
-        // introducer_id: userData.introducer_id || "",
+       
       });
 
       // setSelectedProvince(userData.system_id || null);
@@ -157,8 +154,8 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         {...form.getInputProps("email")}
       />
 <Select
-  label="Vai trò"
-  placeholder="Chọn vai trò"
+  label="Chức vụ"
+  placeholder="Chọn chức vụ"
   data={provinceOptions}
   mt="md"
   value={form.values.system_id} // string
@@ -177,12 +174,6 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         mt="md"
         {...form.getInputProps("is_active", { type: "checkbox" })}
       />
-
-      {/* <Switch
-        label="Quyền quản trị"
-        mt="md"
-        {...form.getInputProps("is_superuser", { type: "checkbox" })}
-      /> */}
 
       <Group justify="flex-end" mt="lg">
         <Button

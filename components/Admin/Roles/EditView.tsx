@@ -42,7 +42,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       name: "",
       rank: "",
       description_vi: "",
-      description_en: "",
+      // description_en: "",
     },
     validate: {
       // name: (value) => (value ? null : "Tên không được để trống"),
@@ -84,7 +84,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         rank: userData.rank ? String(userData.rank) : "",
     
         description_vi: userData.description_vi || "",
-        description_en: userData.description_en || "",
+        // description_en: userData.description_en || "",
       });
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu user:", error);
@@ -137,7 +137,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       />
 
       <Select
-       label="Cấp Bậc"
+       label="Cấp bậc"
        placeholder="Chọn cấp bậc"
        withAsterisk
        mt="md"
@@ -162,14 +162,14 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   {...form.getInputProps("description_vi")}
 />
 
-      <Textarea
+      {/* <Textarea
         label="Mô tả (Tiếng Anh)"
         placeholder="Enter English description"
         autosize
         minRows={3}
         mt="md"
         {...form.getInputProps("description_en")}
-      />
+      /> */}
        
 
       <Group justify="flex-end" mt="lg">

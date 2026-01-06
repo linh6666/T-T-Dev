@@ -40,7 +40,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       name: "",
       rank: "",
       description_vi: "",
-      description_en: "",
+      // description_en: "",
     },
     validate: {
       name: (value) => (value ? null : "Tên không được để trống"),
@@ -82,7 +82,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         rank: userData.rank || "",
     
         description_vi: userData.description_vi || "",
-        description_en: userData.description_en || "",
+        // description_en: userData.description_en || "",
       });
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu user:", error);
@@ -142,22 +142,22 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         {...form.getInputProps("rank")}
       />
 <Textarea
-  label="Mô tả (Tiếng Việt)"
-  placeholder="Nhập mô tả tiếng Việt"
+  label="Mô tả "
+  placeholder="Nhập mô tả"
   autosize
   minRows={3}
   mt="md"
   {...form.getInputProps("description_vi")}
 />
 
-<Textarea
+{/* <Textarea
   label="Mô tả (Tiếng Anh)"
   placeholder="Enter English description"
   autosize
   minRows={3}
   mt="md"
   {...form.getInputProps("description_en")}
-/>
+/> */}
        
 
       <Group justify="flex-end" mt="lg">

@@ -75,38 +75,53 @@ export default function LargeFixedTable() {
     });
   };
 
-  const columns: ColumnsType<DataType> = [
-    { title: "Tên vai trò", dataIndex: "name", key: "name", width: 30 },
-    {
-      title: "Cấp Bậc",
-      dataIndex: "rank",
-      key: "rank",
-      width: 90,
-      sorter: (a, b) => a.rank - b.rank,
-    },
-    { title: "Mô Tả ", dataIndex: "description_vi", key: "description_vi", width: 100 },
-    { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
-    {
-      title: "Hành Động",
-      width: 30,
-      fixed: "right",
-      render: (user: DataType) => (
-        <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="documentEdit"
-              aria-label="Chỉnh sửa"
-              color="success"
-              onClick={() => openEditUserModal(user)}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon iconType="trash" aria-label="Xóa" color="danger" onClick={() => openDeleteUserModal(user)} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
-    },
-  ];
+ const columns: ColumnsType<DataType> = [
+  {
+    title: "Tên vai trò",
+    dataIndex: "name",
+    key: "name",
+    width: 30,
+  },
+  {
+    title: "Cấp bậc",
+    dataIndex: "rank",
+    key: "rank",
+    width: 90,
+    sorter: (a, b) => a.rank - b.rank,
+  },
+  {
+    title: "Mô tả",
+    dataIndex: "description_vi",
+    key: "description_vi",
+    width: 100,
+  },
+  {
+    title: "Hành động",
+    width: 30,
+    fixed: "right",
+    render: (user: DataType) => (
+      <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            iconType="documentEdit"
+            aria-label="Chỉnh sửa"
+            color="success"
+            onClick={() => openEditUserModal(user)}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            iconType="trash"
+            aria-label="Xóa"
+            color="danger"
+            onClick={() => openDeleteUserModal(user)}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    ),
+  },
+];
+
 
   const openModal = () => {
     modals.openConfirmModal({

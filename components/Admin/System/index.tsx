@@ -96,7 +96,7 @@ export default function LargeFixedTable() {
   // Modal thêm
   const openModal = () => {
     modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Thêm vai trò mới</div>,
+      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Tạo tên vai trò trong hệ thống</div>,
       children: <CreateView onSearch={fetchData} />,
       size: "lg",
       radius: "md",
@@ -109,15 +109,15 @@ export default function LargeFixedTable() {
   const columns: ColumnsType<DataType> = [
     { title: "Tên vai trò ", dataIndex: "name", key: "name", width: 30 },
 {
-  title: "Cấp Bậc",
+  title: "Cấp bậc",
   dataIndex: "rank_total",
   key: "rank_total",
   width: 90,
   sorter: (a, b) => a.rank_total - b.rank_total,  // thêm vào đây
 },
-    { title: "Mô Tả ", dataIndex: "description_vi", key: "description_vi", width: 100 },
+    { title: "Mô tả ", dataIndex: "description_vi", key: "description_vi", width: 100 },
     {
-      title: "Hành Động",
+      title: "Hành động",
       width: 30,
       fixed: "right",
       render: (user: DataType) => (

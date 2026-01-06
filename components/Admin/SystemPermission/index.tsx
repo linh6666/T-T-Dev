@@ -120,16 +120,16 @@ export default function LargeFixedTable() {
   };
 
   // ✅ Định nghĩa cột bảng
-  const columns: ColumnsType<DataType> = [
-    // { title: "Mã Hệ Thống", dataIndex: "system_id", key: "system_id", width: 30 },
-    // { title: "Mã Quyền", dataIndex: "permission_id", key: "permission_id", width: 90 },
-     {
+const columns: ColumnsType<DataType> = [
+  {
     title: "Tên vai trò",
     dataIndex: "system_id",
     key: "system_id",
     width: 30,
     render: (system_id: number) => {
-      const system = systemOptions.find((s) => s.value === system_id.toString());
+      const system = systemOptions.find(
+        (s) => s.value === system_id.toString()
+      );
       return system ? system.label : `#${system_id}`;
     },
   },
@@ -139,34 +139,50 @@ export default function LargeFixedTable() {
     key: "permission_id",
     width: 90,
     render: (permission_id: number) => {
-      const permission = permissionOptions.find((p) => p.value === permission_id.toString());
+      const permission = permissionOptions.find(
+        (p) => p.value === permission_id.toString()
+      );
       return permission ? permission.label : `#${permission_id}`;
     },
   },
-    { title: "Mô Tả ", dataIndex: "description_vi", key: "description_vi", width: 100 },
-    // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
-    {
-      title: "Hành Động",
-      width: 30,
-      fixed: "right",
-      render: (user: DataType) => (
-        <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
-          <EuiFlexItem grow={false}>
-            {/* ✅ truyền đúng user vào onClick */}
-            <EuiButtonIcon
-              iconType="documentEdit"
-              aria-label="Chỉnh sửa"
-              color="success"
-              onClick={() => openEditUserModal(user)}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon iconType="trash" aria-label="Xóa" color="danger" onClick={() => openDeleteUserModal(user)} />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
-    },
-  ];
+  {
+    title: "Mô tả",
+    dataIndex: "description_vi",
+    key: "description_vi",
+    width: 100,
+  },
+  // {
+  //   title: "Mô tả (tiếng Anh)",
+  //   dataIndex: "description_en",
+  //   key: "description_en",
+  //   width: 100,
+  // },
+  {
+    title: "Hành động",
+    width: 30,
+    fixed: "right",
+    render: (user: DataType) => (
+      <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            iconType="documentEdit"
+            aria-label="Chỉnh sửa"
+            color="success"
+            onClick={() => openEditUserModal(user)}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            iconType="trash"
+            aria-label="Xóa"
+            color="danger"
+            onClick={() => openDeleteUserModal(user)}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    ),
+  },
+];
 
   // ✅ Modal thêm người dùng
   const openModal = () => {
