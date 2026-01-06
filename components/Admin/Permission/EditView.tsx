@@ -36,7 +36,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const form = useForm<CreateUserPayload>({
     initialValues: {
       description_vi: "",
-      description_en: "",
+      // description_en: "",
     },
   });
 
@@ -73,7 +73,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
       formRef.current.setValues({
         description_vi: userData.description_vi || "",
-        description_en: userData.description_en || "",
+        // description_en: userData.description_en || "",
       });
     } catch (error: unknown) {
       console.error("Lỗi khi lấy dữ liệu user:", error);
@@ -105,22 +105,32 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
 
-      <Textarea
-        label="Mô tả"
-        placeholder="Nhập mô tả"
-        autosize
-        minRows={3}
-        mt="md"
-        {...form.getInputProps("description_vi")}
-      />
-      <Textarea
+         <Textarea
+  label="Mô tả chức năng"
+  placeholder="Nhập mô tả chức năng"
+  autosize
+  minRows={3}
+  mt="md"
+  value={form.values.description_vi}
+  onChange={(event) => {
+    const value = event.currentTarget.value;
+
+    form.setFieldValue(
+      "description_vi",
+      value
+        ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+        : value
+    );
+  }}
+/>
+      {/* <Textarea
         label="Mô tả(Tiếng Anh)"
         placeholder="Nhập mô tả (Tiếng Anh)"
         autosize
         minRows={3}
         mt="md"
         {...form.getInputProps("description_en")}
-      />
+      /> */}
 
       <Group justify="flex-end" mt="lg">
         <Button

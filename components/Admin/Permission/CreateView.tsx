@@ -26,12 +26,12 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     initialValues: {
       code: "",
       description_vi: "",
-      description_en: "",
+      // description_en: "",
     },
     validate: {
       code: isNotEmpty("Mã không được để trống"),
       description_vi: isNotEmpty("Mô tả không được để trống"),
-      description_en: isNotEmpty("Mô tả không được để trống"),
+      // description_en: isNotEmpty("Mô tả không được để trống"),
     },
   });
 
@@ -41,7 +41,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
       const userData = {
         code: values.code,
         description_vi: values.description_vi,
-        description_en: values.description_en,
+        // description_en: values.description_en,
       };
       await createUser(userData);
 
@@ -84,23 +84,41 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
         {...form.getInputProps("code")}
       />
 
-      <Textarea
-        label="Mô tả"
-        placeholder="Nhập mô tả"
+      {/* <Textarea
+        label="Mô tả chức năng"
+        placeholder="Nhập mô tả chức năng"
         autosize
         minRows={3}
         mt="md"
         {...form.getInputProps("description_vi")}
-      />
-
+      /> */}
       <Textarea
+  label="Mô tả chức năng"
+  placeholder="Nhập mô tả chức năng"
+  autosize
+  minRows={3}
+  mt="md"
+  value={form.values.description_vi}
+  onChange={(event) => {
+    const value = event.currentTarget.value;
+
+    form.setFieldValue(
+      "description_vi",
+      value
+        ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+        : value
+    );
+  }}
+/>
+
+      {/* <Textarea
         label="Mô tả (Tiếng Anh)"
         placeholder="Enter English description"
         autosize
         minRows={3}
         mt="md"
         {...form.getInputProps("description_en")}
-      />
+      /> */}
 
       <Group justify="flex-end" mt="lg">
         <Button

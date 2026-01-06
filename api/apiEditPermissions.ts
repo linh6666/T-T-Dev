@@ -4,7 +4,7 @@ import { API_ROUTE } from "../const/apiRouter"; // ✅ import đúng object ch�
 export interface CreateUserPayload {
   
 description_vi: string;
-    description_en: string;
+    // description_en: string;
 }
 
 export const createUser = async (payload: CreateUserPayload) => {
