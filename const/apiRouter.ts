@@ -58,6 +58,7 @@ export const API_ROUTE = {
     GET_LIST_USERPROJECTROLE:"/api/v1/UserProjectRole/assignments",
     CREATE_USERPROJECTROLE:"/api/v1/UserProjectRole/{project_id}",
    DELETE_USERPROJECTROLE:"/api/v1/UserProjectRole/{user_project_role_id}",
+   GET_USERPROJECTROLE:"/api/v1/UserProjectRole/{user_project_role_id}",
     UPDATE_USERPROJECTROLE:"/api/v1/UserProjectRole/{user_id}/{project_id}/{old_role_id}",
 
 ///Attributes

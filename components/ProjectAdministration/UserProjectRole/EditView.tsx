@@ -60,7 +60,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
   const form = useForm<CreateUserPayload>({
     initialValues: {
-      system_id: "",
+      // system_id: "",
       project_id: "",
       user_id: "",
       role_id: "",
@@ -95,7 +95,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
       const userData = response.data;
 
       formRef.current.setValues({
-        system_id: userData.system_id?.toString() || "",
+        // system_id: userData.system_id?.toString() || "",
         project_id: userData.project_id?.toString() || "",
         user_id: userData.user_id?.toString() || "",
         role_id: userData.role_id?.toString() || "",

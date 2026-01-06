@@ -11,12 +11,17 @@ export interface GetListRolesParams {
 }
 
 export interface CreateUserPayload {
-      system_id: string;
-      project_id:string;
-  user_id?: string;
-  role_id?: string;
-  
+  project_id: string | number;
+  user_id: string | number;   // bắt buộc
+  role_id: string | number;
+
+  role_name?: string;
+  project_name?: string;
+  user_email?: string;
+  old_role_id?: string | number;
 }
+
+
 
 
 export const getListRoless = async ({ token, skip, limit }: GetListRolesParams) => {
