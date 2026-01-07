@@ -12,7 +12,7 @@ export interface GetListRolesParams {
 
 export interface CreateUserPayload {
    type_vi: string;
-   type_en: string;
+  //  type_en: string;
   
 }
 

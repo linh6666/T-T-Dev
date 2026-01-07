@@ -25,14 +25,14 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
   const form = useForm({
     initialValues: {
         type_vi: "",
-        type_en: "",
+        // type_en: "",
      
      
  
     },
     validate: {
       type_vi: isNotEmpty("không được để trống"),
-         type_en: isNotEmpty("không được để trống"),
+        //  type_en: isNotEmpty("không được để trống"),
     
      
     },
@@ -43,7 +43,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
     try {
       const userData = {
         type_vi: values.type_vi,
-        type_en: values.type_en,
+        // type_en: values.type_en,
            
       };
       await createUser(userData);
@@ -77,13 +77,13 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
         mt="md"
         {...form.getInputProps("type_vi")}
       />
-      <TextInput
+      {/* <TextInput
         label="Loại dự án (Tiếng Anh)"
         placeholder="Nhập Loại dự án (Tiếng Anh)"
         withAsterisk
         mt="md"
         {...form.getInputProps("type_en")}
-      />
+      /> */}
 
       <Group justify="flex-end" mt="lg">
         <Button

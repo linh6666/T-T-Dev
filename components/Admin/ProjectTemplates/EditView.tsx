@@ -38,7 +38,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const form = useForm<CreateUserPayload>({
     initialValues: {
     type_vi: "",
-      type_en: "",
+      // type_en: "",
     
       // description_en: "",
     },
@@ -77,7 +77,7 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
       formRef.current.setValues({
         type_vi: userData.type_vi|| "",
-        type_en: userData.type_en || "",
+        // type_en: userData.type_en || "",
        
     
        
@@ -131,13 +131,13 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         mt="md"
         {...form.getInputProps("type_vi")}
       />
-       <TextInput
+       {/* <TextInput
         label="Loại dự án (Tiếng Anh)"
         placeholder="Nhập loại dự án (Tiếng Anh)"
         withAsterisk
         mt="md"
         {...form.getInputProps("type_en")}
-      />
+      /> */}
 
      
        
