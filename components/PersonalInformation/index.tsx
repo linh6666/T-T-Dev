@@ -11,6 +11,7 @@ import {
   IconList,
   
   IconExchange,
+  IconStackBack,
 } from "@tabler/icons-react";
 import { Loader, Container,  Text } from "@mantine/core";
 import { getCurrentUser } from "../../api/apiProfile";
@@ -41,7 +42,7 @@ export default function ProfilePage() {
 //   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<
-    "home" | "profile" | "orders" | "bookings" | "membership" | "promotions"| "listcustomer"| "ResetPassword"
+    "home" | "profile" | "orders" | "bookings" | "membership" | "promotions"| "listcustomer"| "ResetPassword"| "test"
   >("profile");
 
   useEffect(() => {
@@ -121,7 +122,7 @@ export default function ProfilePage() {
                   activeTab === "profile" ? styles.active : ""
                 }`}
               >
-                <IconUser size={18} /> Tài khoản của bạn
+                <IconUser size={18} /> Tài khoản của tôi
               </button>
             </li>
             <li>
@@ -163,6 +164,18 @@ export default function ProfilePage() {
               >
                 <IconList
  size={18} /> Danh sách khách hàng
+              </button>
+            </li>
+                  <li>
+              <button
+                onClick={() => setActiveTab("test")}
+                className={`${styles.menuItem} ${
+                  activeTab === "test" ? styles.active : ""
+                }`}
+              >
+                <IconStackBack
+
+ size={18} /> Danh sách đơn hàng
               </button>
             </li>
                  <li>
