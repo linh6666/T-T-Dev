@@ -25,7 +25,7 @@ import HomeAdmin from '../HomeAdmin/index';
 const mockdata = [
   { label: 'Báo cáo tổng quan', icon: IconGauge, link: 'home' },
   {
-    label: 'CẤU HÌNH HỆ THÔNG',
+    label: 'CẤU HÌNH HỆ THỐNG',
     icon: IconNotes,
     initiallyOpened: true,
     links: [
