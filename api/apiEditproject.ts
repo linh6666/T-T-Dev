@@ -7,7 +7,9 @@ export interface CreateUserPayload {
   template: string;
   address: string;
   investor: string;
+ 
 overview_image: File | null;
+
   rank: string;
     
 }
