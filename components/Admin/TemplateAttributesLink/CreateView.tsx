@@ -14,7 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { createUser } from "../../../api/apiTemplateAttributesLink";
 import { getListRoles } from "../../../api/apigetlistAttributes";
-import { getListProjectTemplates } from "../../../api/apiProjectTemplates";
+import { getListProjectTemplates } from "../../../api/apiProjectTemplates2";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface CreateViewProps {
@@ -54,22 +54,34 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
   });
 
   // ✅ Gọi API lấy danh sách "Dự án mẫu"
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const res = await getListProjectTemplates({ token, skip: 0, limit: 100 });
-        setTemplateOptions(
-          res.data.map((item: ProjectTemplate) => ({
-            value: item.id,
-            label: item.template_vi || item.template_name || "Không có tên",
+useEffect(() => {
+  const fetchTemplates = async () => {
+    try {
+      const res = await getListProjectTemplates({
+        token,
+        skip: 0,
+        limit: 100,
+      });
+
+      const data = res.data as ProjectTemplate[];
+
+      setTemplateOptions(
+        data
+          .filter((item: ProjectTemplate) => item.template_vi?.trim())
+          .map((item: ProjectTemplate) => ({
+            value: item.id.toString(),
+            label: item.template_vi!,
           }))
-        );
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách dự án mẫu:", error);
-      }
-    };
-    fetchTemplates();
-  }, [token]);
+      );
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách dự án mẫu:", error);
+      setTemplateOptions([]);
+    }
+  };
+
+  fetchTemplates();
+}, [token]);
+
 
   // ✅ Gọi API lấy danh sách "Thuộc tính"
   useEffect(() => {

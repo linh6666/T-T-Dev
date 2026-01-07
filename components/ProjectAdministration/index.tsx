@@ -49,7 +49,6 @@ const mockdata = [
     icon: IconUser,
     initiallyOpened: true,
     links: [{ label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
-     
     ],
   },
 ];

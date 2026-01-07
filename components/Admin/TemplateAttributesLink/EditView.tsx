@@ -16,7 +16,7 @@ import { API_ROUTE } from "../../../const/apiRouter";
 import { api } from "../../../libray/axios";
 import { CreateUserPayload } from "../../../api/apiTemplateAttributesLink";
 import { getListRoles } from "../../../api/apigetlistAttributes";
-import { getListProjectTemplates } from "../../../api/apiProjectTemplates";
+import { getListProjectTemplates } from "../../../api/apiProjectTemplates2";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface EditViewProps {
@@ -101,19 +101,28 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   }, [id, open, close]);
 
   /** ✅ Gọi API danh sách “Mẫu dự án” */
-  const fetchTemplateOptions = useCallback(async () => {
-    try {
-      const res = await getListProjectTemplates({ token, skip: 0, limit: 100 });
-      setTemplateOptions(
-        res.data.map((item: ProjectTemplate) => ({
-          value: item.id,
-          label: item.template_vi || item.template_name || "Không có tên",
+const fetchTemplateOptions = useCallback(async () => {
+  try {
+    const res = await getListProjectTemplates({
+      token,
+      skip: 0,
+      limit: 100,
+    });
+
+    setTemplateOptions(
+      (res.data as ProjectTemplate[])
+        .filter((item) => item.template_vi?.trim())
+        .map((item) => ({
+          value: item.id.toString(),
+          label: item.template_vi!,
         }))
-      );
-    } catch (error) {
-      console.error("Lỗi khi tải mẫu dự án:", error);
-    }
-  }, [token]);
+    );
+  } catch (error) {
+    console.error("Lỗi khi tải mẫu dự án:", error);
+    setTemplateOptions([]);
+  }
+}, [token]);
+
 
   /** ✅ Gọi API danh sách “Thuộc tính” */
   const fetchAttributeOptions = useCallback(async () => {

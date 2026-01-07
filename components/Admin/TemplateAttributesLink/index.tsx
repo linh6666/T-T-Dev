@@ -6,7 +6,7 @@ import type { ColumnsType } from "antd/es/table";
 import AppAction from "../../../common/AppAction";
 import { modals } from "@mantine/modals";
 import { getListTemplateAttributesLink } from "../../../api/apiTemplateAttributesLink";
-import { getListProjectTemplates } from "../../../api/apiProjectTemplates";
+import { getListProjectTemplates } from "../../../api/apiProjectTemplates2";
 import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
 import { Group, Select } from "@mantine/core";
 import CreateView from "./CreateView";
@@ -57,21 +57,34 @@ export default function LargeFixedTable() {
   // ============================================================
   // 🔹 1️⃣ Gọi API lấy danh sách template
   // ============================================================
-  const fetchTemplateList = useCallback(async () => {
-    try {
-      const res = await getListProjectTemplates({ token, skip: 0, limit: 100 });
-      const data: ProjectTemplate[] = res.data || [];
+const fetchTemplateList = useCallback(async () => {
+  try {
+    const res = await getListProjectTemplates({
+      token,
+      skip: 0,
+      limit: 100,
+    });
 
-      const options = data.map((item) => ({
+    const data: ProjectTemplate[] = res.data || [];
+
+    const options = data
+      .filter(
+        (item): item is ProjectTemplate & { template_vi: string } =>
+          typeof item.template_vi === "string" &&
+          item.template_vi.trim() !== ""
+      )
+      .map((item) => ({
         value: item.id.toString(),
-        label: item.template_vi || item.template_name || `Template ${item.id}`,
+        label: item.template_vi, // ✅ chắc chắn là string
       }));
-      setTemplateOptions(options);
-    } catch (err) {
-      console.error("Lỗi khi load danh sách template:", err);
-      setTemplateOptions([]);
-    }
-  }, [token]);
+
+    setTemplateOptions(options);
+  } catch (err) {
+    console.error("Lỗi khi load danh sách template:", err);
+    setTemplateOptions([]);
+  }
+}, [token]);
+
 
   // ============================================================
   // 🔹 2️⃣ Gọi API lấy danh sách thuộc tính
