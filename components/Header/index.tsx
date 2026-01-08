@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Image } from "@mantine/core";
+import { Group, HoverCard, Image } from "@mantine/core";
 import { jwtDecode } from "jwt-decode";
 import {  IconHeart, IconPhoneCall, } from "@tabler/icons-react";
 import LoginButton from "./ButtonLogin/index";
 import Notification from "./Notification/index";
+import FavoriteHoverContent from "./favourite";
 
 import styles from "./Header.module.css";
 
@@ -159,8 +160,14 @@ const isActive = (href: string, highlight?: boolean) => {
           >
             <IconPhoneCall size={17} color="#752E0B" stroke={1.5} />
           </div>
-          <Link href="/yeu-thich">
-  <div
+        
+
+
+
+ <Group justify="center">
+      <HoverCard width={320} shadow="md" withArrow openDelay={200} closeDelay={400}>
+        <HoverCard.Target>
+          <div
     style={{
       border: "1px solid #752E0B",
       borderRadius: "50%",
@@ -174,7 +181,18 @@ const isActive = (href: string, highlight?: boolean) => {
   >
     <IconHeart size={17} color="#752E0B" stroke={1.5} />
   </div>
-</Link>
+        
+        </HoverCard.Target>
+        <HoverCard.Dropdown>
+          
+
+      <FavoriteHoverContent />
+
+        
+        </HoverCard.Dropdown>
+      </HoverCard>
+    </Group>
+
           
 <Notification />
 

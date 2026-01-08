@@ -48,7 +48,11 @@ const mockdata = [
     label: 'Phân quyền người dùng trong dự án',
     icon: IconUser,
     initiallyOpened: true,
-    links: [{ label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
+    links: [
+      { label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
+      { label: 'Duyệt đơn hàng', link: 'Test' },
+      { label: 'Duyệt đơn thanh toán kế tiếp', link: 'Test1' },
+      
     ],
   },
 ];
