@@ -52,7 +52,6 @@ interface UserItem {
 const EditView = ({ onSearch, id }: EditViewProps) => {
   const [visible, { open, close }] = useDisclosure(false);
 
-  // ✅ State lưu dữ liệu các dropdown
   const [systemOptions, setSystemOptions] = useState<Option[]>([]);
   const [projectOptions, setProjectOptions] = useState<Option[]>([]);
   const [roleOptions, setRoleOptions] = useState<Option[]>([]);
@@ -60,9 +59,12 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
 
   const form = useForm<CreateUserPayload>({
     initialValues: {
-      // system_id: "",
       project_id: "",
       user_id: "",
+      role_name: "",
+      project_name: "",
+      old_role_id: "",
+      user_email: "",
       role_id: "",
     },
   });
@@ -73,7 +75,11 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   const handleSubmit = async (values: CreateUserPayload) => {
     open();
     try {
-      const url = API_ROUTE.UPDATE_USERPROJECTROLE.replace("{role_id}", id);
+      const url = API_ROUTE.UPDATE_USERPROJECTROLE
+        .replace("{user_id}", values.user_id.toString())
+        .replace("{project_id}", values.project_id.toString())
+        // .replace("{old_role_id}", values.old_role_id.toString());
+
       await api.put(url, values);
       await onSearch();
       modals.closeAll();
@@ -88,17 +94,29 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   /** ✅ Lấy dữ liệu chi tiết user */
   const fetchUserDetail = useCallback(async () => {
     if (!id) return;
+
     open();
     try {
-      const url = API_ROUTE.UPDATE_USERPROJECTROLE.replace("{role_id}", id);
-      const response = await api.get(url);
+      const url = API_ROUTE.GET_USERPROJECTROLE.replace(
+        "{user_project_role_id}",
+        id
+      );
+
+      const response = await api.get(url, {
+        params: { lang: "vi" },
+      });
+
       const userData = response.data;
 
       formRef.current.setValues({
-        // system_id: userData.system_id?.toString() || "",
-        project_id: userData.project_id?.toString() || "",
-        user_id: userData.user_id?.toString() || "",
+        user_email: userData.user_email?.toString() || "",
+        project_name: userData.project_name?.toString() || "",
+        role_name: userData.role_name?.toString() || "",
         role_id: userData.role_id?.toString() || "",
+        old_role_id: userData.role_id?.toString() || "",
+      
+        user_id: userData.user_id?.toString() || "",
+        project_id: userData.project_id?.toString() || "",
       });
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu user:", error);
@@ -114,42 +132,37 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     try {
       const token = localStorage.getItem("access_token") || "";
 
-    const [systems, projects, roles, users] = await Promise.all([
-  getListSystem({ token }) as Promise<{ data: SystemItem[] }>,
-  getListProject({ token }) as Promise<{ data: ProjectItem[] }>,
-  getListRoles({ token }) as Promise<{ data: RoleItem[] }>,
-  getListUser({ token }) as Promise<{ data: UserItem[] }>,
-]);
+      const [systems, projects, roles, users] = await Promise.all([
+        getListSystem({ token }) as Promise<{ data: SystemItem[] }>,
+        getListProject({ token }) as Promise<{ data: ProjectItem[] }>,
+        getListRoles({ token }) as Promise<{ data: RoleItem[] }>,
+        getListUser({ token }) as Promise<{ data: UserItem[] }>,
+      ]);
 
-
-      // Hệ thống
       setSystemOptions(
         systems.data?.map((item) => ({
-          value: String(item.id),
+          value: item.name, // dùng name làm value
           label: item.name || `Hệ thống ${item.id}`,
         })) || []
       );
 
-      // Dự án
       setProjectOptions(
         projects.data?.map((item) => ({
-          value: String(item.id),
+          value: item.name,
           label: item.name || `Dự án ${item.id}`,
         })) || []
       );
 
-      // Vai trò
       setRoleOptions(
         roles.data?.map((item) => ({
-          value: String(item.id),
+          value: String(item.id), // giữ nguyên ID cho role_id
           label: item.name || `Vai trò ${item.id}`,
         })) || []
       );
 
-      // Người dùng (hiển thị email)
       setUserOptions(
         users.data?.map((item) => ({
-          value: String(item.id),
+          value: item.email, // dùng email làm value
           label: item.email || `User ${item.id}`,
         })) || []
       );
@@ -158,7 +171,6 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
     }
   }, []);
 
-  /** ✅ Gọi API khi mở form sửa */
   useEffect(() => {
     fetchDropdownData();
     fetchUserDetail();
@@ -177,47 +189,46 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
 
-      {/* Hệ thống */}
       <Select
         label="Tên hệ thống"
         placeholder="Chọn hệ thống"
-        data={systemOptions.length ? systemOptions : [{ value: "", label: "Đang tải..." }]}
+        data={systemOptions}
         rightSection={<IconChevronDown size={16} />}
         mt="md"
         withAsterisk
-        {...form.getInputProps("system_id")}
+        {...form.getInputProps("role_name")}
       />
 
-      {/* Dự án */}
       <Select
         rightSection={<IconChevronDown size={16} />}
         label="Dự án"
         placeholder="Chọn dự án"
-        data={projectOptions.length ? projectOptions : [{ value: "", label: "Đang tải..." }]}
+        data={projectOptions}
         mt="md"
-        {...form.getInputProps("project_id")}
+        {...form.getInputProps("project_name")}
       />
 
-      {/* Người dùng */}
       <Select
         rightSection={<IconChevronDown size={16} />}
         label="Email người dùng"
         placeholder="Chọn người dùng"
-        data={userOptions.length ? userOptions : [{ value: "", label: "Đang tải..." }]}
+        data={userOptions}
         mt="md"
-        {...form.getInputProps("user_id")}
+        {...form.getInputProps("user_email")}
       />
 
-      {/* Vai trò */}
-      <Select
+  <Select
         rightSection={<IconChevronDown size={16} />}
         label="Vai trò"
         placeholder="Chọn vai trò"
-        data={roleOptions.length ? roleOptions : [{ value: "", label: "Đang tải..." }]}
+        data={
+          roleOptions.length
+            ? roleOptions
+            : [{ value: "", label: "Đang tải..." }]
+        }
         mt="md"
         {...form.getInputProps("role_id")}
       />
-
       <Group justify="flex-end" mt="lg">
         <Button
           type="submit"

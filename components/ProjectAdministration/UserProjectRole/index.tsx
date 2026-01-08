@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Pagination, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import AppSearch from "../../../common/AppSearch";
@@ -15,25 +15,24 @@ import EditView from "./EditView";
 import DeleteView from "./DeleteView";
 
 interface DataType {
-  id:string;
-     system_id: string;
-      project_id:string;
-  user_id?: string;
+  id: string;
+  role_name: string;
+  project_name: string;
+  user_email?: string;
   role_id?: string;
-  // description_en: string;
 }
 
 export default function LargeFixedTable() {
-  const [data, setData] = useState<DataType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [allData, setAllData] = useState<DataType[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const [total, setTotal] = useState<number>(0);
-     const [currentPage, setCurrentPage] = useState<number>(1);
-      const pageSize = 10; 
-   console.error("Lỗi khi tải dữ liệu:", error); // ✅ thêm console.error(error)
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const token = localStorage.getItem("access_token") || "YOUR_TOKEN_HERE";
+  const pageSize = 10;
+  const token = localStorage.getItem("access_token") || "";
 
+  // ✅ FIX: dùng useCallback
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -45,111 +44,114 @@ export default function LargeFixedTable() {
     }
 
     try {
-         const skip = (currentPage - 1) * pageSize;
-      const result = await getListRoless({ token, skip, limit: pageSize });
-      const users = result.  assignments.map((user: DataType) => ({
-   // ✅ map thêm id
-    ...user,
-        key: user.id,
+      const result = await getListRoless({ token });
+
+      const users = result.assignments.map((item: DataType) => ({
+        ...item,
+        key: item.id,
       }));
-      setData(users);
+
+      setAllData(users);
       setTotal(result.total);
-
-////
-   const totalPages = Math.ceil(result.total / pageSize);
-      if (currentPage > totalPages && totalPages > 0) {
-        setCurrentPage(totalPages);
-      }
-
-///
-
     } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Đã xảy ra lỗi khi tải dữ liệu.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Đã xảy ra lỗi khi tải dữ liệu.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [token,currentPage]);
+  }, [token]);
 
+  // ✅ FIX: thêm fetchData vào dependency
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // ✅ Hàm mở modal chỉnh sửa
+  // ✅ phân trang client
+  const paginatedData = allData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // ===== MODALS =====
   const openEditUserModal = (role: DataType) => {
     modals.openConfirmModal({
       title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa người dùng</div>,
-      children: <EditView id={role.id} onSearch={fetchData} />, // ✅ đổi fetchRoles → fetchData
+      children: <EditView id={role.id} onSearch={fetchData} />,
       confirmProps: { display: "none" },
       cancelProps: { display: "none" },
     });
   };
 
-  // ✅ Định nghĩa cột bảng
+  const openDeleteUserModal = (role: DataType) => {
+    modals.openConfirmModal({
+      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Xóa vai trò</div>,
+      children: <DeleteView idItem={[role.id]} onSearch={fetchData} />,
+      confirmProps: { display: "none" },
+      cancelProps: { display: "none" },
+    });
+  };
+
+  const openModal = () => {
+    modals.openConfirmModal({
+      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Thêm người dùng mới</div>,
+      children: <CreateView onSearch={fetchData} />,
+      size: "lg",
+      confirmProps: { display: "none" },
+      cancelProps: { display: "none" },
+    });
+  };
+
+  // ===== TABLE =====
   const columns: ColumnsType<DataType> = [
-      { title: "Tên hệ thống", dataIndex: "system_id", key: "system_id", width: 30 },
-    { title: "Dự án", dataIndex: "project_id", key: "project_id", width: 30 },
-    { title: "Email người dùng", dataIndex: "user_id", key: "user_id", width: 90 },
-    { title: "Vai trò", dataIndex: "role_id", key: "role_id", width: 100 },
-    // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
+    { title: "Tên hệ thống", dataIndex: "role_name", key: "role_name" },
+    { title: "Dự án", dataIndex: "project_name", key: "project_name" },
+    { title: "Email", dataIndex: "user_email", key: "user_email" },
     {
-      title: "Hành Động",
-      width: 30,
+      title: "Hành động",
       fixed: "right",
       render: (user: DataType) => (
-        <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
+        <EuiFlexGroup gutterSize="s">
           <EuiFlexItem grow={false}>
-            {/* ✅ truyền đúng user vào onClick */}
             <EuiButtonIcon
               iconType="documentEdit"
-              aria-label="Chỉnh sửa"
-              color="success"
+              aria-label="Edit"
+                  color="success"
               onClick={() => openEditUserModal(user)}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiButtonIcon iconType="trash" aria-label="Xóa" color="danger" onClick={() => openDeleteUserModal(user)} />
+            <EuiButtonIcon
+              iconType="trash"
+              aria-label="Delete"
+              color="danger"
+              onClick={() => openDeleteUserModal(user)}
+            />
           </EuiFlexItem>
         </EuiFlexGroup>
       ),
     },
   ];
 
-  // ✅ Modal thêm người dùng
-  const openModal = () => {
-    modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Thêm người dùng mới</div>,
-      children: <CreateView onSearch={fetchData} />,
-      size: "lg",
-      radius: "md",
-      confirmProps: { display: "none" },
-      cancelProps: { display: "none" },
-    });
-  };
-
-    const openDeleteUserModal = (role: DataType) => {
-    modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Xóa vai trò</div>,
-      children: <DeleteView idItem={[role.id]} onSearch={fetchData} />,
-      confirmProps: { display: 'none' },
-      cancelProps: { display: 'none' },
-    });
-  };
-
   return (
     <>
-      <Group style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Group justify="space-between" mb={12}>
         <AppSearch />
         <AppAction openModal={openModal} />
       </Group>
 
+      {/* ✅ FIX lỗi unused error */}
+      {error && <div style={{ color: "red", marginBottom: 12 }}>{error}</div>}
+
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={paginatedData}
         loading={loading}
         pagination={false}
+        rowKey="id"
         bordered
-        rowKey="id" // ✅ thêm key cho mỗi hàng
       />
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
@@ -157,9 +159,8 @@ export default function LargeFixedTable() {
           total={total}
           current={currentPage}
           pageSize={pageSize}
-          onChange={(page) => setCurrentPage(page)}
+          onChange={setCurrentPage}
           showSizeChanger={false}
-          showQuickJumper={false}
         />
       </div>
     </>
