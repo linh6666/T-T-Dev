@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Text, Button, Image } from "@mantine/core";
-import { IconArrowLeft, IconClipboardText, IconHeart } from "@tabler/icons-react";
+import { IconArrowLeft, IconClipboardText, IconHeart, IconShoppingCart } from "@tabler/icons-react";
 import { Getlisthome } from "../../../api/apiGetListHome";
 import styles from "./App.module.css";
 import { AxiosError } from "axios";
@@ -107,219 +107,272 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
   const current = imageData[index];
 
   return (
-    <div className={styles.container}style={{ padding: "20px" }}>
-      {/* Nút quay lại */}
-      <Button
-        onClick={onBack}
-        variant="light"
-        leftSection={<IconArrowLeft />}
-        style={{ marginBottom: "20px" }}
-      >
-        Quay lại
-      </Button>
-       {loading && <p>Đang tải dữ liệu...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+<div className={styles.container} style={{ padding: "20px" }}>
+  {/* Nút quay lại */}
+  <Button
+    onClick={onBack}
+    variant="light"
+    leftSection={<IconArrowLeft />}
+    style={{ marginBottom: "20px" }}
+  >
+    Quay lại
+  </Button>
 
-        <div style={{ display: "flex", gap: "20px", height: "80vh" }}>
-               {/* Cột trái */}
-               <div style={{ flex: 1 }}>
-                 {/* Lấy dữ liệu từ item đầu tiên */}
-                 
-                   <>
-                     <Text fw={700} mb={12} style={{ fontSize: "18px" }}>
+  {loading && <p>Đang tải dữ liệu...</p>}
+  {error && <p style={{ color: "red" }}>{error}</p>}
+
+  <div style={{ display: "flex", gap: "20px", height: "80vh" }}>
+    {/* ================= CỘT TRÁI ================= */}
+    <div style={{ flex: 1 }}>
+      <>
+        <Text fw={700} mb={12} style={{ fontSize: "18px" }}>
           Chi tiết căn hộ: {item.unit_code}
         </Text>
-      <Text style={{ fontSize: "15px" }}>
-  {item.zone
-    ? `Phân khu: ${item.zone}`
-    : `Tòa: ${item.layer3}`}
-</Text>
-           <Text style={{ fontSize: "15px" }}>
-  {item.building_type
-    ? `Loại công trình: ${item.building_type}`
-    : `Vị trí: ${item.layer2}`}
-</Text>
-        <Text style={{ fontSize: "15px" }}>Phòng ngủ: {item.bedroom}</Text>
-       <Text style={{ fontSize: "13px" }}>
-  Phòng tắm: {
-    typeof item.bathroom === "string" &&
-    item.bathroom.trim().toLowerCase() === "skip"
-      ? "chưa có"
-      : item.bathroom
-  }
-</Text>
-       {item.direction && item.direction.trim() !== "" && (
-  <Text style={{ fontSize: "15px" }}>
-    Hướng: {item.direction.trim().toLowerCase() === "skip"
-      ? "chưa có"
-      : item.direction}
-  </Text>
-)}
 
-{item.main_door_direction && item.main_door_direction.trim() !== "" && (
-  <Text style={{ fontSize: "15px" }}>
-    Hướng cửa chính: {item.main_door_direction.trim().toLowerCase() === "skip"
-      ? "chưa có"
-      : item.main_door_direction}
-  </Text>
-)}
+        <Text style={{ fontSize: "15px" }}>
+          {item.zone ? `Phân khu: ${item.zone}` : `Tòa: ${item.layer3}`}
+        </Text>
 
-{item.balcony_direction && item.balcony_direction.trim() !== "" && (
-  <Text style={{ fontSize: "15px" }}>
-    Hướng ban công: {item.balcony_direction.trim().toLowerCase() === "skip"
-      ? "chưa có"
-      : item.balcony_direction}
-  </Text>
-)}
+        <Text style={{ fontSize: "15px" }}>
+          {item.building_type
+            ? `Loại công trình: ${item.building_type}`
+            : `Vị trí: ${item.layer2}`}
+        </Text>
 
-  <Text style={{ fontSize: "15px" }}>Cảnh quang: {item.view}</Text>
-              <Text style={{ fontSize: "15px" }}>Trạng thái: {item.status_unit}</Text>
+        <Text style={{ fontSize: "15px" }}>
+          Phòng ngủ: {item.bedroom}
+        </Text>
+
+        <Text style={{ fontSize: "13px" }}>
+          Phòng tắm:{" "}
+          {typeof item.bathroom === "string" &&
+          item.bathroom.trim().toLowerCase() === "skip"
+            ? "chưa có"
+            : item.bathroom}
+        </Text>
+
+        {item.direction && item.direction.trim() !== "" && (
+          <Text style={{ fontSize: "15px" }}>
+            Hướng:{" "}
+            {item.direction.trim().toLowerCase() === "skip"
+              ? "chưa có"
+              : item.direction}
+          </Text>
+        )}
+
+        {item.main_door_direction &&
+          item.main_door_direction.trim() !== "" && (
+            <Text style={{ fontSize: "15px" }}>
+              Hướng cửa chính:{" "}
+              {item.main_door_direction.trim().toLowerCase() === "skip"
+                ? "chưa có"
+                : item.main_door_direction}
+            </Text>
+          )}
+
+        {item.balcony_direction &&
+          item.balcony_direction.trim() !== "" && (
+            <Text style={{ fontSize: "15px" }}>
+              Hướng ban công:{" "}
+              {item.balcony_direction.trim().toLowerCase() === "skip"
+                ? "chưa có"
+                : item.balcony_direction}
+            </Text>
+          )}
+
+        <Text style={{ fontSize: "15px" }}>
+          Cảnh quang: {item.view}
+        </Text>
+
+        <Text style={{ fontSize: "15px" }}>
+          Trạng thái: {item.status_unit}
+        </Text>
+
         <Text style={{ fontSize: "15px" }}>
           Giá: {item.price ? item.price.toLocaleString() + "đ" : "Chưa có"}
         </Text>
-         <Text>
-  <b>Mô tả:</b> {item.describe_vi || item.describe}
-</Text>
-                   </>
-              
-     
-                 {/* Hiển thị PDF */}
-                 {pdfData.map(pdf => (
-                   <div key={pdf.id} style={{ marginTop: "10px" }}>
-                     <a
-                       href={pdf.url}
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       style={{ display: "flex", textDecoration: "underline" }}
-                     >
-                       <IconClipboardText /> Xem tài liệu: {pdf.name_vi || pdf.name_en || pdf.id}
-                     </a>
-                   </div>
-                 ))}
-               </div>
-     
-               {/* Cột phải: SLIDER */}
-           
-               <div
-                 style={{
-                   flex: 2,
-                   paddingLeft: "20px",
-                   display: "flex",
-                   flexDirection: "column",
-                   alignItems: "center",
-                   position: "relative"
-                 }}
-               >
-     <IconHeart
-  style={{
-    position: "absolute",
 
-    top: 0,
-    right: 0,
-    cursor: "pointer",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.25)",
-    borderRadius: "50%",
-    backgroundColor: "#fff",
-    padding: "1px",
-  }}
-   color="#752E0B" 
-/>
+        <Text>
+          <b>Mô tả:</b> {item.describe_vi || item.describe}
+        </Text>
+      </>
 
-
-                 {current && (
-                   <div
-                     style={{
-                       width: "100%",
-                       textAlign: "center",
-                       marginBottom: "20px",
-                       position: "relative",
-                     }}
-                   >
-                     <Image
-                       src={current.url}
-                       alt={current.description_en}
-                       width={800}
-                       height={600}
-                       style={{ maxWidth: "100%", borderRadius: "8px", height: "auto" }}
-                     />
-     
-                     <button
-                       onClick={goPrev}
-                       disabled={index === 0}
-                       style={{
-                         position: "absolute",
-                         top: "50%",
-                         left: "10px",
-                         transform: "translateY(-50%)",
-                         background: "rgba(0,0,0,0.5)",
-                         color: "white",
-                         border: "none",
-                         padding: "10px",
-                         borderRadius: "50%",
-                         cursor: "pointer",
-                       }}
-                     >
-                       ◀
-                     </button>
-     
-                     <button
-                       onClick={goNext}
-                       disabled={index === imageData.length - 1}
-                       style={{
-                         position: "absolute",
-                         top: "50%",
-                         right: "10px",
-                         transform: "translateY(-50%)",
-                         background: "rgba(0,0,0,0.5)",
-                         color: "white",
-                         border: "none",
-                         padding: "10px",
-                         borderRadius: "50%",
-                         cursor: "pointer",
-                       }}
-                     >
-                       ▶
-                     </button>
-                   </div>
-                 )}
-     
-                 {/* Thumbnail gallery */}
-                 <div
-                   style={{
-                     marginTop: "10px",
-                     display: "flex",
-                     gap: "10px",
-                     justifyContent: "center",
-                     flexWrap: "wrap",
-                   }}
-                 >
-                   {imageData.map((item, i) => (
-                     <div
-                       key={item.id}
-                       onClick={() => setIndex(i)}
-                       style={{
-                         border: i === index ? "2px solid blue" : "1px solid #ccc",
-                         padding: "2px",
-                         cursor: "pointer",
-                         borderRadius: "4px",
-                       }}
-                     >
-                       <Image
-                         src={item.url}
-                         alt={item.description_en}
-                         width={80}
-                         height={60}
-                         style={{
-                           objectFit: "cover",
-                           borderRadius: "4px",
-                         }}
-                       />
-                     </div>
-                   ))}
-                 </div>
-               </div>
-             </div>
+      {/* PDF */}
+      {pdfData.map((pdf) => (
+        <div key={pdf.id} style={{ marginTop: "10px" }}>
+          <a
+            href={pdf.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "underline",
+            }}
+          >
+            <IconClipboardText size={18} />
+            &nbsp;Xem tài liệu: {pdf.name_vi || pdf.name_en || pdf.id}
+          </a>
+        </div>
+      ))}
     </div>
+
+    {/* ================= CỘT PHẢI ================= */}
+    <div
+      style={{
+        flex: 2,
+        paddingLeft: "20px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        position: "relative",
+      }}
+    >
+      {/* ICON ACTION – NẰM NGANG */}
+      <div
+        style={{
+          position: "absolute",
+          top: "12px",
+          right: "12px",
+          display: "flex",
+          flexDirection: "row", // ✅ NẰM NGANG
+          gap: "12px",
+          zIndex: 10,
+        }}
+      >
+        <button
+          title="Yêu thích"
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#fff",
+            boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconHeart size={20} color="#752E0B" />
+        </button>
+
+        <button
+          title="Thêm vào giỏ"
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#fff",
+            boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconShoppingCart size={20} color="#752E0B" />
+        </button>
+      </div>
+
+      {current && (
+        <div
+          style={{
+            width: "100%",
+            textAlign: "center",
+            marginBottom: "20px",
+            position: "relative",
+          }}
+        >
+          <Image
+            src={current.url}
+            alt={current.description_en}
+            width={800}
+            height={600}
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              borderRadius: "8px",
+            }}
+          />
+
+          <button
+            onClick={goPrev}
+            disabled={index === 0}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "10px",
+              transform: "translateY(-50%)",
+              background: "rgba(0,0,0,0.5)",
+              color: "#fff",
+              border: "none",
+              padding: "10px",
+              borderRadius: "50%",
+              cursor: "pointer",
+            }}
+          >
+            ◀
+          </button>
+
+          <button
+            onClick={goNext}
+            disabled={index === imageData.length - 1}
+            style={{
+              position: "absolute",
+              top: "50%",
+              right: "10px",
+              transform: "translateY(-50%)",
+              background: "rgba(0,0,0,0.5)",
+              color: "#fff",
+              border: "none",
+              padding: "10px",
+              borderRadius: "50%",
+              cursor: "pointer",
+            }}
+          >
+            ▶
+          </button>
+        </div>
+      )}
+
+      {/* THUMBNAIL */}
+      <div
+        style={{
+          marginTop: "10px",
+          display: "flex",
+          gap: "10px",
+          justifyContent: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        {imageData.map((img, i) => (
+          <div
+            key={img.id}
+            onClick={() => setIndex(i)}
+            style={{
+              border: i === index ? "2px solid #752E0B" : "1px solid #ccc",
+              padding: "2px",
+              cursor: "pointer",
+              borderRadius: "4px",
+            }}
+          >
+            <Image
+              src={img.url}
+              alt={img.description_en}
+              width={80}
+              height={60}
+              style={{ objectFit: "cover", borderRadius: "4px" }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
   );
 }
 
