@@ -85,7 +85,7 @@ export default function LargeFixedTable() {
       sorter: (a, b) => a.rank - b.rank,
     },
     { title: "Mô Tả ", dataIndex: "description_vi", key: "description_vi", width: 100 },
-    { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
+    // { title: "Mô Tả (Tiếng Anh)", dataIndex: "description_en", key: "description_en", width: 100 },
     {
       title: "Hành Động",
       width: 30,
