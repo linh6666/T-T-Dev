@@ -9,10 +9,8 @@ import {  IconHeart, IconPhoneCall, } from "@tabler/icons-react";
 import LoginButton from "./ButtonLogin/index";
 import Notification from "./Notification/index";
 import FavoriteHoverContent from "./favourite";
-
 import styles from "./Header.module.css";
 
-// 🧭 Danh sách menu gốc
 const baseLinks = [
   // { label: "TRANG CHỦ", href: "/", highlight: true },
    { label: "GIỚI THIỆU", href: "/gioi-thieu" },
@@ -36,6 +34,7 @@ export default function Header() {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSuperUser, setIsSuperUser] = useState(false);
+  // const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     // ✅ thử đọc cả hai tên token
@@ -192,6 +191,9 @@ const isActive = (href: string, highlight?: boolean) => {
         </HoverCard.Dropdown>
       </HoverCard>
     </Group>
+
+
+
 
           
 <Notification />
