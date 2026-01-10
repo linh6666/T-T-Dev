@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./ProjectList.module.css";
-import { getListProject } from "../../../api/apigetlistProject";
+import { getListProject } from "../../../api/apigetlistProjectBasic";
 
 interface Project {
   id: string;
@@ -21,43 +21,27 @@ interface Project {
 
 export default function ProjectList() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const fetchedRef = useRef(false);
+  const [fetched, setFetched] = useState(false); // phân biệt chưa fetch và rỗng
 
   const fetchProjects = useCallback(async () => {
     try {
-      setLoading(true);
-
       const res = await getListProject({
-        token: "", 
+        token: "",
         skip: 0,
-        limit: 100,
+        limit: 10,
       });
 
       if (res && res.data) {
         setProjects(res.data);
-        // Lưu cache để lần sau load nhanh hơn
-        localStorage.setItem("projects", JSON.stringify(res.data));
       }
     } catch (error) {
       console.error("Lỗi lấy danh sách project:", error);
     } finally {
-      setLoading(false);
+      setFetched(true);
     }
   }, []);
 
   useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
-
-    // Kiểm tra cache trước
-    const cached = localStorage.getItem("projects");
-    if (cached) {
-      setProjects(JSON.parse(cached));
-      setLoading(false);
-    }
-
-    // Gọi API để cập nhật dữ liệu mới
     fetchProjects();
   }, [fetchProjects]);
 
@@ -68,15 +52,6 @@ export default function ProjectList() {
       alert("Dự án này chưa có link truy cập.");
     }
   };
-
-  if (loading && projects.length === 0) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-        <p>Đang tải dữ liệu dự án...</p>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.wrapper}>
@@ -90,7 +65,8 @@ export default function ProjectList() {
                   alt={item.name}
                   loading="lazy"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/placeholder-project.png";
+                    (e.target as HTMLImageElement).src =
+                      "/placeholder-project.png";
                   }}
                 />
               ) : (
@@ -120,11 +96,11 @@ export default function ProjectList() {
             </div>
           </div>
         ))
-      ) : (
+      ) : fetched ? (
         <div className={styles.empty}>
           <p>Không có dữ liệu dự án nào để hiển thị.</p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
