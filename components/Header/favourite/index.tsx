@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./ProjectList.module.css";
 import { getListProject } from "../../../api/apigetlistProjectBasic";
 
@@ -20,6 +21,8 @@ interface Project {
 }
 
 export default function ProjectList() {
+  const router = useRouter();
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [fetched, setFetched] = useState(false); // phân biệt chưa fetch và rỗng
 
@@ -28,7 +31,7 @@ export default function ProjectList() {
       const res = await getListProject({
         token: "",
         skip: 0,
-        limit: 10,
+        limit: 100,
       });
 
       if (res && res.data) {
@@ -45,12 +48,14 @@ export default function ProjectList() {
     fetchProjects();
   }, [fetchProjects]);
 
-  const handleNavigate = (link?: string) => {
-    if (link) {
-      window.location.href = link;
-    } else {
-      alert("Dự án này chưa có link truy cập.");
-    }
+  /**
+   * Điều hướng sang trang chi tiết
+   * Truyền id + name qua query params
+   */
+  const handleNavigate = (id: string, name: string) => {
+    router.push(
+      `/chi-tiet-yeu-thich?id=${id}&name=${encodeURIComponent(name)}`
+    );
   };
 
   return (
@@ -87,7 +92,9 @@ export default function ProjectList() {
                 <div className={styles.buttonWrapper}>
                   <button
                     className={styles.button}
-                    onClick={() => handleNavigate(item.link)}
+                    onClick={() =>
+                      handleNavigate(item.id, item.name)
+                    }
                   >
                     Truy cập
                   </button>
