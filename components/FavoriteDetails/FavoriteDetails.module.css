@@ -40,7 +40,7 @@
   background: #f5f5f5;
   border-radius: 10px;
   padding: 12px;
-  overflow-y: auto;
+
 }
 
 .sectionTitle {
@@ -48,7 +48,7 @@
   margin-bottom: 12px;
 }
 
-.card {
+/* .card {
   display: flex;
   gap: 10px;
   background: #fff;
@@ -56,7 +56,35 @@
   padding: 10px;
   margin-bottom: 10px;
   position: relative;
+} */
+ .card {
+  display: flex;
+  gap: 10px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  position: relative;
+
+  max-height: 140px;   /* ✅ giới hạn chiều cao card */
+  overflow-y: auto;    /* ✅ bật scroll trong card */
+
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
 }
+.card::-webkit-scrollbar {
+  width: 4px;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 4px;
+}
+
+.card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 
 .thumb {
   width: 120px;
@@ -267,6 +295,31 @@
 
 .contact {
   background: #fff;
-  border: 1px solid #7a2d0b;
-  color: #7a2d0b;
+  /* border: 1px solid #7a2d0b; */
+  /* color: #7a2d0b; */
+
+  box-shadow: 0 3px 8px rgba(122, 45, 11, 0.25);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.contact:hover {
+  box-shadow: 0 5px 12px rgba(122, 45, 11, 0.35);
+  transform: translateY(-1px);
+}
+.cardList {
+  height: 575px;        /* ✅ chiều cao cố định */
+  overflow-y: auto;     /* ✅ bật scroll */
+  padding-right: 6px;
+}
+.cardList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cardList::-webkit-scrollbar-thumb {
+  background: #ffbe00;
+  border-radius: 4px;
+}
+
+.cardList::-webkit-scrollbar-track {
+  background: transparent;
 }

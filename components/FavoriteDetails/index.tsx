@@ -28,8 +28,8 @@ export default function FavoriteDetails() {
           <div className={styles.sectionTitle}>
             Yêu thích (15)
           </div>
-
-          {[1, 2, 3].map((_, index) => (
+          <div className={styles.cardList}>
+ {[1, 2, 3, 4,5,6,7,8,9,10,11,12,13,14,15].map((_, index) => (
             <div key={index} className={styles.card}>
               <div className={styles.thumb}></div>
 
@@ -48,6 +48,9 @@ export default function FavoriteDetails() {
               <div className={styles.heart}><IconHeart/></div>
             </div>
           ))}
+          </div>
+
+         
         </div>
 
         {/* Right detail */}
@@ -91,25 +94,7 @@ export default function FavoriteDetails() {
               enim ad minim veniam, quis nostrud exerci tation ullamcorper
               suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
               enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              {/* suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper */}
-              {/* suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
-              enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat. */}
+          
   </div>
 
   {/* ACTIONS */}
