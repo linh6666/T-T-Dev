@@ -1,7 +1,6 @@
 .wrapper {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 16px;
 }
 
 /* Header */
@@ -15,7 +14,6 @@
 .title {
   font-size: 18px;
   font-weight: 600;
-  color: #7a2d0b;
 }
 
 .historyBtn {
@@ -32,9 +30,7 @@
 /* Layout */
 .container {
   display: flex;
-  /* gap: 16px; */
-  /* background: #fff6dc;
-  padding: 16px; */
+  height: 650px;
   border-radius: 10px;
 }
 
@@ -44,6 +40,7 @@
   background: #f5f5f5;
   border-radius: 10px;
   padding: 12px;
+  overflow-y: auto;
 }
 
 .sectionTitle {
@@ -62,8 +59,7 @@
 }
 
 .thumb {
-  width: 90px;
-  height: 70px;
+  width: 120px;
   background: #dcdce0;
   border-radius: 8px;
 }
@@ -93,6 +89,12 @@
   margin-top: 6px;
 }
 
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .status {
   background: #4e7c91;
   color: #fff;
@@ -112,17 +114,23 @@
   background: #fff;
   border-radius: 10px;
   padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* Gallery */
 .gallery {
   display: flex;
   gap: 12px;
+  flex-shrink: 0; /* 🔴 CỰC KỲ QUAN TRỌNG */
 }
 
 .mainImage {
   flex: 2;
-  height: 220px;
+  height: 300px;
   background: #dcdce0;
   border-radius: 10px;
 }
@@ -143,12 +151,24 @@
 /* Detail */
 .detail {
   margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.detailHeader {
+/* Header detail */
+.topRow {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+}
+
+/* Right info */
+.rightInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-align: right;
 }
 
 .badge {
@@ -165,34 +185,72 @@
   margin: 6px 0;
 }
 
+/* Info row */
 .infoRow {
   display: flex;
   gap: 12px;
   margin: 10px 0;
 }
 
+.infoRow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .type {
-  background: #eee;
+  background: #FFFAEE;
   padding: 4px 8px;
   border-radius: 6px;
 }
 
-.priceDetail {
-  font-size: 14px;
-  margin: 10px 0;
+.type1 {
+  background: #FFFAEE;
+  padding: 4px;
+  border-radius: 6px;
 }
 
+/* Price */
+.priceDetail {
+  font-size: 13px;
+  color: #777;
+}
+
+.priceDetail b {
+  font-size: 16px;
+  color: #000;
+}
+
+/* Description */
 .desc {
   font-size: 14px;
   color: #444;
   line-height: 1.6;
+
+  max-height: 100px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Scrollbar */
+.desc::-webkit-scrollbar {
+  width: 4px;
+}
+
+.desc::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.desc::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* Actions */
 .actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 16px;
+  justify-content: flex-end;
+  margin-top: auto; /* ✅ DÒNG QUYẾT ĐỊNH */
 }
 
 .compare,

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import styles from "./FavoriteDetails.module.css";
+import { IconBath, IconBed, IconHeart } from "@tabler/icons-react";
 
 export default function FavoriteDetails() {
   const searchParams = useSearchParams();
@@ -38,13 +39,13 @@ export default function FavoriteDetails() {
                 <div className={styles.sub}>Shophouse, Đa Lộc</div>
 
                 <div className={styles.meta}>
-                  <span>🚗 3</span>
-                  <span>🛏 2</span>
+                  <span className={styles.type1}> <IconBed size={14} />3</span>
+                  <span className={styles.type1}><IconBath size={14} /> 2</span>
                   <span className={styles.status}>Đang bán</span>
                 </div>
               </div>
 
-              <div className={styles.heart}>❤️</div>
+              <div className={styles.heart}><IconHeart/></div>
             </div>
           ))}
         </div>
@@ -60,34 +61,64 @@ export default function FavoriteDetails() {
           </div>
 
           <div className={styles.detail}>
-            <div className={styles.detailHeader}>
-              <h2>SH1.13</h2>
-              <span className={styles.badge}>Đang bán</span>
-            </div>
+  {/* HEADER */}
+  <div className={styles.topRow}>
+    {/* LEFT */}
+    <div>
+      <h2 className={styles.title}>SH1.13</h2>
+      <div className={styles.location}>Shophouse, Đa Lộc</div>
+    </div>
+   <div className={styles.rightInfo}>
+      <span className={styles.badge}>Đang bán</span>
+      <div className={styles.priceDetail}>
+        Giá niêm yết <b>10.500.000.000</b>
+      </div>
+    </div>
+    {/* RIGHT */}
+ 
+  </div>
 
-            <div className={styles.location}>Shophouse, Đa Lộc</div>
+  {/* INFO */}
+  <div className={styles.infoRow}>
+    <span className={styles.type}><IconBed size={14} />3</span>
+    <span className={styles.type}><IconBath size={14} />2</span>
+    <span className={styles.type}>Shophouse</span>
+  </div>
 
-            <div className={styles.infoRow}>
-              <span>🚗 3</span>
-              <span>🛏 2</span>
-              <span className={styles.type}>Shophouse</span>
-            </div>
-
-            <div className={styles.priceDetail}>
-              Giá niêm yết <b>10.500.000.000</b>
-            </div>
-
-            <div className={styles.desc}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+  {/* DESC */}
+  <div className={styles.desc}>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
               enim ad minim veniam, quis nostrud exerci tation ullamcorper
-              suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-            </div>
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              {/* suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper */}
+              {/* suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut wisi
+              enim ad minim veniam, quis nostrud exerci tation ullamcorper
+              suscipit lobortis nisl ut aliquip ex ea commodo consequat. */}
+  </div>
 
-            <div className={styles.actions}>
-              <button className={styles.compare}>So sánh</button>
-              <button className={styles.contact}>Liên hệ</button>
-            </div>
-          </div>
+  {/* ACTIONS */}
+  <div className={styles.actions}>
+    {/* <button className={styles.compare}>So sánh</button> */}
+    <button className={styles.contact}>Liên hệ</button>
+  </div>
+</div>
+
         </div>
       </div>
     </div>
