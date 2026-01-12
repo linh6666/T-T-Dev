@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Text, Button, Image } from "@mantine/core";
-import { IconArrowLeft, IconClipboardText, IconHeart, IconShoppingCart } from "@tabler/icons-react";
+import { IconArrowLeft, IconClipboardText } from "@tabler/icons-react";
 import { Getlisthome } from "../../../api/apiGetListHome";
 import styles from "./App.module.css";
 import { AxiosError } from "axios";
+import ImageActionButtons from "../ImageActionButtons";
 
 export interface WarehouseItem {
   id: string;
@@ -229,54 +230,11 @@ export default function WarehouseDetail({ item, onBack , projectId,}: WarehouseD
       }}
     >
       {/* ICON ACTION – NẰM NGANG */}
-      <div
-        style={{
-          position: "absolute",
-          top: "12px",
-          right: "12px",
-          display: "flex",
-          flexDirection: "row", // ✅ NẰM NGANG
-          gap: "12px",
-          zIndex: 10,
-        }}
-      >
-        <button
-          title="Yêu thích"
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            border: "none",
-            backgroundColor: "#fff",
-            boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <IconHeart size={20} color="#752E0B" />
-        </button>
-
-        <button
-          title="Thêm vào giỏ"
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            border: "none",
-            backgroundColor: "#fff",
-            boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <IconShoppingCart size={20} color="#752E0B" />
-        </button>
-      </div>
-
+    
+<ImageActionButtons
+  unitCode={item.unit_code}
+  projectId={projectId}
+/>
       {current && (
         <div
           style={{
