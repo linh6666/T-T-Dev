@@ -48,16 +48,6 @@
   font-weight: 600;
   margin-bottom: 12px;
 }
-
-/* .card {
-  display: flex;
-  gap: 10px;
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
-  position: relative;
-} */
  .card {
   display: flex;
   gap: 10px;
@@ -135,6 +125,7 @@
   position: absolute;
   right: 10px;
   top: 10px;
+
 }
 
 /* Right */
@@ -296,9 +287,6 @@
 
 .contact {
   background: #fff;
-  /* border: 1px solid #7a2d0b; */
-  /* color: #7a2d0b; */
-
   box-shadow: 0 3px 8px rgba(122, 45, 11, 0.25);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -323,4 +311,9 @@
 
 .cardList::-webkit-scrollbar-track {
   background: transparent;
+}
+.card:hover {
+  background: #fff6f1;
+  box-shadow: 0 4px 12px rgba(122, 45, 11, 0.15);
+  transform: translateY(-1px);
 }
