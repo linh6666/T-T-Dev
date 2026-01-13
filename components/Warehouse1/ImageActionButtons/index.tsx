@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IconHeart, IconShoppingCart } from "@tabler/icons-react";
+import { IconHeart } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { createFavorite } from "../../../api/apicreateFavorites";
 
@@ -26,15 +26,10 @@ export default function ImageActionButtons({
         unit_code: unitCode,
         project_id: projectId,
       });
-
-      // ✅ chỉ đổi màu
       setIsFavorite(true);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 409) {
-          // đã tồn tại → vẫn coi là favorite
-          setIsFavorite(true);
-        }
+      if (error instanceof AxiosError && error.response?.status === 409) {
+        setIsFavorite(true);
       }
     } finally {
       setLoading(false);
@@ -44,54 +39,57 @@ export default function ImageActionButtons({
   return (
     <div
       style={{
-        position: "absolute",
-        top: "12px",
-        right: "12px",
         display: "flex",
-        gap: "12px",
-        zIndex: 10,
+        // justifyContent: "flex-end",
       }}
     >
-      {/* ❤️ FAVORITE */}
       <button
         onClick={handleFavorite}
         disabled={loading || isFavorite}
         style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "50%",
-          border: "none",
-          backgroundColor: "#fff",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-          cursor: loading || isFavorite ? "not-allowed" : "pointer",
-          opacity: loading || isFavorite ? 0.6 : 1,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          gap: "8px",
+
+          padding: "10px 16px",
+          borderRadius: "999px",
+
+          fontSize: "14px",
+          fontWeight: 500,
+
+          border: isFavorite
+            ? "1px solid #ff4d4f"
+            : "1px solid #e5e7eb",
+
+          backgroundColor: isFavorite ? "#fff5f5" : "#ffffff",
+          color: isFavorite ? "#ff4d4f" : "#752E0B",
+
+          boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+
+          cursor: loading || isFavorite ? "not-allowed" : "pointer",
+          opacity: loading ? 0.7 : 1,
+
+          transition: "all 0.2s ease",
+        }}
+        onMouseEnter={(e) => {
+          if (!isFavorite) {
+            e.currentTarget.style.boxShadow =
+              "0 6px 18px rgba(0,0,0,0.18)";
+            e.currentTarget.style.transform = "translateY(-1px)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow =
+            "0 4px 12px rgba(0,0,0,0.12)";
+          e.currentTarget.style.transform = "translateY(0)";
         }}
       >
         <IconHeart
-          size={20}
-          color={isFavorite ? "red" : "#752E0B"}
-          fill={isFavorite ? "red" : "none"}
+          size={18}
+          color={isFavorite ? "#ff4d4f" : "#752E0B"}
+          fill={isFavorite ? "#ff4d4f" : "none"}
         />
-      </button>
-
-      {/* 🛒 GIỎ HÀNG */}
-      <button
-        style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "50%",
-          border: "none",
-          backgroundColor: "#fff",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <IconShoppingCart size={20} color="#752E0B" />
+        {isFavorite ? "Đã yêu thích" : "Yêu thích"}
       </button>
     </div>
   );
