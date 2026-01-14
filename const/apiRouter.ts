@@ -129,7 +129,9 @@ GET_LIST_FAVORITES:"/api/v1/favorites/me",
 CREATE_FAVORITES:"/api/v1/favorites/",
 DELETE_FAVORITES:"/api/v1/favorites/{favorite_id}",
 
-
+////Order
+CREATE_ORDER:"/api/v1/order/",
+GET_LIST_ORDER:"/api/v1/order/{project_id}",
 
 
 }

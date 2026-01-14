@@ -7,6 +7,7 @@ import { Getlisthome } from "../../../api/apiGetListHome";
 import styles from "./App.module.css";
 import { AxiosError } from "axios";
 import ImageActionButtons from "../ImageActionButtons";
+import OrderButton from "../Order";
 
 export interface WarehouseItem {
   id: string;
@@ -188,11 +189,26 @@ export default function WarehouseDetail({ item, onBack, projectId }: WarehouseDe
               </a>
             </div>
           ))}
-
+<div
+ style={{
+    display: "flex",
+    gap: "12px", // khoảng cách giữa 2 nút
+    // alignItems: "center",
+  }}
+>
            <ImageActionButtons
   unitCode={item.unit_code}
   projectId={projectId}
 />
+
+           <OrderButton
+  unitCode={item.unit_code}
+  projectId={projectId}
+/>
+
+
+</div>
+
         </div>
                        {/* Cột phải: SLIDER */}
         <div

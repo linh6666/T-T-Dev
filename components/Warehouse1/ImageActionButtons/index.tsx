@@ -51,7 +51,7 @@ export default function ImageActionButtons({
           alignItems: "center",
           gap: "8px",
 
-          padding: "10px 16px",
+          padding: "6px 10px",
           borderRadius: "999px",
 
           fontSize: "14px",
