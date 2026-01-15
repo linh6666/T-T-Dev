@@ -22,15 +22,13 @@ import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 import { AxiosError } from "axios";
+
 interface OrderButtonProps {
   unitCode: string;
   projectId: string;
 }
 
-export default function OrderButton({
-  unitCode,
-  projectId,
-}: OrderButtonProps) {
+export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
   const [opened, setOpened] = useState(false);
   const [visible, { open, close }] = useDisclosure(false);
 
@@ -45,22 +43,22 @@ export default function OrderButton({
     },
   });
 
-  /* =======================
-   * ĐÓNG MODAL + RESET FORM
-   * ======================= */
   const handleCloseModal = () => {
     setOpened(false);
     form.reset();
   };
 
-  /* =======================
-   * SUBMIT FORM
-   * ======================= */
   const handleSubmit = async (values: typeof form.values) => {
-    if (!values.file) {
-      NotificationExtension.Warn("Vui lòng chọn file đính kèm");
+    console.log("Giá trị file trong form:", values.file);
+
+    if (!values.file || !(values.file instanceof File)) {
+      NotificationExtension.Warn("Vui lòng chọn file đính kèm hợp lệ");
       return;
     }
+
+    console.log("File name:", values.file.name);
+    console.log("File size:", values.file.size);
+    console.log("File type:", values.file.type);
 
     open();
 
@@ -73,9 +71,10 @@ export default function OrderButton({
         total_price_at_sale_vi: Number(values.total_price_at_sale_vi),
         total_price_at_sale_en: Number(values.total_price_at_sale_en),
         id_cccd: values.id_cccd,
+        file: values.file,
       };
 
-      const res = await createOrder(payload, values.file);
+      const res = await createOrder(payload);
 
       NotificationExtension.Success(
         res?.data?.message || "Tạo đơn hàng thành công"
@@ -84,23 +83,22 @@ export default function OrderButton({
       handleCloseModal();
       modals.closeAll();
     } catch (error: unknown) {
-  console.error("Lỗi khi tạo đơn hàng:", error);
+      console.error("Lỗi khi tạo đơn hàng:", error);
 
-  let message = "Đã xảy ra lỗi";
+      let message = "Đã xảy ra lỗi";
 
-  if (error instanceof AxiosError) {
-    message = error.response?.data?.detail ?? message;
-  }
+      if (error instanceof AxiosError) {
+        message = error.response?.data?.detail ?? message;
+      }
 
-  NotificationExtension.Fails(message);
-} finally {
+      NotificationExtension.Fails(message);
+    } finally {
       close();
     }
   };
 
   return (
     <div style={{ display: "flex", gap: "12px", zIndex: 10 }}>
-      {/* Button mở modal */}
       <button
         onClick={() => setOpened(true)}
         style={{
@@ -137,8 +135,8 @@ export default function OrderButton({
           <LoadingOverlay visible={visible} />
 
           <TextInput
-            label="Email"
-            placeholder="Nhập email"
+            label="Email khách hàng"
+            placeholder="Nhập email khách hàng"
             withAsterisk
             mt="md"
             {...form.getInputProps("email")}
@@ -178,6 +176,7 @@ export default function OrderButton({
             {...form.getInputProps("id_cccd")}
           />
 
+          {/* FileInput bind đúng value và onChange */}
           <FileInput
             label="File đính kèm"
             placeholder="Chọn file"
@@ -185,7 +184,8 @@ export default function OrderButton({
             mt="md"
             leftSection={<IconUpload size={16} />}
             accept=".pdf,.jpg,.png,.doc,.docx"
-            {...form.getInputProps("file")}
+            value={form.values.file}
+            onChange={(file) => form.setFieldValue("file", file)}
           />
 
           <Group justify="flex-end" mt="lg">

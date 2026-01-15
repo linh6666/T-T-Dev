@@ -9,25 +9,28 @@ export interface CreateOrderPayload {
   total_price_at_sale_vi: number;
   total_price_at_sale_en: number;
   id_cccd: string;
+  file: File;
 }
 
-export const createOrder = async (
-  payload: CreateOrderPayload,
-  file: File
-) => {
+export const createOrder = async (payload: CreateOrderPayload) => {
+  const { file, ...data } = payload;
+
   const formData = new FormData();
 
-  // Đưa JSON vào dưới dạng chuỗi
-  formData.append("data", JSON.stringify(payload));
+  // append từng field text/number
+  formData.append("unit_code", data.unit_code);
+  formData.append("project_id", data.project_id);
+  formData.append("email", data.email);
+  formData.append("contract_code", data.contract_code);
+  formData.append("total_price_at_sale_vi", String(data.total_price_at_sale_vi));
+  formData.append("total_price_at_sale_en", String(data.total_price_at_sale_en));
+  formData.append("id_cccd", data.id_cccd);
 
-  // Đưa file vào form
+  // file upload
   formData.append("file", file);
 
-  const response = await api.post(API_ROUTE.CREATE_ORDER, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  // KHÔNG cần set Content-Type, Axios sẽ tự thêm đúng boundary
+  const response = await api.post(API_ROUTE.CREATE_ORDER, formData);
 
   return response.data;
 };

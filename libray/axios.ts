@@ -5,7 +5,7 @@ const createApiInstance = (baseURL: string) => {
   const api = axios.create({
     baseURL,
     headers: {
-      "Content-Type": "application/json;charset=utf-8",
+      // "Content-Type": "application/json;charset=utf-8",
       "Access-Control-Allow-Origin": "*",
     },
   });

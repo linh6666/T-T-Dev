@@ -53,15 +53,7 @@ export default function Managent({ projectId,target,projectName }: AppProps) {
     </h1>
   </Group>
 
-  {/* Nút Quay lại bên phải */}
- {/* <Button
-    variant="outline"
-    color="gray"
-    onClick={() => router.push("/project")}
-    style={{ marginLeft: "auto" }} // đẩy sang phải
-  >
-    ← Quay lại
-  </Button> */}
+=
 <h1
   style={{ marginLeft: "auto", cursor: "pointer", color: "#1c7ed6" }}
 onClick={() =>
