@@ -125,7 +125,7 @@ GET_LIST_PROJECT_BASIC:"/api/v1/projects/basic",
 
 
 //////favorites
-GET_LIST_FAVORITES:"/api/v1/favorites/me",
+GET_LIST_FAVORITES:"/api/v1/favorites/me/{project_id}",
 CREATE_FAVORITES:"/api/v1/favorites/",
 DELETE_FAVORITES:"/api/v1/favorites/{favorite_id}",
 

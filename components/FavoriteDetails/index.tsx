@@ -11,7 +11,7 @@ interface FavoriteItem {
   id: string;
   unit_code: string;
   price: string;
-  type: string;
+  building_type: string;
   location: string;
   bedrooms: number;
   bathrooms: number;
@@ -24,6 +24,7 @@ interface FavoriteItem {
 export default function FavoriteDetails() {
   const searchParams = useSearchParams();
   const name = searchParams.get("name");
+  const projectId = searchParams.get("id");
 
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,27 +37,31 @@ export default function FavoriteDetails() {
   const [activeItem, setActiveItem] =
     useState<FavoriteItem | null>(null);
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const res = await getListFavorites();
-        const data = res.data || [];
-        setFavorites(data);
+useEffect(() => {
+  if (!projectId) return; // tránh gọi API khi chưa có id
 
-        // ✅ chỉ hiển thị item đầu tiên, KHÔNG active
-        if (data.length > 0) {
-          setPreviewItem(data[0]);
-          
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu yêu thích:", error);
-      } finally {
-        setLoading(false);
+  const fetchFavorites = async () => {
+    try {
+      const res = await getListFavorites(projectId);
+      const data = res.data || [];
+
+      setFavorites(data);
+
+      // chỉ preview item đầu tiên
+      if (data.length > 0) {
+        setPreviewItem(data[0]);
       }
-    };
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu yêu thích:", error);
+      setPreviewItem(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchFavorites();
-  }, []);
+  fetchFavorites();
+}, [projectId]);
+
 
   return (
     <div className={styles.wrapper}>
@@ -114,7 +119,7 @@ export default function FavoriteDetails() {
                         {item.price}
                       </div>
                       <div className={styles.sub}>
-                        {item.type}, {item.location}
+                        {item.building_type},
                       </div>
 
                       <div className={styles.meta}>
@@ -197,7 +202,8 @@ export default function FavoriteDetails() {
                       {previewItem.unit_code}
                     </h2>
                     <div className={styles.location}>
-                      {previewItem.type}, {previewItem.location}
+                      {previewItem.building_type}
+                      , {previewItem.location}
                     </div>
                   </div>
 
@@ -219,7 +225,7 @@ export default function FavoriteDetails() {
                     <IconBath size={14} /> {previewItem.bathrooms}
                   </span>
                   <span className={styles.type}>
-                    {previewItem.type}
+                    {previewItem.building_type}
                   </span>
                 </div>
 
