@@ -3,7 +3,7 @@
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
-import ListImage from "../../../../../components/ListImage3";
+import ListImage from "../../../../../components/ListImage4";
 
 export default function InteractiveClient() {
   // Lấy project_id từ URL query (?id=...)
