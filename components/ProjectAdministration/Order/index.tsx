@@ -4,15 +4,15 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Pagination, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 // import AppAction from "../../../common/AppAction";
-import { modals } from "@mantine/modals";
+// import { modals } from "@mantine/modals";
 import { getListOrder } from "../../../api/apiGetlistOrder";
 import { getListProject } from "../../../api/apigetlistProject";
-import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
-import { Group, Select } from "@mantine/core";
+// import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
+import { Badge, Group, Select } from "@mantine/core";
 // import CreateView from "./CreateView";
 import axios from "axios";
-import EditView from "./EditView";
-import DeleteView from "./DeleteView";
+// import EditView from "./EditView";
+// import DeleteView from "./DeleteView";
 import { IconChevronDown, IconDownload } from "@tabler/icons-react";
 import { getListUser } from "../../../api/apigetlistuse";
 import { api } from "../../../libray/axios";
@@ -348,14 +348,56 @@ const fetchAttributes = useCallback(async () => {
   },
 },
 {
-  title: "trạng thái",
+  title: "Trạng thái",
   dataIndex: "order_status",
-  width: 100,
+  width: 130,
+  render: (status: string) => {
+    const statusConfig: Record<
+      string,
+      { label: string; color: string }
+    > = {
+      pending: {
+        label: "Đang chờ manager khóa căn hộ",
+        color: "yellow",
+      },
+      pending_deposit: {
+        label: "Đang chờ đơn thanh toán",
+        color: "orange",
+      },
+      paying: {
+        label: "Đang thanh toán",
+        color: "blue",
+      },
+      completed: {
+        label: "Đã thanh toán hoàn tất",
+        color: "green",
+      },
+      cancelled: {
+        label: "Đã hủy giao dịch",
+        color: "red",
+      },
+      expired: {
+        label: "Giao dịch không được duyệt - hết hạn",
+        color: "gray",
+      },
+    };
+
+    const config = statusConfig[status];
+
+    return config ? (
+      <Badge color={config.color} variant="light">
+        {config.label}
+      </Badge>
+    ) : (
+      "-"
+    );
+  },
 },
 {
   title: "Tài liệu",
   dataIndex: "contract_url",
   width: 80,
+       fixed: "right",
   render: (url: string) =>
     url ? (
       <a
@@ -375,54 +417,54 @@ const fetchAttributes = useCallback(async () => {
       "-"
     ),
 },
-    {
-      title: "Hành động",
-      width: 60,
-      fixed: "right",
-      render: (record: DataType) => (
-        <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="documentEdit"
-              aria-label="Chỉnh sửa"
-              color="success"
-              onClick={() => openEditUserModal(record)}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="trash"
-              aria-label="Xóa"
-              color="danger"
-              onClick={() => openDeleteUserModal(record)}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
-    },
+    // {
+    //   title: "Hành động",
+    //   width: 60,
+    //   fixed: "right",
+    //   render: (record: DataType) => (
+    //     <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
+    //       <EuiFlexItem grow={false}>
+    //         <EuiButtonIcon
+    //           iconType="documentEdit"
+    //           aria-label="Chỉnh sửa"
+    //           color="success"
+    //           onClick={() => openEditUserModal(record)}
+    //         />
+    //       </EuiFlexItem>
+    //       <EuiFlexItem grow={false}>
+    //         <EuiButtonIcon
+    //           iconType="trash"
+    //           aria-label="Xóa"
+    //           color="danger"
+    //           onClick={() => openDeleteUserModal(record)}
+    //         />
+    //       </EuiFlexItem>
+    //     </EuiFlexGroup>
+    //   ),
+    // },
   ];
 
   // ============================================================
   // 🔹 5️⃣ Các modal CRUD
   // ============================================================
 
-  const openEditUserModal = (record: DataType) => {
-    modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa</div>,
-      children: <EditView id={record.id} onSearch={fetchAttributes} />,
-      confirmProps: { display: "none" },
-      cancelProps: { display: "none" },
-    });
-  };
+  // const openEditUserModal = (record: DataType) => {
+  //   modals.openConfirmModal({
+  //     title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa</div>,
+  //     children: <EditView id={record.id} onSearch={fetchAttributes} />,
+  //     confirmProps: { display: "none" },
+  //     cancelProps: { display: "none" },
+  //   });
+  // };
 
-  const openDeleteUserModal = (record: DataType) => {
-    modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Xóa</div>,
-      children: <DeleteView idItem={[record.id]} onSearch={fetchAttributes} />,
-      confirmProps: { display: "none" },
-      cancelProps: { display: "none" },
-    });
-  };
+  // const openDeleteUserModal = (record: DataType) => {
+  //   modals.openConfirmModal({
+  //     title: <div style={{ fontWeight: 600, fontSize: 18 }}>Xóa</div>,
+  //     children: <DeleteView idItem={[record.id]} onSearch={fetchAttributes} />,
+  //     confirmProps: { display: "none" },
+  //     cancelProps: { display: "none" },
+  //   });
+  // };
 
   // ============================================================
   // 🔹 6️⃣ Render giao diện
