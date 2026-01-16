@@ -10,12 +10,13 @@ import { getListProject } from "../../../api/apigetlistProject";
 import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
 import { Group, Select } from "@mantine/core";
 // import CreateView from "./CreateView";
+import axios from "axios";
 import EditView from "./EditView";
 import DeleteView from "./DeleteView";
 import { IconChevronDown, IconDownload } from "@tabler/icons-react";
 import { getListUser } from "../../../api/apigetlistuse";
 import { api } from "../../../libray/axios";
-// import { NotificationExtension } from "../../../extension/NotificationExtension";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface DataType {
   id: string;
@@ -172,8 +173,12 @@ const fetchTemplateList = useCallback(async () => {
   // ============================================================
   // 🔹 3️⃣ Gọi API lấy dữ liệu bảng
   // ============================================================
- const fetchAttributes = useCallback(async () => {
-  if (!templateId) return;
+const fetchAttributes = useCallback(async () => {
+  if (!templateId) {
+    setData([]);
+    setTotal(0);
+    return;
+  }
 
   setLoading(true);
   setError(null);
@@ -182,6 +187,17 @@ const fetchTemplateList = useCallback(async () => {
     const res = await getListOrder(templateId, { token });
 
     const data: TemplateAttributeLink[] = res.items || [];
+
+    if (data.length === 0) {
+      setData([]);
+      setTotal(0);
+
+      NotificationExtension.Warn(
+        "Dự án này hiện chưa có đơn hàng"
+      );
+
+      return;
+    }
 
     const rows: DataType[] = data.map((item) => ({
       id: item.id.toString(),
@@ -201,10 +217,18 @@ const fetchTemplateList = useCallback(async () => {
 
     setData(rows);
     setTotal(res.total);
-  } catch (err) {
-    setError("Không thể tải dữ liệu bảng");
-    console.error(err);
-  } finally {
+  } catch (err: unknown) {
+  let message = "Có lỗi xảy ra khi tải đơn hàng";
+
+  if (axios.isAxiosError(err)) {
+    message = err.response?.data?.detail || message;
+  }
+
+  setData([]);
+  setTotal(0);
+
+  NotificationExtension.Fails(message);
+} finally {
     setLoading(false);
   }
 }, [templateId, token]);
@@ -411,7 +435,12 @@ const fetchTemplateList = useCallback(async () => {
           placeholder="Chọn dự án mẫu"
           data={templateOptions}
           value={templateId}
-          onChange={(value) => setTemplateId(value || "")}
+        onChange={(value) => {
+  setTemplateId(value || "");
+  setData([]);        // reset bảng
+  setTotal(0);        // reset tổng
+  setCurrentPage(1);  // reset trang
+}}
           rightSection={<IconChevronDown size={16} />}
           withAsterisk
           clearable
