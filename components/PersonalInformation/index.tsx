@@ -125,7 +125,7 @@ export default function ProfilePage() {
                 <IconUser size={18} /> Tài khoản của tôi
               </button>
             </li>
-            <li>
+            {/* <li>
               <button
                 onClick={() => setActiveTab("orders")}
                 className={`${styles.menuItem} ${
@@ -134,7 +134,7 @@ export default function ProfilePage() {
               >
                 <IconHeartFilled size={18} /> Danh sách yêu thích
               </button>
-            </li>
+            </li> */}
             <li>
               <button
                 onClick={() => setActiveTab("bookings")}
