@@ -3,23 +3,41 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Pagination, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import AppAction from "../../../common/AppAction";
+// import AppAction from "../../../common/AppAction";
 import { modals } from "@mantine/modals";
 import { getListOrder } from "../../../api/apiGetlistOrder";
 import { getListProject } from "../../../api/apigetlistProject";
 import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
 import { Group, Select } from "@mantine/core";
-import CreateView from "./CreateView";
+// import CreateView from "./CreateView";
 import EditView from "./EditView";
 import DeleteView from "./DeleteView";
-import { IconChevronDown } from "@tabler/icons-react";
-import { getListRoles } from "../../../api/apigetlistAttributes";
+import { IconChevronDown, IconDownload } from "@tabler/icons-react";
+import { getListUser } from "../../../api/apigetlistuse";
+import { api } from "../../../libray/axios";
 // import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface DataType {
   id: string;
-  project_template_id: string;
-  attribute_id: string;
+  contract_code: string;
+  contract_url: string;
+  fully_paid_date: string;
+  order_date: string;
+order_status: string;
+project_id: string;
+seller_id: string;
+unit_code: string;
+total_price_at_sale_en
+: number;
+total_price_at_sale_vi: number;
+
+id_cccd
+: string;
+customer_id
+: string;
+
+
+
 }
 
 interface ProjectTemplate {
@@ -30,13 +48,27 @@ interface ProjectTemplate {
 
 interface TemplateAttributeLink {
   id: string | number;
-  project_template_id: string;
-  attribute_id: string;
+  contract_code: string;
+  contract_url: string;
+  fully_paid_date: string;
+  order_date: string;
+order_status: string;
+project_id: string;
+seller_id: string;
+unit_code: string;
+total_price_at_sale_en
+: number;
+total_price_at_sale_vi: number;
+
+id_cccd
+: string;
+customer_id
+: string;
 }
 
 interface Attribute {
   id: string | number;
-  label?: string;
+  full_name?: string;
   attribute_name?: string;
 }
 
@@ -54,6 +86,32 @@ export default function LargeFixedTable() {
   const [attributeOptions, setAttributeOptions] = useState<{ value: string; label: string }[]>([]);
 
   const token = localStorage.getItem("access_token") || "";
+
+  const downloadContract = async (url: string) => {
+  try {
+    const response = await api.get(url, {
+      responseType: "blob",
+    });
+
+    const blob = new Blob([response.data], {
+      type: "application/pdf",
+    });
+
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = "hop-dong.pdf"; // có thể đổi tên
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+    console.error("Download contract error:", error);
+  }
+};
+
 
   // ============================================================
   // 🔹 1️⃣ Gọi API lấy danh sách template
@@ -92,12 +150,12 @@ const fetchTemplateList = useCallback(async () => {
   // ============================================================
   const fetchAttributeList = useCallback(async () => {
     try {
-      const res = await getListRoles({ token, skip: 0, limit: 100 });
+      const res = await  getListUser({ token, skip: 0, limit: 100 });
       const data: Attribute[] = res.data || [];
 
       const options = data.map((item) => ({
         value: item.id.toString(),
-        label: item.label || item.attribute_name || `Thuộc tính ${item.id}`,
+        label: item.full_name || item.attribute_name || `Thuộc tính ${item.id}`,
       }));
       setAttributeOptions(options);
     } catch (err) {
@@ -123,12 +181,22 @@ const fetchTemplateList = useCallback(async () => {
   try {
     const res = await getListOrder(templateId, { token });
 
-    const data: TemplateAttributeLink[] = res.data || [];
+    const data: TemplateAttributeLink[] = res.items || [];
 
     const rows: DataType[] = data.map((item) => ({
       id: item.id.toString(),
-      project_template_id: item.project_template_id,
-      attribute_id: item.attribute_id,
+      contract_code: item.contract_code,
+      contract_url: item.contract_url,
+      fully_paid_date: item.fully_paid_date,
+      order_date: item.order_date,
+      order_status: item.order_status,
+      project_id: item.project_id,
+      seller_id: item.seller_id,
+      unit_code: item.unit_code,
+      total_price_at_sale_en: item.total_price_at_sale_en,
+      total_price_at_sale_vi: item.total_price_at_sale_vi,
+      id_cccd: item.id_cccd,
+      customer_id: item.customer_id,
     }));
 
     setData(rows);
@@ -150,24 +218,139 @@ const fetchTemplateList = useCallback(async () => {
   // 🔹 4️⃣ Cột bảng
   // ============================================================
   const columns: ColumnsType<DataType> = [
-    {
-      title: "Mẫu dự án",
-      dataIndex: "project_template_id",
-      key: "project_template_id",
-      width: 100,
-      render: (text: string) => (
-        <span>{templateOptions.find((option) => option.value === text)?.label || "Không có tên"}</span>
-      ),
-    },
-    {
-      title: "Thuộc tính",
-      dataIndex: "attribute_id",
-      key: "attribute_id",
-      width: 100,
-      render: (text: string) => (
+
+       {
+  title: "Dự án",
+  dataIndex: "project_id",
+  width: 70,
+  fixed: "left",
+  render: (text: string) => (
+    <span>{templateOptions.find((option) => option.value === text)?.label || "Không có tên"}</span>
+  ),
+},
+{
+  title: "Người bán",
+  dataIndex: "seller_id",
+  width: 70,
+     render: (text: string) => (
         <span>{attributeOptions.find((option) => option.value === text)?.label || "Không có tên"}</span>
       ),
-    },
+
+},
+ {
+  title: "Khách hàng",
+  dataIndex: "customer_id",
+  width: 70,
+     render: (text: string) => (
+        <span>{attributeOptions.find((option) => option.value === text)?.label || "Không có tên"}</span>
+      ),
+
+},
+
+   {
+  title: "Mã hợp đồng",
+  dataIndex: "contract_code",
+  width: 70,
+
+},
+{
+  title: "Căn hộ",
+  dataIndex: "unit_code",
+  width: 50,
+},
+{
+  title: "Tổng giá bán (VNĐ)",
+  dataIndex: "total_price_at_sale_vi",
+  width: 90,
+  align: "right",
+  render: (value: number) =>
+    typeof value === "number"
+      ? value.toLocaleString("vi-VN") + " ₫"
+      : "-",
+},
+
+ {
+  title: "Tổng giá bán (USD)",
+  dataIndex: "total_price_at_sale_en",
+  width: 90,
+  align: "right",
+  render: (value: number) =>
+    typeof value === "number"
+      ? value.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        })
+      : "-",
+},
+
+{
+  title: "Số CCCD/CMND",
+  dataIndex: "id_cccd",
+  width: 100,
+},
+{
+  title: "Ngày thanh toán đủ",
+  dataIndex: "fully_paid_date",
+  width: 100,
+  render: (value: string) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+    return date.toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  },
+},
+
+{
+  title: "Ngày đặt hàng",
+  dataIndex: "order_date",
+  width: 100,
+  render: (value: string) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+    return date.toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  },
+},
+{
+  title: "trạng thái",
+  dataIndex: "order_status",
+  width: 100,
+},
+{
+  title: "Tài liệu",
+  dataIndex: "contract_url",
+  width: 80,
+  render: (url: string) =>
+    url ? (
+      <a
+        onClick={() => downloadContract(url)}
+        style={{
+          color: "#1677ff",
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <IconDownload size={16} />
+        Tài liệu
+      </a>
+    ) : (
+      "-"
+    ),
+},
     {
       title: "Hành động",
       width: 60,
@@ -198,16 +381,6 @@ const fetchTemplateList = useCallback(async () => {
   // ============================================================
   // 🔹 5️⃣ Các modal CRUD
   // ============================================================
-  const openModal = () => {
-    modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Thêm mới</div>,
-      children: <CreateView onSearch={fetchAttributes} />,
-      size: "lg",
-      radius: "md",
-      confirmProps: { display: "none" },
-      cancelProps: { display: "none" },
-    });
-  };
 
   const openEditUserModal = (record: DataType) => {
     modals.openConfirmModal({
@@ -244,10 +417,16 @@ const fetchTemplateList = useCallback(async () => {
           clearable
           mb="md"
         />
-        <AppAction openModal={openModal} />
+        {/* <AppAction openModal={openModal} /> */}
       </Group>
 
-      <Table columns={columns} dataSource={data} loading={loading} pagination={false} bordered rowKey="id" />
+      <Table 
+       scroll={{ x: 2000 }}
+      columns={columns} 
+      dataSource={data} 
+      loading={loading} 
+      pagination={false} 
+      bordered rowKey="id" />
 
       {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>

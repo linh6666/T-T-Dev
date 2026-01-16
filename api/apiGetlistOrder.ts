@@ -21,7 +21,7 @@ export const getListOrder = async (
   });
 
   return {
-    data: response.data.data,
-    total: response.data.count,
+      items: response.data.items, // ✅ ĐÚNG
+    total: response.data.total, // ✅ ĐÚNG
   };
 };

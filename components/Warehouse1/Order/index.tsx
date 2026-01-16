@@ -177,17 +177,16 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
           />
 
           {/* FileInput bind đúng value và onChange */}
-          <FileInput
-            label="File đính kèm"
-            placeholder="Chọn file"
-            withAsterisk
-            mt="md"
-            leftSection={<IconUpload size={16} />}
-            accept=".pdf,.jpg,.png,.doc,.docx"
-            value={form.values.file}
-            onChange={(file) => form.setFieldValue("file", file)}
-          />
-
+        <FileInput
+  label="File đính kèm"
+  placeholder="Chọn file PDF"
+  withAsterisk
+  mt="md"
+  leftSection={<IconUpload size={16} />}
+  accept="application/pdf"
+  value={form.values.file}
+  onChange={(file) => form.setFieldValue("file", file)}
+/>
           <Group justify="flex-end" mt="lg">
             <Button
               type="submit"
