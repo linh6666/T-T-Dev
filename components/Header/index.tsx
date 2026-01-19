@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Group, HoverCard, Image } from "@mantine/core";
+import { Group,  Image, Popover, Tooltip } from "@mantine/core";
 import { jwtDecode } from "jwt-decode";
 import {  IconHeart, IconPhoneCall, } from "@tabler/icons-react";
 import LoginButton from "./ButtonLogin/index";
@@ -34,7 +34,7 @@ export default function Header() {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSuperUser, setIsSuperUser] = useState(false);
-  // const [opened, setOpened] = useState(false);
+  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     // ✅ thử đọc cả hai tên token
@@ -145,8 +145,16 @@ const isActive = (href: string, highlight?: boolean) => {
           className={`hidden md:flex ${styles.loginLangBlock}`}
           style={{ display: "flex", gap: "20px" }}
         >
-         
-          <div
+            <Tooltip label="Liên Hệ" position="bottom"
+      
+  styles={{
+    tooltip: {
+      backgroundColor: "#f1eeeeff",
+      color: "#000",
+    },
+  }}
+            >
+      <div
             style={{
               border: "1px solid #752E0B",
               borderRadius: "50%",
@@ -157,39 +165,60 @@ const isActive = (href: string, highlight?: boolean) => {
               justifyContent: "center",
             }}
           >
-            <IconPhoneCall size={17} color="#752E0B" stroke={1.5} />
+               
+<IconPhoneCall size={17} color="#752E0B" stroke={1.5} />
+            
+            
           </div>
+            </Tooltip>
+    
         
 
 
 
- <Group justify="center">
-      <HoverCard width={320} shadow="md" withArrow openDelay={200} closeDelay={400}>
-        <HoverCard.Target>
+  <Group justify="center">
+      <Popover
+        width={320}
+        position="bottom"
+        withArrow
+        shadow="md"
+        opened={opened}
+        onChange={setOpened}
+      >
+        <Tooltip label="Yêu Thích" position="bottom"
+      
+  styles={{
+    tooltip: {
+      backgroundColor: "#f1eeeeff",
+      color: "#000",
+    },
+  }}
+            >
+               <Popover.Target>
           <div
-    style={{
-      border: "1px solid #752E0B",
-      borderRadius: "50%",
-      width: 26,
-      height: 26,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-    }}
-  >
-    <IconHeart size={17} color="#752E0B" stroke={1.5} />
-  </div>
-        
-        </HoverCard.Target>
-        <HoverCard.Dropdown>
-          
+            onClick={() => setOpened((o) => !o)}
+            style={{
+              border: "1px solid #752E0B",
+              borderRadius: "50%",
+              width: 26,
+              height: 26,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <IconHeart size={17} color="#752E0B" stroke={1.5} />
+          </div>
+        </Popover.Target>
 
-      <FavoriteHoverContent />
+            </Tooltip>
+       
 
-        
-        </HoverCard.Dropdown>
-      </HoverCard>
+        <Popover.Dropdown>
+          <FavoriteHoverContent />
+        </Popover.Dropdown>
+      </Popover>
     </Group>
 
 

@@ -101,7 +101,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
 
       const body = {
         project_id: projectId,
-        filters: [{ lable: "type_info", values: ["bh"] }],
+        filters: [{ label: "type_info", values: ["bh"] }],
       };
 
       const res = await createWarehouse(projectId as string, body);

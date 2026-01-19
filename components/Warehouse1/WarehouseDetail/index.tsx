@@ -309,7 +309,9 @@ export default function WarehouseDetail({ item, onBack, projectId }: WarehouseDe
         borderRadius: "4px",
       }}
     >
-      <Image src="/image/test1.jpg" // ảnh mặc định trong public alt="Fallback thumbnail"
+      <Image src="/image/test1.jpg" 
+        alt="Fallback thumbnail"
+        // ảnh mặc định trong public alt="Fallback thumbnail"
         width={80} height={60} fit="cover"
           radius="sm"  style={{ objectFit: "cover", borderRadius: "4px", display: "block", maxWidth: "80px",  maxHeight: "60px"  }} />
     </div>

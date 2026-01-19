@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { IconUser } from "@tabler/icons-react";
-import { Text } from "@mantine/core";
+import { Text, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import useAuth from "../../../hook/useAuth";
 import ProfileModal from "./Profile";
@@ -23,7 +23,16 @@ export default function LoginButton() {
   return (
     <>
       {isLoggedIn && user ? (
-        <Link
+        <Tooltip label="Tài Khoản" position="bottom"
+      
+  styles={{
+    tooltip: {
+      backgroundColor: "#f1eeeeff",
+      color: "#000",
+    },
+  }}
+            >
+ <Link
           href="/Tai-khoan"
           style={{
             textDecoration: "none",
@@ -37,6 +46,9 @@ export default function LoginButton() {
             </Text>
           </ButtonsCollection>
         </Link>
+
+            </Tooltip>
+       
       ) : (
         <Link
           href="/dang-nhap"
@@ -47,7 +59,16 @@ export default function LoginButton() {
             alignItems: "center",
           }}
         >
-          <div
+          <Tooltip label="Đăng Nhập" position="bottom"
+      
+  styles={{
+    tooltip: {
+      backgroundColor: "#f1eeeeff",
+      color: "#000",
+    },
+  }}
+            >
+                <div
             style={{
               border: "1px solid #752E0B",
               borderRadius: "50%",
@@ -60,6 +81,9 @@ export default function LoginButton() {
           >
             <IconUser size={17} color="#752E0B" stroke={1.5} />
           </div>
+
+            </Tooltip>
+        
         </Link>
       )}
 

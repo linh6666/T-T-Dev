@@ -33,26 +33,26 @@
   border: 1px solid #762f0b;
   margin-bottom: 10px;
   padding: 10px;
-border-radius: 15px;
-  display: flex;
- align-items: center;
-  flex-direction: column;
-  /* justify-content: center; */
-  /* 🟠 Căn giữa theo chiều dọc */
-  
-}
+  border-radius: 15px;
 
-.scroll {
-  height: 375px; /* Chiều cao cố định */
-  overflow-y: scroll; /* Cho phép scroll dọc */
-  scrollbar-width: none; /* Firefox: ẩn thanh cuộn */
-  -ms-overflow-style: none; /* IE 10+: ẩn thanh cuộn */
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;      /* ✅ THÊM SCROLL */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
 }
 
 /* Chrome, Safari, Edge */
-.scroll::-webkit-scrollbar {
-  display: none; /* Ẩn thanh cuộn */
+.Function::-webkit-scrollbar {
+  display: none;
 }
+
+/* scroll chỉ để bọc nội dung */
+.scroll {
+  width: 100%;
+}
+
 .btn {
   background-color: #fff;
   color:#762f0b ;

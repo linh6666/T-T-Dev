@@ -53,7 +53,6 @@ export default function Managent({ projectId,target,projectName }: AppProps) {
     </h1>
   </Group>
 
-=
 <h1
   style={{ marginLeft: "auto", cursor: "pointer", color: "#1c7ed6" }}
 onClick={() =>

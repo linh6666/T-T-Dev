@@ -10,6 +10,7 @@ import {
   ScrollArea,
   Stack,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { IconBellRinging, IconUser } from "@tabler/icons-react";
 import styles from "./Announcement.module.css";
@@ -131,12 +132,22 @@ export default function HomePage() {
   };
 
   return (
+
     <Menu
       transitionProps={{ transition: "rotate-right", duration: 150 }}
       position="bottom-end"
       offset={5}
     >
-      <Menu.Target>
+      <Tooltip label="Thông Báo" position="bottom"
+      
+  styles={{
+    tooltip: {
+      backgroundColor: "#f1eeeeff",
+      color: "#000",
+    },
+  }}
+            >
+  <Menu.Target>
         <div
           style={{
             border: "1px solid #752E0B",
@@ -151,6 +162,7 @@ export default function HomePage() {
           }}
         >
           <IconBellRinging size={18} color="#752E0B" stroke={1.5} />
+
           <Badge
             size="xs"
             color="red"
@@ -162,6 +174,8 @@ export default function HomePage() {
         </div>
       </Menu.Target>
 
+            </Tooltip>
+    
       <Menu.Dropdown w={350} p={0}>
         <Group justify="space-between" px="md" py="sm">
           <Text fw={600} size="lg">
