@@ -135,7 +135,7 @@ export default function WarehouseDetail({ item, onBack, projectId }: WarehouseDe
               {item.building_type ? `Loại công trình: ${item.building_type}` : `Vị trí: ${item.layer2}`}
             </Text>
             <Text style={{ fontSize: "15px" }}>Phòng ngủ: {item.bedroom}</Text>
-            <Text style={{ fontSize: "13px" }}>
+            <Text style={{ fontSize: "15px" }}>
               Phòng tắm:{" "}
               {typeof item.bathroom === "string" && item.bathroom.trim().toLowerCase() === "skip"
                 ? "chưa có"

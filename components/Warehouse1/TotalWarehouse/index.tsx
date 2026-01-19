@@ -753,12 +753,12 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               </Text>
 
               {/* Phòng ngủ và phòng tắm */}
-         <Text style={{ fontSize: "13px" }}>
+         <Text style={{ fontSize: "15px" }}>
   Phòng ngủ: {typeof item.bedroom === "string" && item.bedroom.trim().toLowerCase() === "skip"
     ? "Không có"
     : item.bedroom}
 </Text>
-<Text style={{ fontSize: "13px" }}>
+<Text style={{ fontSize: "15px" }}>
   Phòng tắm: {
     typeof item.bathroom === "string" &&
     item.bathroom.trim().toLowerCase() === "skip"
@@ -785,7 +785,7 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               )}
 
               {/* Trạng thái căn hộ */}
-              <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
+              <Text style={{ fontSize: "15px" }}>Trạng thái: {item.status_unit}</Text>
             </Card>
           );
         })}
