@@ -50,7 +50,7 @@ const mockdata = [
     initiallyOpened: true,
     links: [
       { label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
-      { label: 'Duyệt đơn hàng', link: 'Order' },
+      { label: 'Quản lý đơn hàng', link: 'Order' },
       { label: 'Duyệt đơn thanh toán kế tiếp', link: 'Test1' },
       
     ],
