@@ -15,7 +15,7 @@ import User from './User';
 import Roles from './Roles'; 
 import UserProjectRole from './UserProjectRole';
 import Order from './Order'; 
-// import UserProjectRole from './UserProjectRole';
+import  ProjectDetails from './ProjectDetails';
 import HomeAdmin from '../HomeAdmin/index';  
 // import ProjectManagere from './ProjectManagere'; 
 
@@ -38,6 +38,7 @@ const mockdata = [
     initiallyOpened: true,
     links: [
       { label: 'Danh sách dự án', link: 'project' },
+         { label: 'Cập nhật dự án', link: 'projectdetails' },
       
       { label: 'Định danh vai trò người trong dự án', link: 'Roles' },
        { label: 'Phân quyền người dùng trong dự án', link: 'UserProjectRole' },
@@ -84,6 +85,8 @@ export function ProjectManagement() {
         return <div>Đây là trang dự án</div>;
       case 'project-list':
         return <div>Đây là trang dự án</div>;
+           case 'projectdetails':
+        return <ProjectDetails />;
       case 'JionProject':
        return <JionProject/>;
       // case 'user-list':

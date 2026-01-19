@@ -154,7 +154,7 @@ export default function ProjectDetail({ project }: Props) {
     window.URL.revokeObjectURL(url);
   }}
 >
-  Tải hợp đồng PDF
+  Tải PDF
 </Text>
 
                 </Stack>
