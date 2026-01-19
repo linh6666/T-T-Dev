@@ -17,6 +17,8 @@ import { Loader, Container,  Text } from "@mantine/core";
 import { getCurrentUser } from "../../api/apiProfile";
 import ProfileInfo from "./Profile";
 import  Project from "./Project";
+import  Listcustomer from "./listcustomer";
+import  Order from "./Order";
 import ResetPasswword from "./ResetPasswword";
 
 
@@ -93,7 +95,7 @@ export default function ProfilePage() {
       case "profile":
         return <ProfileInfo user={user} />;
       case "orders":
-        return  <h1>xin chào</h1>;
+        return  <Order />;
         // <FavoritesList  />
       case "bookings":
         return <Project  />;
@@ -101,7 +103,7 @@ export default function ProfilePage() {
         return <h1>xin chào</h1>;
         // <Warehouse/>
          case "listcustomer":
-        return <>xin chào các bạn nhé </>;
+        return <Listcustomer />;
           case "ResetPassword":
         return <ResetPasswword />;
       default:
@@ -125,16 +127,7 @@ export default function ProfilePage() {
                 <IconUser size={18} /> Tài khoản của tôi
               </button>
             </li>
-            {/* <li>
-              <button
-                onClick={() => setActiveTab("orders")}
-                className={`${styles.menuItem} ${
-                  activeTab === "orders" ? styles.active : ""
-                }`}
-              >
-                <IconHeartFilled size={18} /> Danh sách yêu thích
-              </button>
-            </li> */}
+           
             <li>
               <button
                 onClick={() => setActiveTab("bookings")}
@@ -168,9 +161,9 @@ export default function ProfilePage() {
             </li>
                   <li>
               <button
-                onClick={() => setActiveTab("test")}
+                onClick={() => setActiveTab("orders")}
                 className={`${styles.menuItem} ${
-                  activeTab === "test" ? styles.active : ""
+                  activeTab === "orders" ? styles.active : ""
                 }`}
               >
                 <IconStackBack
