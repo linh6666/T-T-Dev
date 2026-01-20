@@ -1,6 +1,4 @@
-"use client";
-
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -8,63 +6,51 @@ import {
   Group,
   LoadingOverlay,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { IconPlus, IconCheck } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { IconCheck } from "@tabler/icons-react";
-
-import {
-  createImg,
-  CreateImgPayload,
-} from "../../../api/apiCreateImg";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
+import { createImg } from "../../../api/apiCreateImg";
 
-/* =======================
-   PROPS
-======================= */
-interface DetailsImngProps {
+interface Props {
   unitCode: string;
   projectId: string;
   onSearch: () => void;
-  onClose?: () => void; // 👈 thêm prop để đóng modal
+  onClose?: () => void;
 }
 
-/* =======================
-   COMPONENT
-======================= */
-const CreateView = ({
-  unitCode,
-  projectId,
-  onSearch,
-  onClose, // 👈 nhận prop
-}: DetailsImngProps) => {
+const CreateView = ({ unitCode, projectId, onSearch, onClose }: Props) => {
   const [visible, { open, close }] = useDisclosure(false);
+  const [files, setFiles] = useState<(File | null)[]>([null]);
 
-  const form = useForm<CreateImgPayload>({
-    initialValues: {
-      file: null as unknown as File,
-    },
-    validate: {
-      file: (v) => (!v ? "Bắt buộc chọn ảnh" : null),
-    },
-  });
+  const handleFileChange = (index: number, file: File | null) => {
+    const updated = [...files];
+    updated[index] = file;
+    setFiles(updated);
+  };
 
-  const handleSubmit = async (values: CreateImgPayload) => {
+  const handleAddInput = () => {
+    setFiles([...files, null]);
+  };
+
+  const handleSubmit = async () => {
+    const validFiles = files.filter((f): f is File => f !== null);
+    if (validFiles.length === 0) {
+      NotificationExtension.Fails("Vui lòng chọn ít nhất một ảnh.");
+      return;
+    }
+
     open();
     try {
-      await createImg(projectId, unitCode, values);
+      // ✅ truyền đúng kiểu payload: { files: File[] }
+      await createImg(projectId, unitCode, { files: validFiles });
 
       NotificationExtension.Success("Tạo ảnh chi tiết nhà thành công!");
-
-      form.reset();
+      setFiles([null]);
       onSearch();
-
-      // 👇 gọi hàm đóng modal nếu có
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     } catch (error) {
       console.error(error);
-      NotificationExtension.Fails("Tạo ảnh chi tiết nhà thất bại!");
+      NotificationExtension.Fails("Tạo ảnh thất bại!");
     } finally {
       close();
     }
@@ -73,26 +59,38 @@ const CreateView = ({
   return (
     <Box
       component="form"
-      onSubmit={form.onSubmit(handleSubmit)}
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
       pos="relative"
     >
       <LoadingOverlay visible={visible} />
 
-     <FileInput
-  label="Chọn ảnh"
-  placeholder="Nhấp để chọn ảnh từ máy"
-  accept="image/*"
-  withAsterisk
-  mt="md"
-  clearable
-  value={form.values.file}   // ✅ QUAN TRỌNG
-  onChange={(file) => {
-    form.setFieldValue("file", file as File);
-  }}
-  error={form.errors.file}
-/>
+      {files.map((file, index) => (
+        <FileInput
+          key={index}
+          label={`Ảnh ${index + 1}`}
+          placeholder="Chọn ảnh"
+          accept="image/*"
+          value={file}
+          onChange={(f) => handleFileChange(index, f)}
+          withAsterisk
+          clearable
+          mt="md"
+        />
+      ))}
 
-      <Group justify="flex-end" mt="lg">
+      <Group justify="space-between" mt="lg">
+        <Button
+          variant="light"
+          color="gray"
+          onClick={handleAddInput}
+          leftSection={<IconPlus size={18} />}
+        >
+          Thêm ảnh
+        </Button>
+
         <Button
           type="submit"
           color="#3598dc"

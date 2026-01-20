@@ -422,7 +422,7 @@ const openImgModal = (record: DataType, project_id: string) => {
   const unit_code = record.unit_code || "-"; // hoặc giá trị mặc định nếu không có
 
   modals.openConfirmModal({
-    title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa hình ảnh</div>,
+    title: <div style={{ fontWeight: 600, fontSize: 18 }}>Hình ảnh</div>,
     children: <DetailsImng  projectId={project_id} unitCode={unit_code}   onClose={close}  onSearch={fetchWarehouse} />,
     confirmProps: { display: "none" },
     cancelProps: { display: "none" },
