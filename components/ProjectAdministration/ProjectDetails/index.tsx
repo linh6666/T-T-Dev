@@ -418,12 +418,25 @@ const columns: ColumnsType<DataType> = [
     });
   };
 const openImgModal = (record: DataType, project_id: string) => {
-  // Thêm unit_code vào record
-  const unit_code = record.unit_code || "-"; // hoặc giá trị mặc định nếu không có
+  const unit_code = record.unit_code || "-";
 
   modals.openConfirmModal({
-    title: <div style={{ fontWeight: 600, fontSize: 18 }}>Hình ảnh</div>,
-    children: <DetailsImng  projectId={project_id} unitCode={unit_code}   onClose={close}  onSearch={fetchWarehouse} />,
+    title: (
+      <div style={{ fontWeight: 600, fontSize: 18 }}>
+        Hình ảnh
+      </div>
+    ),
+
+    size: "xl", // 👈 tăng width modal
+
+    children: (
+      <DetailsImng
+        projectId={project_id}
+        unitCode={unit_code}
+        onSearch={fetchWarehouse}
+      />
+    ),
+
     confirmProps: { display: "none" },
     cancelProps: { display: "none" },
   });

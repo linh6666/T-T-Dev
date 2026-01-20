@@ -1,108 +1,62 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  FileInput,
-  Group,
-  LoadingOverlay,
-} from "@mantine/core";
-import { IconPlus, IconCheck } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { NotificationExtension } from "../../../extension/NotificationExtension";
-import { createImg } from "../../../api/apiCreateImg";
+import React from "react";
+import { Tabs } from "@mantine/core";
+import { IconPhoto, IconEdit } from "@tabler/icons-react";
+import CreateImg from "./CreateImng";
 
-interface Props {
-  unitCode: string;
+/* =======================
+   PROPS
+======================= */
+interface DetailsImngProps {
+  idItem?: string[];
   projectId: string;
-  onSearch: () => void;
+  unitCode: string;
+  onSearch: () => Promise<void> | void;
+  opened?: boolean;
   onClose?: () => void;
 }
 
-const CreateView = ({ unitCode, projectId, onSearch, onClose }: Props) => {
-  const [visible, { open, close }] = useDisclosure(false);
-  const [files, setFiles] = useState<(File | null)[]>([null]);
-
-  const handleFileChange = (index: number, file: File | null) => {
-    const updated = [...files];
-    updated[index] = file;
-    setFiles(updated);
-  };
-
-  const handleAddInput = () => {
-    setFiles([...files, null]);
-  };
-
-  const handleSubmit = async () => {
-    const validFiles = files.filter((f): f is File => f !== null);
-    if (validFiles.length === 0) {
-      NotificationExtension.Fails("Vui lòng chọn ít nhất một ảnh.");
-      return;
-    }
-
-    open();
-    try {
-      // ✅ truyền đúng kiểu payload: { files: File[] }
-      await createImg(projectId, unitCode, { files: validFiles });
-
-      NotificationExtension.Success("Tạo ảnh chi tiết nhà thành công!");
-      setFiles([null]);
-      onSearch();
-      onClose?.();
-    } catch (error) {
-      console.error(error);
-      NotificationExtension.Fails("Tạo ảnh thất bại!");
-    } finally {
-      close();
-    }
-  };
-
+/* =======================
+   COMPONENT
+======================= */
+const DetailsImng: React.FC<DetailsImngProps> = ({
+  idItem,
+  projectId,
+  unitCode,
+  onSearch,
+  onClose,
+}) => {
   return (
-    <Box
-      component="form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-      pos="relative"
-    >
-      <LoadingOverlay visible={visible} />
-
-      {files.map((file, index) => (
-        <FileInput
-          key={index}
-          label={`Ảnh ${index + 1}`}
-          placeholder="Chọn ảnh"
-          accept="image/*"
-          value={file}
-          onChange={(f) => handleFileChange(index, f)}
-          withAsterisk
-          clearable
-          mt="md"
-        />
-      ))}
-
-      <Group justify="space-between" mt="lg">
-        <Button
-          variant="light"
-          color="gray"
-          onClick={handleAddInput}
-          leftSection={<IconPlus size={18} />}
-        >
+    <Tabs radius="md" defaultValue="gallery">
+      <Tabs.List>
+        <Tabs.Tab value="gallery" leftSection={<IconPhoto size={15} />}>
           Thêm ảnh
-        </Button>
+        </Tabs.Tab>
 
-        <Button
-          type="submit"
-          color="#3598dc"
-          loading={visible}
-          leftSection={<IconCheck size={18} />}
-        >
-          Tạo ảnh
-        </Button>
-      </Group>
-    </Box>
+        <Tabs.Tab value="messages" leftSection={<IconEdit size={15} />}>
+          Chỉnh sửa ảnh
+        </Tabs.Tab>
+      </Tabs.List>
+
+      {/* TAB THÊM ẢNH */}
+      <Tabs.Panel value="gallery" pt="md">
+        <CreateImg
+          projectId={projectId}
+          unitCode={unitCode}
+          idItem={idItem}
+          onSearch={onSearch}
+          onClose={onClose}
+        />
+      </Tabs.Panel>
+
+      {/* TAB CHỈNH SỬA */}
+      <Tabs.Panel value="messages" pt="md">
+        Messages tab content
+      </Tabs.Panel>
+    </Tabs>
   );
 };
 
-export default CreateView;
+export default DetailsImng;
+
+
 
