@@ -2,10 +2,10 @@ import React from "react";
 import { Tabs } from "@mantine/core";
 import { IconPhoto, IconEdit } from "@tabler/icons-react";
 import CreateImg from "./CreateImng";
+import EditImg from "../EditImg";
 
-/* =======================
-   PROPS
-======================= */
+
+
 interface DetailsImngProps {
   idItem?: string[];
   projectId: string;
@@ -50,7 +50,11 @@ const DetailsImng: React.FC<DetailsImngProps> = ({
 
       {/* TAB CHỈNH SỬA */}
       <Tabs.Panel value="messages" pt="md">
-        Messages tab content
+       <EditImg   projectId={projectId}
+          unitCode={unitCode}
+          idItem={idItem}
+          onSearch={onSearch}
+          onClose={onClose}/>
       </Tabs.Panel>
     </Tabs>
   );
