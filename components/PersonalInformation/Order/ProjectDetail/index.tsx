@@ -5,40 +5,36 @@ import {
   Text,
   Stack,
   Title,
-  Divider,
   Group,
   ScrollArea,
+  Badge,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { getListOrder } from "../../../../api/apiGetlistOrder";
+import Image from "next/image";
+// import { Getlisthome } from "../../../../api/apiGetListHome";
 
-/* =======================
-   TYPE
-======================= */
 interface Project {
   id: string;
+  name?: string;
 }
 
 interface Order {
   id: string;
+  img: string;
   project_id: string;
   customer_id: string;
   seller_id: string;
-
   unit_code: string;
   contract_code: string;
   contract_url: string;
-
   order_status: string;
   order_date: string;
   fully_paid_date?: string | null;
-
   total_price_at_sale_vi?: number | null;
   total_price_at_sale_en?: number | null;
-
   amount_paid_vi?: number | null;
   amount_paid_en?: number | null;
-
   commission_rate?: number | null;
   id_cccd?: string | null;
 }
@@ -46,6 +42,39 @@ interface Order {
 interface Props {
   project: Project | null;
 }
+
+/* =======================
+   ORDER STATUS FORMAT
+======================= */
+const ORDER_STATUS_MAP: Record<
+  string,
+  { label: string; color: string }
+> = {
+  pending: {
+    label: "Đang chờ manager khóa căn hộ",
+    color: "yellow",
+  },
+  pending_deposit: {
+    label: "Đang chờ đơn thanh toán",
+    color: "orange",
+  },
+  paying: {
+    label: "Đang thanh toán",
+    color: "blue",
+  },
+  completed: {
+    label: "Đã thanh toán hoàn tất",
+    color: "green",
+  },
+  cancelled: {
+    label: "Đã hủy giao dịch",
+    color: "red",
+  },
+  expired: {
+    label: "Giao dịch không được duyệt - hết hạn",
+    color: "gray",
+  },
+};
 
 /* =======================
    COMPONENT
@@ -77,17 +106,14 @@ export default function ProjectDetail({ project }: Props) {
   if (!project) return null;
 
   return (
-    <Card shadow="md" radius="md" withBorder>
-      {/* ===== HEADER (KHÔNG SCROLL) ===== */}
+    <div>
+      {/* HEADER */}
       <Group justify="space-between" align="center">
         <Title order={4}>Danh sách đơn hàng</Title>
-
-        <Text fw={500}>
-          Số lượng: {loading ? "..." : totalOrder}
-        </Text>
+        <Text fw={500}>Số lượng: {loading ? "..." : totalOrder}</Text>
       </Group>
 
-      {/* ===== CONTENT (SCROLL) ===== */}
+      {/* LIST */}
       <ScrollArea h={580} mt="sm" type="auto">
         <Stack gap="md">
           {loading && <Text>Đang tải dữ liệu...</Text>}
@@ -97,69 +123,80 @@ export default function ProjectDetail({ project }: Props) {
           )}
 
           {!loading &&
-            orders.map((order) => (
-              <Card key={order.id} withBorder radius="sm" p="sm">
-                <Stack gap={4}>
-                  <Text fw={500}>Căn hộ: {order.unit_code}</Text>
-                
+            orders.map((order) => {
+              const status =
+                ORDER_STATUS_MAP[order.order_status] || {
+                  label: order.order_status,
+                  color: "gray",
+                };
 
-                  <Text>
-                    Giá bán (VN):{" "}
-                    {order.total_price_at_sale_vi
-                      ? order.total_price_at_sale_vi.toLocaleString("vi-VN")
-                      : "—"}
-                  </Text>
+              return (
+                <Card
+                  key={order.id}
+                  withBorder
+                  radius="lg"
+                  p="md"
+                  bg="#f8f9fa"
+                >
+                  <Group align="flex-start" wrap="nowrap">
+                    {/* IMAGE */}
+                    <Image
+                      src={order.img}
+                      alt={order.unit_code}
+                      width={88}
+                      height={88}
+                      style={{
+                        borderRadius: 12,
+                        objectFit: "cover",
+                        flexShrink: 0,
+                      }}
+                    />
 
-                  <Text>
-                    Giá bán (EN):{" "}
-                    {order.total_price_at_sale_en
-                      ? order.total_price_at_sale_en.toLocaleString("en-US")
-                      : "—"}
-                  </Text>
+                    {/* CONTENT */}
+                    <Stack gap={4} style={{ flex: 1 }}>
+                      <Group justify="space-between" align="flex-start">
+                        <Text fw={700} size="lg">
+                          {order.unit_code}
+                        </Text>
 
-             
+                        {/* 👇 STATUS ĐÃ FORMAT */}
+                        <Badge color={status.color} variant="light">
+                          {status.label}
+                        </Badge>
+                      </Group>
 
-                  <Text>
-                    Ngày tạo:{" "}
-                    {new Date(order.order_date).toLocaleDateString("vi-VN")}
-                  </Text>
+                      <Text size="sm" c="dimmed">
+                        Dự án {project?.name || "—"}
+                      </Text>
 
-                  {order.fully_paid_date && (
-                    <Text>
-                      Ngày thanh toán đủ:{" "}
-                      {new Date(order.fully_paid_date).toLocaleDateString(
-                        "vi-VN"
-                      )}
-                    </Text>
-                  )}
+                      <Text fw={600}>
+                        {order.total_price_at_sale_vi
+                          ? order.total_price_at_sale_vi.toLocaleString(
+                              "vi-VN"
+                            )
+                          : "—"}{" "}
+                        VND
+                      </Text>
 
-                  <Divider my="xs" />
-<Text
-  component="button"
-  c="blue"
-  onClick={async () => {
-    const res = await fetch(order.contract_url);
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
+                      <Group justify="space-between" mt="xs">
+                        <Text size="sm">
+                          Mã đơn hàng:{" "}
+                          <Text span fw={500}>
+                            {order.contract_code?.slice(0, 6)}
+                          </Text>
+                        </Text>
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "hop-dong.pdf";
-    document.body.appendChild(a);
-    a.click();
-
-    a.remove();
-    window.URL.revokeObjectURL(url);
-  }}
->
-  Tải hợp đồng PDF
-</Text>
-
-                </Stack>
-              </Card>
-            ))}
+                        <Text size="sm" c="dimmed">
+                          {new Date(order.order_date).toLocaleString("vi-VN")}
+                        </Text>
+                      </Group>
+                    </Stack>
+                  </Group>
+                </Card>
+              );
+            })}
         </Stack>
       </ScrollArea>
-    </Card>
+    </div>
   );
 }

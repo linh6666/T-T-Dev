@@ -8,7 +8,7 @@ import {
   Text,
   Loader,
   Title,
-  Button,
+
 } from "@mantine/core";
 import styles from "./Interact.module.css";
 import { getListProject } from "../../../api/apigetlistProjectControl";
@@ -97,13 +97,7 @@ export default function Listcustomer() {
         {/* ===== DETAIL VIEW ===== */}
         {selectedProject ? (
           <>
-            <Button
-              variant="subtle"
-              mb="md"
-              onClick={() => setSelectedProject(null)}
-            >
-              ← Quay lại danh sách
-            </Button>
+            
 
             <ProjectDetail project={selectedProject} />
           </>
