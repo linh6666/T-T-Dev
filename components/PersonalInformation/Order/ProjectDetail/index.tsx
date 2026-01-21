@@ -10,10 +10,14 @@ import {
   Badge,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { getListOrder } from "../../../../api/apiGetlistOrder";
 import Image from "next/image";
-// import { Getlisthome } from "../../../../api/apiGetListHome";
 
+import { getListOrder } from "../../../../api/apiGetlistOrder";
+import { Getlisthome } from "../../../../api/apiGetListHome";
+
+/* =======================
+   TYPE
+======================= */
 interface Project {
   id: string;
   name?: string;
@@ -21,22 +25,12 @@ interface Project {
 
 interface Order {
   id: string;
-  img: string;
   project_id: string;
-  customer_id: string;
-  seller_id: string;
   unit_code: string;
   contract_code: string;
-  contract_url: string;
   order_status: string;
   order_date: string;
-  fully_paid_date?: string | null;
   total_price_at_sale_vi?: number | null;
-  total_price_at_sale_en?: number | null;
-  amount_paid_vi?: number | null;
-  amount_paid_en?: number | null;
-  commission_rate?: number | null;
-  id_cccd?: string | null;
 }
 
 interface Props {
@@ -84,6 +78,12 @@ export default function ProjectDetail({ project }: Props) {
   const [totalOrder, setTotalOrder] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
+  // 👉 map ảnh theo order.id
+  const [imageMap, setImageMap] = useState<Record<string, string>>({});
+
+  /* =======================
+     FETCH ORDERS
+  ======================= */
   useEffect(() => {
     if (!project?.id) return;
 
@@ -91,8 +91,8 @@ export default function ProjectDetail({ project }: Props) {
       setLoading(true);
       try {
         const res = await getListOrder(project.id);
-        setOrders(res.items);
-        setTotalOrder(res.total);
+        setOrders(res.items || []);
+        setTotalOrder(res.total || 0);
       } catch (error) {
         console.error("Lỗi lấy danh sách order:", error);
       } finally {
@@ -103,6 +103,44 @@ export default function ProjectDetail({ project }: Props) {
     fetchOrders();
   }, [project?.id]);
 
+  /* =======================
+     FETCH IMAGES PER ORDER
+  ======================= */
+useEffect(() => {
+  if (!project?.id || orders.length === 0) return;
+
+  const fetchImages = async () => {
+    const map: Record<string, string> = {};
+
+    await Promise.all(
+      orders.map(async (order) => {
+        try {
+          const res = await Getlisthome({
+            project_id: project.id,
+            unit_code: order.unit_code,
+          });
+
+          // ✅ res là ARRAY, không phải object
+          map[order.id] = res?.[0]?.url || "/no-image.png";
+        } catch (error) {
+          console.error(
+            "Lỗi lấy ảnh:",
+            project.id,
+            order.unit_code,
+            error
+          );
+          map[order.id] = "/no-image.png";
+        }
+      })
+    );
+
+    setImageMap(map);
+  };
+
+  fetchImages();
+}, [project?.id, orders]);
+
+
   if (!project) return null;
 
   return (
@@ -110,12 +148,31 @@ export default function ProjectDetail({ project }: Props) {
       {/* HEADER */}
       <Group justify="space-between" align="center">
         <Title order={4}>Danh sách đơn hàng</Title>
-        <Text fw={500}>Số lượng: {loading ? "..." : totalOrder}</Text>
+        <Text fw={500}>
+          Số lượng: {loading ? "..." : totalOrder}
+        </Text>
       </Group>
 
       {/* LIST */}
-      <ScrollArea h={580} mt="sm" type="auto">
-        <Stack gap="md">
+      <ScrollArea
+  h={630}
+  mt="sm"
+  p="md"
+  styles={{
+    scrollbar: {
+      backgroundColor: "#f1f3f5", // track (rãnh)
+    },
+    thumb: {
+      backgroundColor: "#ffbe00", // thanh trượt
+      borderRadius: 8,
+      "&:hover": {
+        backgroundColor: "#868e96",
+      },
+    },
+  }}
+>
+        <div>
+  <Stack gap="md">
           {loading && <Text>Đang tải dữ liệu...</Text>}
 
           {!loading && orders.length === 0 && (
@@ -140,17 +197,19 @@ export default function ProjectDetail({ project }: Props) {
                 >
                   <Group align="flex-start" wrap="nowrap">
                     {/* IMAGE */}
-                    <Image
-                      src={order.img}
-                      alt={order.unit_code}
-                      width={88}
-                      height={88}
-                      style={{
-                        borderRadius: 12,
-                        objectFit: "cover",
-                        flexShrink: 0,
-                      }}
-                    />
+                 <Image
+  src={imageMap[order.id] || "/no-image.png"}
+  alt={order.unit_code}
+  width={200}
+  height={1} // ⚠️ bắt buộc để Next Image không lỗi
+  style={{
+    width: 200,
+    height: "auto",
+    borderRadius: 12,
+    objectFit: "contain", // hoặc cover
+    flexShrink: 0,
+  }}
+/>
 
                     {/* CONTENT */}
                     <Stack gap={4} style={{ flex: 1 }}>
@@ -159,14 +218,13 @@ export default function ProjectDetail({ project }: Props) {
                           {order.unit_code}
                         </Text>
 
-                        {/* 👇 STATUS ĐÃ FORMAT */}
                         <Badge color={status.color} variant="light">
                           {status.label}
                         </Badge>
                       </Group>
 
                       <Text size="sm" c="dimmed">
-                        Dự án {project?.name || "—"}
+                        Dự án {project.name || "—"}
                       </Text>
 
                       <Text fw={600}>
@@ -187,7 +245,9 @@ export default function ProjectDetail({ project }: Props) {
                         </Text>
 
                         <Text size="sm" c="dimmed">
-                          {new Date(order.order_date).toLocaleString("vi-VN")}
+                          {new Date(
+                            order.order_date
+                          ).toLocaleString("vi-VN")}
                         </Text>
                       </Group>
                     </Stack>
@@ -196,6 +256,9 @@ export default function ProjectDetail({ project }: Props) {
               );
             })}
         </Stack>
+
+        </div>
+      
       </ScrollArea>
     </div>
   );
