@@ -5,146 +5,144 @@ import {
   Button,
   Group,
   LoadingOverlay,
-  Select,
+  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { IconCheck, IconChevronDown, IconX } from "@tabler/icons-react";
-import { useEffect, useCallback, useRef, useState } from "react";
+import {
+  IconCheck,
+  IconX,
+} from "@tabler/icons-react";
+import { useEffect, useCallback, useRef } from "react";
+
 import { API_ROUTE } from "../../../const/apiRouter";
 import { api } from "../../../libray/axios";
-import { CreateUserPayload } from "../../../api/apiTemplateAttributesLink";
-import { getListRoles } from "../../../api/apigetlistAttributes";
-import { getListProjectTemplates } from "../../../api/apiProjectTemplates2";
+import { CreateUserPayload } from "../../../api/apidetailhome";
+
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 
+/* =======================
+   PROPS
+======================= */
 interface EditViewProps {
+  id: string;                 // link_id
+  leaf_id: string;            // leaf_id
+  project_id: string;         // project_id
   onSearch: () => Promise<void>;
-  id: string;
 }
 
-interface ProjectTemplate {
-  id: string | number;
-  template_vi?: string;
-  template_name?: string;
-}
 
-interface Attribute {
-  id: string | number;
-  label?: string;
-  attribute_name?: string;
-}
+const EditView = ({
 
-const EditView = ({ onSearch, id }: EditViewProps) => {
+  leaf_id,
+  project_id,
+  onSearch,
+}: EditViewProps) => {
   const [visible, { open, close }] = useDisclosure(false);
-
-  // 🔹 State cho dropdown
-  const [templateOptions, setTemplateOptions] = useState<{ value: string; label: string }[]>([]);
-  const [attributeOptions, setAttributeOptions] = useState<{ value: string; label: string }[]>([]);
 
   const token = localStorage.getItem("access_token") || "";
 
   const form = useForm<CreateUserPayload>({
     initialValues: {
-      project_template_id: "",
-      attribute_id: "",
-      is_required: "",
+     
+    
+      bathroom:"",
+      bedroom:"",
+      direction:"",
+      balcony_direction:"",
+      // main_door_direction:"",
+     
     },
   });
 
   const formRef = useRef(form);
 
-  /** ✅ Submit cập nhật */
-  const handleSubmit = async (values: CreateUserPayload) => {
-    open();
-    try {
-      const url = API_ROUTE.UPDATE_TEMPLATEATTRIBUTESLINK.replace("{link_id}", id);
-      const res = await api.put(url, values);
 
-      // ✅ Thêm thông báo
-      NotificationExtension.Success(
-        res?.data?.message || "Cập nhật dữ liệu thành công!"
-      );
-
-      await onSearch();
-      modals.closeAll();
-    } catch (error: unknown) {
-     console.error("Lỗi khi tạo:", error);
-      NotificationExtension.Fails("Đã xảy ra lỗi khi tạo!");
-    } finally {
-      close();
-    }
-  };
-
-  /** ✅ Lấy chi tiết record cần sửa */
-  const fetchDetail = useCallback(async () => {
-    if (!id) return;
-    open();
-    try {
-      const url = API_ROUTE.GET_TEMPLATEATTRIBUTESLINK.replace("{link_id}", id);
-      const res = await api.get(url);
-      const data = res.data;
-
-      formRef.current.setValues({
-        project_template_id: data.project_template_id || "",
-        attribute_id: data.attribute_id || "",
-        is_required: data.is_required?.toString() || "",
-      });
-    } catch (error) {
-      console.error("Lỗi khi tải chi tiết:", error);
-      alert("Không thể tải thông tin chi tiết.");
-      modals.closeAll();
-    } finally {
-      close();
-    }
-  }, [id, open, close]);
-
-  /** ✅ Gọi API danh sách “Mẫu dự án” */
-const fetchTemplateOptions = useCallback(async () => {
+ const handleSubmit = async (values: CreateUserPayload) => {
+  open();
   try {
-    const res = await getListProjectTemplates({
-      token,
-      skip: 0,
-      limit: 100,
+    const url = API_ROUTE.EDIT_DETAILE_HOME
+      .replace("{project_id}", project_id)
+      .replace("{leaf_id}", leaf_id);
+
+    // ✅ BỌC DỮ LIỆU TRONG updates
+    const payload = {
+      updates: {
+       
+    
+        bathroom: values.bathroom,
+        bedroom: values.bedroom,
+        balcony_direction: values.balcony_direction,
+        // main_door_direction: values.main_door_direction,
+      },
+    };
+
+    const res = await api.put(url, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
-    setTemplateOptions(
-      (res.data as ProjectTemplate[])
-        .filter((item) => item.template_vi?.trim())
-        .map((item) => ({
-          value: item.id.toString(),
-          label: item.template_vi!,
-        }))
+    NotificationExtension.Success(
+      res?.data?.message || "Cập nhật dữ liệu thành công!"
     );
+
+    await onSearch();
+    modals.closeAll();
   } catch (error) {
-    console.error("Lỗi khi tải mẫu dự án:", error);
-    setTemplateOptions([]);
+    console.error("Lỗi khi cập nhật:", error);
+    NotificationExtension.Fails("Đã xảy ra lỗi khi cập nhật!");
+  } finally {
+    close();
   }
-}, [token]);
+};
 
 
-  /** ✅ Gọi API danh sách “Thuộc tính” */
-  const fetchAttributeOptions = useCallback(async () => {
-    try {
-      const res = await getListRoles({ token, skip: 0, limit: 100 });
-      setAttributeOptions(
-        res.data.map((item: Attribute) => ({
-          value: item.id,
-          label: item.label || item.attribute_name || "Không có tên",
-        }))
-      );
-    } catch (error) {
-      console.error("Lỗi khi tải thuộc tính:", error);
+
+const fetchDetail = useCallback(async () => {
+  if (!project_id || !leaf_id) return;
+
+  open();
+  try {
+    const url = API_ROUTE.GET_DETAILE_HOME
+      .replace("{project_id}", project_id)
+      .replace("{leaf_id}", leaf_id);
+
+    const res = await api.get(url);
+
+    // ✅ LẤY PHẦN TỬ ĐẦU TIÊN TRONG data[]
+    const item = res.data?.data?.[0];
+
+    if (!item) {
+      NotificationExtension.Fails("Không có dữ liệu chi tiết!");
+      return;
     }
-  }, [token]);
 
-  /** ✅ Chạy khi mở modal sửa */
+   formRef.current.setValues({
+
+ 
+  bathroom: item.bathroom ?? "",
+  bedroom: item.bedroom ?? "",
+  balcony_direction: item.balcony_direction ?? "",
+  // main_door_direction: item.main_door_direction ?? "",
+});
+  } catch (error) {
+    console.error("Lỗi khi tải chi tiết:", error);
+    NotificationExtension.Fails("Không thể tải dữ liệu chi tiết!");
+    modals.closeAll();
+  } finally {
+    close();
+  }
+}, [project_id, leaf_id, open, close]);
+
+
+
+
   useEffect(() => {
     fetchDetail();
-    fetchTemplateOptions();
-    fetchAttributeOptions();
-  }, [fetchDetail, fetchTemplateOptions, fetchAttributeOptions]);
+   
+  }, [fetchDetail,]);
 
   return (
     <Box
@@ -159,40 +157,20 @@ const fetchTemplateOptions = useCallback(async () => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
 
-      {/* 🔹 Mẫu dự án */}
-      <Select
-        label="Mẫu dự án"
-        placeholder="Chọn mẫu dự án"
-        data={templateOptions}
-        rightSection={<IconChevronDown size={16} />}
-        mt="md"
-        withAsterisk
-        {...form.getInputProps("project_template_id")}
+ 
+       <TextInput
+        label="Phòng tắm "
+         {...form.getInputProps("bathroom")}
       />
-
-      {/* 🔹 Thuộc tính */}
-      <Select
-        label="Thuộc tính"
-        placeholder="Chọn thuộc tính"
-        data={attributeOptions}
-        rightSection={<IconChevronDown size={16} />}
-        mt="md"
-        withAsterisk
-        {...form.getInputProps("attribute_id")}
+      <TextInput
+        label="Phòng ngủ "
+         {...form.getInputProps("bedroom")}
       />
-
-      {/* 🔹 Có thể thêm chọn “Bắt buộc / Không bắt buộc” */}
-      <Select
-        label="Bắt buộc?"
-        placeholder="Chọn"
-        data={[
-          { value: "true", label: "Bắt buộc" },
-          { value: "false", label: "Không bắt buộc" },
-        ]}
-        rightSection={<IconChevronDown size={16} />}
-        mt="md"
-        {...form.getInputProps("is_required")}
+  <TextInput
+        label="Hướng "
+         {...form.getInputProps("direction")}
       />
+      <TextInput label="Hướng ban công" {...form.getInputProps("balcony_direction")} />
 
       <Group justify="flex-end" mt="lg">
         <Button
@@ -203,6 +181,7 @@ const fetchTemplateOptions = useCallback(async () => {
         >
           Lưu
         </Button>
+
         <Button
           variant="outline"
           color="black"

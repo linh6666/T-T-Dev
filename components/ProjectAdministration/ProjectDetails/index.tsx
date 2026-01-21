@@ -32,6 +32,7 @@ interface DataType {
   main_door_direction: string;
   balcony_direction: string;
   status_unit: string;
+  leaf_id:string;
   
 }
 
@@ -53,6 +54,7 @@ interface TemplateAttributeLink {
   main_door_direction: string;
 balcony_direction: string;
   status_unit: string;
+  leaf_id:string;
 }
 
 /* =======================
@@ -164,6 +166,7 @@ export default function LargeFixedTable() {
         main_door_direction: item.main_door_direction ,
         balcony_direction: item.balcony_direction,
         status_unit: item.status_unit,
+        leaf_id:item.leaf_id,
       }));
 
       console.log("ROWS ĐƯA VÀO TABLE:", rows);
@@ -222,8 +225,7 @@ const columns: ColumnsType<DataType> = [
     width: 50,
     fixed: "left",
   },
-
-  {
+{
     title: "Phân khu/Tòa",
     dataIndex: "zone",
     width: 40,
@@ -398,16 +400,24 @@ const columns: ColumnsType<DataType> = [
       </EuiFlexGroup>
     ),
   },
+ 
 ];
 
-  const openEditUserModal = (record: DataType) => {
-    modals.openConfirmModal({
-      title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa</div>,
-      children: <EditView id={record.id} onSearch={fetchWarehouse} />,
-      confirmProps: { display: "none" },
-      cancelProps: { display: "none" },
-    });
-  };
+const openEditUserModal = (record: DataType) => {
+  modals.openConfirmModal({
+    title: <div style={{ fontWeight: 600, fontSize: 18 }}>Chỉnh sửa</div>,
+    children: (
+      <EditView
+        id={record.id}
+        leaf_id={record.leaf_id}
+        project_id={templateId}   // 👈 project đang chọn
+        onSearch={fetchWarehouse}
+      />
+    ),
+    confirmProps: { display: "none" },
+    cancelProps: { display: "none" },
+  });
+};
 
   const openDeleteUserModal = (record: DataType) => {
     modals.openConfirmModal({

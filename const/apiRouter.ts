@@ -138,5 +138,12 @@ DELETE_FAVORITES:"/api/v1/favorites/{favorite_id}",
 CREATE_ORDER:"/api/v1/order/",
 GET_LIST_ORDER:"/api/v1/order/{project_id}",
 
+//Home
+EDIT_DETAILE_HOME:"/api/v1/node_attribute/node_by_leaf/{project_id}/{leaf_id}",
+GET_DETAILE_HOME:"/api/v1/node_attribute/node_by_leaf/{project_id}/{leaf_id}",
+
+
+
+
 
 }
