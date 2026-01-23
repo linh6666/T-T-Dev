@@ -1,12 +1,21 @@
-   "use client";
+"use client";
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./FavoriteDetails.module.css";
-import { IconBath, IconBed, IconHeartFilled } from "@tabler/icons-react";
+import {
+  IconBath,
+  IconBed,
+  IconHeartFilled,
+} from "@tabler/icons-react";
 import { getListFavorites } from "../../api/apiGetListFavorites";
 import { deleteFavorites } from "../../api/apiDeteleFavorites";
+import { Getlisthome } from "../../api/apiGetListHome";
+import { Image } from "@mantine/core";
 
+/* =======================
+   TYPE
+======================= */
 interface FavoriteItem {
   id: string;
   unit_code: string;
@@ -16,9 +25,12 @@ interface FavoriteItem {
   bedrooms: number;
   bathrooms: number;
   status: string;
-  image?: string | null;
   desc?: string;
   favorite_id: string;
+}
+
+interface HomeImage {
+  url: string;
 }
 
 export default function FavoriteDetails() {
@@ -29,49 +41,94 @@ export default function FavoriteDetails() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 👉 hiển thị bên phải
   const [previewItem, setPreviewItem] =
     useState<FavoriteItem | null>(null);
 
-  // 👉 active bên trái (chỉ set khi click)
   const [activeItem, setActiveItem] =
     useState<FavoriteItem | null>(null);
 
-useEffect(() => {
-  if (!projectId) return; // tránh gọi API khi chưa có id
+  // map id → danh sách ảnh
+  const [imageMap, setImageMap] = useState<
+    Record<string, string[]>
+  >({});
 
-  const fetchFavorites = async () => {
-    try {
-      const res = await getListFavorites(projectId);
-      const data = res.data || [];
+  /* =======================
+     FETCH FAVORITES
+  ======================= */
+  useEffect(() => {
+    if (!projectId) return;
 
-      setFavorites(data);
+    const fetchFavorites = async () => {
+      try {
+        const res = await getListFavorites(projectId);
+        const data: FavoriteItem[] = res.data || [];
 
-      // chỉ preview item đầu tiên
-      if (data.length > 0) {
-        setPreviewItem(data[0]);
+        setFavorites(data);
+
+        if (data.length > 0) {
+          setActiveItem(data[0]);
+          setPreviewItem(data[0]);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy favorites:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu yêu thích:", error);
-      setPreviewItem(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchFavorites();
-}, [projectId]);
+    fetchFavorites();
+  }, [projectId]);
 
+  /* =======================
+     FETCH IMAGES
+  ======================= */
+  useEffect(() => {
+    if (!projectId || favorites.length === 0) return;
 
+    const fetchImages = async () => {
+      const map: Record<string, string[]> = {};
+
+      await Promise.all(
+        favorites.map(async (item) => {
+          try {
+            const res: HomeImage[] = await Getlisthome({
+              project_id: projectId,
+              unit_code: item.unit_code,
+            });
+
+            map[item.id] = res?.map((img) => img.url) || [];
+          } catch (error) {
+            console.error(
+              "Lỗi lấy ảnh:",
+              item.unit_code,
+              error
+            );
+            map[item.id] = [];
+          }
+        })
+      );
+
+      setImageMap(map);
+    };
+
+    fetchImages();
+  }, [projectId, favorites]);
+
+  /* =======================
+     RENDER
+  ======================= */
   return (
     <div className={styles.wrapper}>
-      {/* Header */}
+      {/* HEADER */}
       <div className={styles.header}>
-        <div className={styles.title}>Dự án {name}</div>
-        <button className={styles.historyBtn}>Lịch sử đơn hàng</button>
+        <div className={styles.title}>
+          Dự án {name}
+        </div>
+        <button className={styles.historyBtn}>
+          Lịch sử đơn hàng
+        </button>
       </div>
 
-      {/* Main content */}
       <div className={styles.container}>
         {/* ================= LEFT ================= */}
         <div className={styles.left}>
@@ -86,7 +143,8 @@ useEffect(() => {
               <div>Không có dự án yêu thích</div>
             ) : (
               favorites.map((item) => {
-                const isActive = activeItem?.id === item.id;
+                const isActive =
+                  activeItem?.id === item.id;
 
                 return (
                   <div
@@ -95,19 +153,25 @@ useEffect(() => {
                       isActive ? styles.active : ""
                     }`}
                     onClick={() => {
-                      setActiveItem(item);   // 👉 highlight
-                      setPreviewItem(item);  // 👉 đổi nội dung phải
+                      setActiveItem(item);
+                      setPreviewItem(item);
                     }}
                   >
-                    <div
-                      className={styles.thumb}
+                    {/* IMAGE LEFT */}
+                    <Image
+                      src={
+                        imageMap[item.id]?.[0] ||
+                        "/no-image.png"
+                      }
+                      alt={item.unit_code}
+                      width={120}
+                      height={1}
                       style={{
-                        backgroundImage: item.image
-                          ? `url(${item.image})`
-                          : undefined,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        borderRadius: "8px",
+                        width: 120,
+                        height: "auto",
+                        borderRadius: 12,
+                        objectFit: "contain",
+                        flexShrink: 0,
                       }}
                     />
 
@@ -119,15 +183,17 @@ useEffect(() => {
                         {item.price}
                       </div>
                       <div className={styles.sub}>
-                        {item.building_type},
+                        {item.building_type}
                       </div>
 
                       <div className={styles.meta}>
                         <span className={styles.type1}>
-                          <IconBed size={14} /> {item.bedrooms}
+                          <IconBed size={14} />{" "}
+                          {item.bedrooms}
                         </span>
                         <span className={styles.type1}>
-                          <IconBath size={14} /> {item.bathrooms}
+                          <IconBath size={14} />{" "}
+                          {item.bathrooms}
                         </span>
                         <span className={styles.status}>
                           {item.status}
@@ -135,37 +201,40 @@ useEffect(() => {
                       </div>
                     </div>
 
+                    {/* DELETE */}
                     <div
-  className={styles.heart}
-  onClick={async (e) => {
-    e.stopPropagation(); // tránh trigger click card
+                      className={styles.heart}
+                      onClick={async (e) => {
+                        e.stopPropagation();
 
-    if (!item.favorite_id) return;
+                        if (!item.favorite_id) return;
 
-    // ✅ Hiển thị popup confirm
-    const confirmDelete = window.confirm("Bạn có muốn loại bỏ yêu thích này không?");
-    if (!confirmDelete) return; // người dùng chọn Hủy
+                        const ok =
+                          window.confirm(
+                            "Bạn có muốn loại bỏ yêu thích này không?"
+                          );
+                        if (!ok) return;
 
-    try {
-      await deleteFavorites(item.favorite_id);
+                        await deleteFavorites(
+                          item.favorite_id
+                        );
 
-      // ✅ Cập nhật state, loại bỏ item khỏi danh sách
-      setFavorites((prev) =>
-        prev.filter((fav) => fav.favorite_id !== item.favorite_id)
-      );
+                        setFavorites((prev) =>
+                          prev.filter(
+                            (f) =>
+                              f.favorite_id !==
+                              item.favorite_id
+                          )
+                        );
 
-      // nếu previewItem đang hiển thị item này, reset preview
-      if (previewItem?.favorite_id === item.favorite_id) {
-        setPreviewItem(null);
-      }
-    } catch (error) {
-      console.error("Xóa yêu thích thất bại:", error);
-    }
-  }}
->
-  <IconHeartFilled color="red" size={20} />
-</div>
-
+                        setPreviewItem(null);
+                      }}
+                    >
+                      <IconHeartFilled
+                        color="red"
+                        size={20}
+                      />
+                    </div>
                   </div>
                 );
               })
@@ -177,24 +246,47 @@ useEffect(() => {
         <div className={styles.right}>
           {previewItem ? (
             <>
+              {/* GALLERY */}
               <div className={styles.gallery}>
-                <div
+                <Image
+                  src={
+                    imageMap[previewItem.id]?.[0] ||
+                    "/no-image.png"
+                  }
+                  alt={previewItem.unit_code}
                   className={styles.mainImage}
-                  style={{
-                    backgroundImage: previewItem.image
-                      ? `url(${previewItem.image})`
-                      : undefined,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
+                  fit="cover"
+                  radius={16}
                 />
 
                 <div className={styles.subImages}>
-                  <div />
-                  <div />
+                  <Image
+                    src={
+                      imageMap[previewItem.id]?.[1] ||
+                      "/no-image.png"
+                    }
+                    alt={`${previewItem.unit_code} - ảnh phụ 1`}
+                    fit="cover"
+                    radius={12}
+                    width={300}
+                    height={50}
+                  />
+
+                  <Image
+                    src={
+                      imageMap[previewItem.id]?.[2] ||
+                      "/no-image.png"
+                    }
+                    alt={`${previewItem.unit_code} - ảnh phụ 2`}
+                    fit="cover"
+                    radius={12}
+                    width={120}
+                    height={90}
+                  />
                 </div>
               </div>
 
+              {/* DETAIL */}
               <div className={styles.detail}>
                 <div className={styles.topRow}>
                   <div>
@@ -202,8 +294,8 @@ useEffect(() => {
                       {previewItem.unit_code}
                     </h2>
                     <div className={styles.location}>
-                      {previewItem.building_type}
-                      , {previewItem.location}
+                      {previewItem.building_type},{" "}
+                      {previewItem.location}
                     </div>
                   </div>
 
@@ -212,17 +304,20 @@ useEffect(() => {
                       {previewItem.status}
                     </span>
                     <div className={styles.priceDetail}>
-                      Giá niêm yết <b>{previewItem.price}</b>
+                      Giá niêm yết{" "}
+                      <b>{previewItem.price}</b>
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.infoRow}>
                   <span className={styles.type}>
-                    <IconBed size={14} /> {previewItem.bedrooms}
+                    <IconBed size={14} />{" "}
+                    {previewItem.bedrooms}
                   </span>
                   <span className={styles.type}>
-                    <IconBath size={14} /> {previewItem.bathrooms}
+                    <IconBath size={14} />{" "}
+                    {previewItem.bathrooms}
                   </span>
                   <span className={styles.type}>
                     {previewItem.building_type}
@@ -249,4 +344,3 @@ useEffect(() => {
     </div>
   );
 }
-

@@ -160,14 +160,21 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height: 300px;
 }
 
-.subImages div {
-  flex: 1;
-  background: #dcdce0;
+.subImages > * {
+  flex: 1; /* 👈 QUAN TRỌNG: chia đều chiều cao */
   border-radius: 10px;
+  overflow: hidden;
 }
 
+/* ép ảnh Mantine phủ đầy box */
+.subImages :global(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 /* Detail */
 .detail {
   margin-top: 16px;
