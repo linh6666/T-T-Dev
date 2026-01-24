@@ -7,7 +7,7 @@ export interface CreateUserPayload {
   full_name: string;
   phone: string;
   is_active: boolean;
-  is_superuser: boolean;
+  // is_superuser: boolean;
 }
 
 export const createUser = async (payload: CreateUserPayload) => {

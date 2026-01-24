@@ -162,12 +162,12 @@ const EditView = ({ onSearch, id }: EditViewProps) => {
   onChange={(value) => form.setFieldValue("system_id", value || "")} // string
 />
 
-      <TextInput
+      {/* <TextInput
         label="Người giới thiệu"
         placeholder="Nhập người giới thiệu"
         mt="md"
         {...form.getInputProps("introducer_id")}
-      />
+      /> */}
 
       <Switch
         label="Kích hoạt tài khoản"
