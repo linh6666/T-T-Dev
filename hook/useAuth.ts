@@ -6,6 +6,7 @@ interface User {
   full_name: string;
   email: string;
   system_rank?: number;
+    is_active?: boolean;
 }
 
 const useAuth = () => {
