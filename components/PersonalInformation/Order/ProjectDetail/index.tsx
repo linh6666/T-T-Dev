@@ -11,12 +11,13 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
 import { getListOrder } from "../../../../api/apiGetlistOrder";
 import { Getlisthome } from "../../../../api/apiGetListHome";
+import { useRouter } from "next/navigation";
+import { IconFolder } from "@tabler/icons-react";
 
 /* =======================
-   TYPE
+   TYPES
 ======================= */
 interface Project {
   id: string;
@@ -26,6 +27,7 @@ interface Project {
 interface Order {
   id: string;
   project_id: string;
+  contract_url: string;
   unit_code: string;
   contract_code: string;
   order_status: string;
@@ -38,7 +40,7 @@ interface Props {
 }
 
 /* =======================
-   ORDER STATUS FORMAT
+   STATUS MAP
 ======================= */
 const ORDER_STATUS_MAP: Record<
   string,
@@ -53,8 +55,8 @@ const ORDER_STATUS_MAP: Record<
     color: "orange",
   },
   paying: {
-    label: "Đang thanh toán",
-    color: "blue",
+    label: "ĐANG CHỜ ĐƠN THANH TOÁN",
+    color: "orange",
   },
   completed: {
     label: "Đã thanh toán hoàn tất",
@@ -75,11 +77,10 @@ const ORDER_STATUS_MAP: Record<
 ======================= */
 export default function ProjectDetail({ project }: Props) {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [totalOrder, setTotalOrder] = useState<number>(0);
+  const [totalOrder, setTotalOrder] = useState(0);
   const [loading, setLoading] = useState(false);
-
-  // 👉 map ảnh theo order.id
   const [imageMap, setImageMap] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   /* =======================
      FETCH ORDERS
@@ -104,42 +105,34 @@ export default function ProjectDetail({ project }: Props) {
   }, [project?.id]);
 
   /* =======================
-     FETCH IMAGES PER ORDER
+     FETCH IMAGES
   ======================= */
-useEffect(() => {
-  if (!project?.id || orders.length === 0) return;
+  useEffect(() => {
+    if (!project?.id || orders.length === 0) return;
 
-  const fetchImages = async () => {
-    const map: Record<string, string> = {};
+    const fetchImages = async () => {
+      const map: Record<string, string> = {};
 
-    await Promise.all(
-      orders.map(async (order) => {
-        try {
-          const res = await Getlisthome({
-            project_id: project.id,
-            unit_code: order.unit_code,
-          });
+      await Promise.all(
+        orders.map(async (order) => {
+          try {
+            const res = await Getlisthome({
+              project_id: project.id,
+              unit_code: order.unit_code,
+            });
 
-          // ✅ res là ARRAY, không phải object
-          map[order.id] = res?.[0]?.url || "/no-image.png";
-        } catch (error) {
-          console.error(
-            "Lỗi lấy ảnh:",
-            project.id,
-            order.unit_code,
-            error
-          );
-          map[order.id] = "/no-image.png";
-        }
-      })
-    );
+            map[order.id] = res?.[0]?.url || "/no-image.png";
+          } catch {
+            map[order.id] = "/no-image.png";
+          }
+        })
+      );
 
-    setImageMap(map);
-  };
+      setImageMap(map);
+    };
 
-  fetchImages();
-}, [project?.id, orders]);
-
+    fetchImages();
+  }, [project?.id, orders]);
 
   if (!project) return null;
 
@@ -155,26 +148,19 @@ useEffect(() => {
 
       {/* LIST */}
       <ScrollArea
-  h={630}
-  mt="sm"
-  p="md"
-  styles={{
-    scrollbar: {
-      backgroundColor: "#f1f3f5", // track (rãnh)
-    },
-    thumb: {
-      backgroundColor: "#ffbe00", // thanh trượt
-      borderRadius: 8,
-      "&:hover": {
-        backgroundColor: "#868e96",
-      },
-    },
-  }}
->
-        <div>
-  <Stack gap="md">
+        h={630}
+        mt="sm"
+        p="md"
+        styles={{
+          scrollbar: { backgroundColor: "#f1f3f5" },
+          thumb: {
+            backgroundColor: "#ffbe00",
+            borderRadius: 8,
+          },
+        }}
+      >
+        <Stack gap="md">
           {loading && <Text>Đang tải dữ liệu...</Text>}
-
           {!loading && orders.length === 0 && (
             <Text c="dimmed">Không có order nào</Text>
           )}
@@ -193,35 +179,31 @@ useEffect(() => {
                   withBorder
                   radius="lg"
                   p="md"
-                  bg="#f8f9fa"
+                  bg="#ffffff"
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    router.push(`/chi-tiet-don/${order.id}`)
+                  }
                 >
-                  <Group align="flex-start" wrap="nowrap">
+                  <Group wrap="nowrap" align="flex-start">
                     {/* IMAGE */}
-                 <Image
-  src={imageMap[order.id] || "/no-image.png"}
-  alt={order.unit_code}
-  width={200}
-  height={1} // ⚠️ bắt buộc để Next Image không lỗi
-  style={{
-    width: 200,
-    height: "auto",
-    borderRadius: 12,
-    objectFit: "contain", // hoặc cover
-    flexShrink: 0,
-  }}
-/>
+                    <Image
+                      src={imageMap[order.id] || "/no-image.png"}
+                      alt={order.unit_code}
+                      width={120}
+                      height={80}
+                      style={{
+                        borderRadius: 10,
+                        objectFit: "cover",
+                        flexShrink: 0,
+                      }}
+                    />
 
-                    {/* CONTENT */}
-                    <Stack gap={4} style={{ flex: 1 }}>
-                      <Group justify="space-between" align="flex-start">
-                        <Text fw={700} size="lg">
-                          {order.unit_code}
-                        </Text>
-
-                        <Badge color={status.color} variant="light">
-                          {status.label}
-                        </Badge>
-                      </Group>
+                    {/* CONTENT LEFT */}
+                    <Stack gap={6} style={{ flex: 1 }}>
+                      <Text fw={700} size="md">
+                        {order.unit_code}
+                      </Text>
 
                       <Text size="sm" c="dimmed">
                         Dự án {project.name || "—"}
@@ -236,29 +218,54 @@ useEffect(() => {
                         VND
                       </Text>
 
-                      <Group justify="space-between" mt="xs">
-                        <Text size="sm">
-                          Mã đơn hàng:{" "}
-                          <Text span fw={500}>
-                            {order.contract_code?.slice(0, 6)}
-                          </Text>
+                      <Text size="sm">
+                        Mã đơn hàng:{" "}
+                        <Text span fw={500}>
+                          {order.contract_code}
                         </Text>
+                      </Text>
+                    </Stack>
 
-                        <Text size="sm" c="dimmed">
-                          {new Date(
-                            order.order_date
-                          ).toLocaleString("vi-VN")}
-                        </Text>
-                      </Group>
+                    {/* RIGHT COLUMN */}
+                    <Stack gap={6} align="flex-end">
+                      {/* BADGE */}
+                      <Badge
+                        color={status.color}
+                        variant="light"
+                        radius="xl"
+                      >
+                        {status.label}
+                      </Badge>
+
+                      {/* ICON FOLDER */}
+                      {order.contract_url && (
+                        <IconFolder
+                          size={70}
+                          stroke={1.8}
+                          color="#c0c0c0"
+                          style={{ cursor: "pointer" }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(
+                              order.contract_url,
+                              "_blank"
+                            );
+                          }}
+                        />
+                      )}
+
+                      {/* TIME */}
+                      <Text size="xs" c="dimmed">
+                        {new Date(
+                          order.order_date
+                        ).toLocaleString("vi-VN")}
+                      </Text>
                     </Stack>
                   </Group>
                 </Card>
               );
             })}
         </Stack>
-
-        </div>
-      
       </ScrollArea>
     </div>
   );
