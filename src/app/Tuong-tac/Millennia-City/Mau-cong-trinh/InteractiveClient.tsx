@@ -9,11 +9,11 @@ export default function InteractiveClient() {
   // Lấy project_id và phase_vi từ URL query
   const searchParams = useSearchParams();
   const project_id = searchParams.get("id");
-  const phase = searchParams.get("phase"); // ← phase_vi được truyền từ Menu
+  const layer6 = searchParams.get("layer6"); // ← phase_vi được truyền từ Menu
 
   if (!project_id) return <div>Không có project_id trong URL</div>;
-  if (!phase) return <div>Không có phase trong URL</div>;
+  if (!layer6) return <div>Không có layer6 trong URL</div>;
 
   // Truyền cả project_id và phase vào component ZoningSystem
-  return <ZoningSystem project_id={project_id} phase={phase} />;
+  return <ZoningSystem project_id={project_id} phase={layer6} />;
 }

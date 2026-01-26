@@ -24,7 +24,7 @@ export default function ZoningSystem({
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
    const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
        const searchParams = useSearchParams();
-      const urlPhase = searchParams.get("subzone_vi"); 
+      const urlPhase = searchParams.get("layer4"); 
         const [, setCurrentPhase] = useState<string>(urlPhase || "");
 
   // 🔹 Lọc và highlight SVG
@@ -83,9 +83,9 @@ useEffect(() => {
 }, [urlPhase]);
 
 
-const zoomToPhase = (subzone: string) => {
+const zoomToPhase = (layer4: string) => {
   if (!transformRef.current) return;
-  switch (subzone) {
+  switch (layer4) {
     case "ĐA LỘC":
       transformRef.current.setTransform(-35, -155, 1.5);
       break;

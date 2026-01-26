@@ -17,7 +17,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  subzone_vi?: string;
+  layer4?: string;
   [key: string]: unknown;
 }
 
@@ -44,7 +44,7 @@ export default function Menu({ project_id }: MenuProps) {
       try {
         const body = {
           project_id,
-          filters: [{ label: "group", values: ["ct"] }],
+          filters: [{ label: "layer5", values: ["ct"] }],
         };
 
         const data = await createNodeAttribute(body);
@@ -56,7 +56,7 @@ export default function Menu({ project_id }: MenuProps) {
 
         if (data?.data && Array.isArray(data.data)) {
           const allSubzones: string[] = data.data.flatMap((item: NodeAttributeItem) =>
-            String(item.subzone_vi || "")
+            String(item.layer4 || "")
               .split(";")
               .map((z) => z.trim())
               .filter(Boolean)
@@ -106,10 +106,10 @@ export default function Menu({ project_id }: MenuProps) {
     fetchData();
   }, [project_id]);
 
-  const handleNavigate = (subzone_vi: string) => {
+  const handleNavigate = (layer4: string) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Phuoc-tho/Loai-cong-trinh?id=${project_id}&subzone_vi=${encodeURIComponent(subzone_vi)}`
+      `/Tuong-tac/Phuoc-tho/Loai-cong-trinh?id=${project_id}&layer4=${encodeURIComponent(layer4)}`
     );
   };
 

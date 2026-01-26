@@ -129,9 +129,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     }
   };
 
-  /* ===========================
-     AUTO ZOOM SAU KHI SVG RENDER
-  ============================ */
+
   useEffect(() => {
     if (!transformRef.current) return;
 

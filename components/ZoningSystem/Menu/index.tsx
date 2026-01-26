@@ -40,7 +40,7 @@ export default function Menu({ project_id }: MenuProps) {
       try {
         const body = {
           project_id,
-          filters: [{ label: "group", values: ["ct"] }],
+          filters: [{ label: "layer7", values: ["ct"] }],
         };
 
         const data: ApiResponse = await createNodeAttribute(body);
@@ -53,7 +53,7 @@ export default function Menu({ project_id }: MenuProps) {
         if (data?.data && Array.isArray(data.data)) {
           const allPhases: string[] = data.data.flatMap(
             (item: NodeAttributeItem) =>
-              String(item.phase_vi || "")
+              String(item.layer6 || "")
                 .split(";")
                 .map((z) => z.trim())
                 .filter(Boolean)
@@ -105,9 +105,9 @@ export default function Menu({ project_id }: MenuProps) {
     fetchData();
   }, [project_id]);
 
-  const handleNavigate = (phase: string) => {
+  const handleNavigate = (layer6: string) => {
     if (!project_id) return;
-    router.push(`/Tuong-tac/Millennia-City/Mau-cong-trinh?id=${project_id}&phase=${encodeURIComponent(phase)}`);
+    router.push(`/Tuong-tac/Millennia-City/Mau-cong-trinh?id=${project_id}&layer6=${encodeURIComponent(layer6)}`);
   };
 
   const handleBack = () => {

@@ -39,9 +39,9 @@ export default function Menu({
 }: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const phaseFromQuery = searchParams.get("phase") || initialPhase;
+  const phaseFromQuery = searchParams.get("layer6") || initialPhase;
   const buildingTypeFromQuery =
-    searchParams.get("building_type_vi") || initialBuildingType;
+    searchParams.get("layer3") || initialBuildingType;
 
   // 🟡 Ban đầu không sáng nút nào
   const [active, setActive] = useState<"on" | "off" | null>(null);
@@ -65,9 +65,9 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct", "phase_vi"] },
-          { label: "phase_vi", values: [phaseFromQuery] },
-          { label: "building_type_vi", values: [buildingTypeFromQuery] },
+          { label: "layer7", values: ["ct"] },
+          { label: "layer6", values: [phaseFromQuery] },
+          { label: "layer3", values: [buildingTypeFromQuery] },
         ],
       });
 
@@ -76,11 +76,11 @@ export default function Menu({
 
         // Gọi callback nếu có
         onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.model_building_vi)
+          data.data.map((i: NodeAttributeItem) => i.layer1)
         );
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const modelLabel = item.model_building_vi as string;
+          const modelLabel = item.layer2 as string;
           if (modelLabel?.toLowerCase() === "skip") {
             return;
           }
@@ -123,10 +123,10 @@ export default function Menu({
       const result = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct", "phase_vi"] },
-          { label: "phase_vi", values: [phaseFromQuery] },
-          { label: "building_type_vi", values: [buildingTypeFromQuery] },
-          { label: "model_building_vi", values: [modelName] },
+        { label: "layer7", values: ["ct"] },
+          { label: "layer6", values: [phaseFromQuery] },
+          { label: "layer3", values: [buildingTypeFromQuery] },
+          { label: "layer2", values: [modelName] },
         ],
       });
 

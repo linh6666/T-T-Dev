@@ -11,14 +11,14 @@ import { useSearchParams } from "next/navigation";
 
 interface ZoningSystemProps {
   project_id: string | null;
-  subzone_vi?: string | null; // ✅ đổi từ phase → subzone_vi
+  layer4?: string | null; // ✅ đổi từ phase → subzone_vi
 }
 
-export default function ZoningSystem({ project_id, subzone_vi }: ZoningSystemProps) {
+export default function ZoningSystem({ project_id, layer4 }: ZoningSystemProps) {
    const [activeModels, setActiveModels] = useState<string[]>([]);
     const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
        const searchParams = useSearchParams();
-      const urlPhase = searchParams.get("subzone_vi"); 
+      const urlPhase = searchParams.get("layer4"); 
         const [, setCurrentPhase] = useState<string>(urlPhase || "");
 
      const filteredPaths = useMemo(() => {
@@ -124,7 +124,7 @@ const handlePhaseChange = (newPhase: string) => {
 
       <div className={styles.right}>
         {/* 👇 Truyền cả project_id và subzone_vi xuống Menu */}
-        <Menu project_id={project_id} initialSubzone={subzone_vi}
+        <Menu project_id={project_id} initialSubzone={layer4}
             onModelsLoaded={setActiveModels}
               onPhaseChange={handlePhaseChange} />
       </div>

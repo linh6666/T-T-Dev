@@ -33,7 +33,7 @@ interface MenuItem {
 interface NodeAttributeItem {
   building_type_vi?: string;
   model_building_vi?: string;
-  building_code?: string;
+  layer1?: string;
   [key: string]: unknown;
 }
 
@@ -49,9 +49,9 @@ export default function Menu({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const subzoneFromQuery = searchParams.get("subzone_vi") || initialSubzone || "";
-  const buildingTypeViFromQuery = searchParams.get("building_type_vi") || initialBuildingTypeVi || "";
-  const modelBuildingViFromQuery = searchParams.get("model_building_vi") || initialModelBuildingVi || "";
+  const subzoneFromQuery = searchParams.get("layer4") || initialSubzone || "";
+  const buildingTypeViFromQuery = searchParams.get("layer3") || initialBuildingTypeVi || "";
+  const modelBuildingViFromQuery = searchParams.get("layer2") || initialModelBuildingVi || "";
  const phaseFromQuery = searchParams.get("subzone") || initialSubzone;
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [loadingOn, setLoadingOn] = useState(false);
@@ -76,21 +76,21 @@ useEffect(() => {
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct"] },
-          { label: "subzone_vi", values: [subzoneFromQuery] },
-          { label: "building_type_vi", values: [buildingTypeViFromQuery] },
-          { label: "model_building_vi", values: [modelBuildingViFromQuery] },
+          { label: "layer5", values: ["ct"] },
+          { label: "layer4", values: [subzoneFromQuery] },
+          { label: "layer3", values: [buildingTypeViFromQuery] },
+          { label: "layer2", values: [modelBuildingViFromQuery] },
         ],
       });
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
         const uniqueMap = new Map<string, MenuItem>();
  onModelsLoaded?.(
-        data.data.map((i: NodeAttributeItem) => i.building_code)
+        data.data.map((i: NodeAttributeItem) => i.layer1)
       );
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const type_vi = item.building_code as string || "";
+          const type_vi = item.layer1 as string || "";
           if (type_vi.trim() && !uniqueMap.has(type_vi) && !type_vi.includes("CẢNH QUAN")) {
             uniqueMap.set(type_vi, {
               label: type_vi,
@@ -119,9 +119,9 @@ useEffect(() => {
   const handleBack = () => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Phuoc-tho/Mau-cong-trinh?id=${project_id}&subzone_vi=${encodeURIComponent(
+      `/Tuong-tac/Phuoc-tho/Mau-cong-trinh?id=${project_id}&layer4=${encodeURIComponent(
         subzoneFromQuery
-      )}&building_type_vi=${encodeURIComponent(buildingTypeViFromQuery)}`
+      )}&layer3=${encodeURIComponent(buildingTypeViFromQuery)}`
     );
   };
 
@@ -132,11 +132,11 @@ useEffect(() => {
       await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct"] },
-          { label: "subzone_vi", values: [subzoneFromQuery] },
-          { label: "building_type_vi", values: [buildingTypeViFromQuery] },
-          { label: "model_building_vi", values: [modelBuildingViFromQuery] },
-          { label: "building_code", values: [modelName] },
+               { label: "layer5", values: ["ct"] },
+          { label: "layer4", values: [subzoneFromQuery] },
+          { label: "layer3", values: [buildingTypeViFromQuery] },
+          { label: "layer2", values: [modelBuildingViFromQuery] }, 
+          { label: "layer1", values: [modelName] },
         ],
       });
       //  onModelsLoaded?.([modelName]); đoạn là chỉ hiển thị 1 svg theo từng nút 

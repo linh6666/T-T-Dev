@@ -36,6 +36,7 @@ import { useRef, useState } from "react";
 const AppAction = ({
   language = "vi", // Mặc định là tiếng Việt
   openModal,
+  label,
   openModalEdit,
   openModalDelete,
   openModalupdateExel,
@@ -48,6 +49,7 @@ const AppAction = ({
   exportExcel,
   handleAggregate,
   handleUpdateRank,
+  
 
   isShowOtherAction = false,
   isCustomerUpdate = false,
@@ -184,7 +186,7 @@ const AppAction = ({
     color="blue"
     variant="outline"
   >
-    {language === 'vi' ? 'Thêm mới' : 'Add New'}
+{label ?? (language === 'vi' ? 'Thêm mới' : 'Add New')}
   </Button>
           )}
           {openModalAssign && (
@@ -360,4 +362,5 @@ type AppActionProps = {
   isShowOtherAction?: boolean;
   isUpdateSearchItem?: boolean;
   isCustomerUpdate?: boolean;
+   label?: string;
 };

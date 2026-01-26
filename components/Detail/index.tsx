@@ -18,15 +18,15 @@ interface ZoningSystemProps {
 
 export default function ZoningSystem({ project_id }: ZoningSystemProps) {
   const searchParams = useSearchParams();
-  const urlPhase = searchParams.get("phase");
+  const urlPhase = searchParams.get("layer6");
   const [currentPhase, setCurrentPhase] = useState<string>(urlPhase || "");
   const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
 
   // ✅ Hàm pan/zoom tới phase tương ứng
-  const panToPhase = (phase: string) => {
+  const panToPhase = (layer6: string) => {
     if (!transformRef.current) return;
 
-    switch (phase) {
+    switch (layer6) {
       case "THE MARINA":
         transformRef.current.setTransform(-117, -81, 1.2);
         break;

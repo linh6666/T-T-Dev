@@ -26,7 +26,7 @@ export default function ZoningSystem({
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
    const searchParams = useSearchParams();
-    const urlPhase = searchParams.get("phase"); 
+    const urlPhase = searchParams.get("layer6"); 
     const [, setCurrentPhase] = useState<string>(urlPhase || "");
 
   // ✅ ref để điều khiển zoom/pan
@@ -80,9 +80,9 @@ useEffect(() => {
   return () => clearTimeout(timer);
 }, [urlPhase]);
 
-const zoomToPhase = (phase: string) => {
+const zoomToPhase = (layer6: string) => {
   if (!transformRef.current) return;
-  switch (phase) {
+  switch (layer6) {
     case "THE MARINA":
       transformRef.current.setTransform(-3, -75, 1.2);
       break;

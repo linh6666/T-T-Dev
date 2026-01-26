@@ -23,7 +23,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  building_type_vi?: string;
+  layer3?: string;
   group?: string;
   [key: string]: unknown;
 }
@@ -59,8 +59,8 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct"] },
-          { label: "phase_vi", values: [phase] },
+          { label: "layer7", values: ["ct"] },
+          { label: "layer6", values: [phase] },
         ],
       });
 
@@ -68,7 +68,7 @@ export default function Menu({
         const uniqueMap = new Map<string, MenuItem>();
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const buildingType = item.building_type_vi || "";
+          const buildingType = item.layer3 || "";
           const groupValue = item.group;
 
           // 🆕 LOGIC LỌC: Bỏ qua nếu building_type_vi là "skip" (không phân biệt chữ hoa/thường)
@@ -110,9 +110,9 @@ export default function Menu({
   const handleNavigate = (phase: string, buildingType: string) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Millennia-City/Cong-trinh?id=${project_id}&phase=${encodeURIComponent(
+      `/Tuong-tac/Millennia-City/Cong-trinh?id=${project_id}&layer6=${encodeURIComponent(
         phase
-      )}&building_type_vi=${encodeURIComponent(buildingType)}`
+      )}&layer3=${encodeURIComponent(buildingType)}`
     );
   };
 

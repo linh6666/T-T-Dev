@@ -27,7 +27,7 @@ interface MenuItem {
 
 interface NodeAttributeItem {
   building_type_vi?: string;
-  model_building_vi?: string;
+layer2?: string;
   [key: string]: unknown;
 }
 
@@ -42,9 +42,9 @@ export default function Menu({
   const searchParams = useSearchParams();
 
   const subzoneFromQuery =
-    searchParams.get("subzone_vi") || initialSubzone || "";
+    searchParams.get("layer4") || initialSubzone || "";
   const buildingTypeViFromQuery =
-    searchParams.get("building_type_vi") || initialBuildingTypeVi || "";
+    searchParams.get("layer3") || initialBuildingTypeVi || "";
 
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -53,7 +53,7 @@ export default function Menu({
   // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(
   //   null
   // );
-   const phaseFromQuery = searchParams.get("subzone") || initialSubzone;
+   const phaseFromQuery = searchParams.get("layer4") || initialSubzone;
 
   const [loadingOn, setLoadingOn] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,9 +76,9 @@ useEffect(() => {
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct"] },
-          { label: "subzone_vi", values: [subzoneFromQuery] },
-          { label: "building_type_vi", values: [buildingTypeViFromQuery] },
+          { label: "layer5", values: ["ct"] },
+          { label: "layer4", values: [subzoneFromQuery] },
+          { label: "layer3", values: [buildingTypeViFromQuery] },
         ],
       });
 
@@ -86,11 +86,11 @@ useEffect(() => {
         const uniqueMap = new Map<string, MenuItem>();
 
         onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
+          data.data.map((i: NodeAttributeItem) => i.layer1)
         );
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const type_vi = (item.model_building_vi as string) || "";
+          const type_vi = (item.layer2 as string) || "";
           if (
             type_vi.trim() &&
             !uniqueMap.has(type_vi) &&
@@ -126,24 +126,24 @@ useEffect(() => {
   }, [project_id, subzoneFromQuery, buildingTypeViFromQuery, onModelsLoaded]);
 
   const handleNavigate = (
-    subzone: string,
-    building_type_vi: string,
-    model_building_vi: string
+    layer4: string,
+    layer3: string,
+    layer2: string
   ) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Phuoc-tho/Cong-trinh?id=${project_id}&subzone_vi=${encodeURIComponent(
-        subzone
-      )}&building_type_vi=${encodeURIComponent(
-        building_type_vi
-      )}&model_building_vi=${encodeURIComponent(model_building_vi)}`
+      `/Tuong-tac/Phuoc-tho/Cong-trinh?id=${project_id}&layer4=${encodeURIComponent(
+        layer4
+      )}&layer3=${encodeURIComponent(
+        layer3
+      )}&layer2=${encodeURIComponent(layer2)}`
     );
   };
 
   const handleBack = () => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Phuoc-tho/Loai-cong-trinh?id=${project_id}&subzone_vi=${encodeURIComponent(
+      `/Tuong-tac/Phuoc-tho/Loai-cong-trinh?id=${project_id}&layer4=${encodeURIComponent(
         subzoneFromQuery
       )}`
     );

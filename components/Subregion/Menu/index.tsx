@@ -24,7 +24,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  building_type_vi?: string;
+  layer3?: string;
   [key: string]: unknown;
 }
 
@@ -36,7 +36,7 @@ export default function Menu({
 }: MenuProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const subzoneFromQuery = searchParams.get("subzone_vi") || initialSubzone;
+  const subzoneFromQuery = searchParams.get("layer4") || initialSubzone;
    const phaseFromQuery = searchParams.get("subzone") || initialSubzone;
 
   const [active, setActive] = useState<"on" | "off" | null>(null);
@@ -64,8 +64,8 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ct"] },
-          { label: "subzone_vi", values: [subzoneFromQuery] },
+          { label: "layer5", values: ["ct"] },
+          { label: "layer4", values: [subzoneFromQuery] },
         ],
       });
 
@@ -75,11 +75,11 @@ export default function Menu({
         const uniqueMap = new Map<string, MenuItem>();
 
         onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
+          data.data.map((i: NodeAttributeItem) => i.layer1)
         );
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const type_vi = (item.building_type_vi as string) || "";
+          const type_vi = (item.layer3 as string) || "";
 
           if (type_vi.trim() && !uniqueMap.has(type_vi)) {
             uniqueMap.set(type_vi, {
@@ -106,12 +106,12 @@ export default function Menu({
     fetchData();
   }, [project_id, subzoneFromQuery, onModelsLoaded]);
 
-  const handleNavigate = (subzone: string, building_type_vi: string) => {
+  const handleNavigate = (layer4: string,layer3: string) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Phuoc-tho/Mau-cong-trinh?id=${project_id}&subzone_vi=${encodeURIComponent(
-        subzone
-      )}&building_type_vi=${encodeURIComponent(building_type_vi)}`
+      `/Tuong-tac/Phuoc-tho/Mau-cong-trinh?id=${project_id}&layer4=${encodeURIComponent(
+        layer4
+      )}&layer3=${encodeURIComponent(layer3)}`
     );
   };
 
@@ -194,10 +194,6 @@ export default function Menu({
                 color="orange"
                 style={{
                   marginBottom: "10px",
-                  // background:
-                  //   isMultiMode === "multi"
-                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                  //     : undefined,
                 }}
               >
                 {item.label}
@@ -213,11 +209,7 @@ export default function Menu({
 
       <div className={styles.footer}>
         <Stack align="center" gap="xs">
-          {/* <Function
-            activeMode={isMultiMode}
-            setActiveMode={setIsMultiMode}
-            onMultiModeClick={handleMultiModeClick}
-          /> */}
+     
           <Group gap="xs">
             <Button
               style={getButtonStyle(active === "on")}

@@ -224,7 +224,7 @@ const CreateView = ({ onSearch }: CreateViewProps) => {
       />
 
       <Checkbox
-        label="Hoạt động"
+        label="Kích hoạt tài khoản"
         mt="md"
         {...form.getInputProps("is_active", { type: "checkbox" })}
       />
