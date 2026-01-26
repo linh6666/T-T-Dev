@@ -99,23 +99,34 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
 
   return (
     <div style={{ display: "flex", gap: "12px", zIndex: 10 }}>
-      <button
-        onClick={() => setOpened(true)}
-        style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "50%",
-          border: "none",
-          backgroundColor: "#fff",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <IconPlus size={20} color="#752E0B" />
-      </button>
+    <button
+  onClick={() => setOpened(true)}
+  style={{
+    height: "40px",
+    padding: "0 14px",
+    borderRadius: "20px",
+    border: "none",
+    backgroundColor: "#fff",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    whiteSpace: "nowrap",
+  }}
+>
+  <IconPlus size={20} color="#752E0B" />
+  <span
+    style={{
+      fontSize: "14px",
+      fontWeight: 500,
+      color: "#752E0B",
+    }}
+  >
+    Tạo đơn hàng
+  </span>
+</button>
+
 
       <Modal
         opened={opened}
