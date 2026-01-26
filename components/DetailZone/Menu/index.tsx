@@ -141,7 +141,7 @@ export default function Menu({
   const handleBack = () => {
     if (!project_id || !phaseFromQuery) return;
     router.push(
-      `/Tuong-tac/Millennia-City/Mau-cong-trinh?id=${project_id}&phase=${encodeURIComponent(phaseFromQuery)}`
+      `/Tuong-tac/Millennia-City/Mau-cong-trinh?id=${project_id}&layer6=${encodeURIComponent(phaseFromQuery)}`
     );
   };
 
