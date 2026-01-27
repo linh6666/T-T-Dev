@@ -22,8 +22,8 @@ export default function Menu({ project_id }: MenuProps) {
     { label: "HỆ THỐNG PHÂN KHU", link: `/Tuong-tac/Millennia-City/Phan-khu${project_id ? `?id=${project_id}` : ""}` },
      { label: "HỆ THỐNG TIỆN ÍCH", link: `/Tuong-tac/Millennia-City/Tien-ich${project_id ? `?id=${project_id}` : ""}` } ,
     { label: "HIỆU ỨNG ÁNH SÁNG", link: `/Tuong-tac/Millennia-City/Hieu-ung-anh-sang${project_id ? `?id=${project_id}` : ""}` },
-    { label: "THƯ VIỆN", link: `/Tuong-tac/Millennia-City/Thu-vien-anh${project_id ? `?id=${project_id}` : ""}` },
-    { label: "MÔ HÌNH", link: `/Tuong-tac/Millennia-City/Mo-hinh${project_id ? `?id=${project_id}` : ""}` },
+    { label: "THƯ VIỆN ẢNH", link: `/Tuong-tac/Millennia-City/Thu-vien-anh${project_id ? `?id=${project_id}` : ""}` },
+    { label: "HƯỚNG DẪN SỬ DỤNG", link: `/Tuong-tac/Millennia-City/Mo-hinh${project_id ? `?id=${project_id}` : ""}` },
   
   ];
 
@@ -48,32 +48,17 @@ export default function Menu({ project_id }: MenuProps) {
       <div className={styles.Function}>
         <Stack align="center" style={{ gap: "20px", marginTop: "30px" }}>
           {/* 5 nút đầu */}
-          {menuItems.slice(0, 4).map((item) => (
-            <Button
-              key={item.link}
-              className={styles.menuBtn}
-              onClick={() => router.push(item.link)}
-              variant="outline"
-            >
-              {item.label}
-            </Button>
-          ))}
+       {menuItems.map((item) => (
+  <Button
+    key={item.link}
+    className={styles.menuBtn}
+    onClick={() => router.push(item.link)}
+    variant="outline"
+  >
+    {item.label}
+  </Button>
+))}
 
-          {/* 2 nút cuối */}
-          <div className={styles.bottomTwo}>
-            {menuItems.slice(4).map((item) => (
-              <Button
-                key={item.link}
-                className={styles.menuBtnSmall}
-                onClick={() => router.push(item.link)}
-                variant="outline"
-                w="auto"
-                style={{ display: "inline-block" }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </div>
         </Stack>
       </div>
 
