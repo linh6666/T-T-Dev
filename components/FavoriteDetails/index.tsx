@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styles from "./FavoriteDetails.module.css";
 import {
   IconBath,
@@ -47,10 +47,13 @@ export default function FavoriteDetails() {
   const [activeItem, setActiveItem] =
     useState<FavoriteItem | null>(null);
 
-  // map id → danh sách ảnh
+  // map unit_code -> danh sách ảnh
   const [imageMap, setImageMap] = useState<
     Record<string, string[]>
   >({});
+
+  // chặn fetch ảnh nhiều lần
+  const fetchedImagesRef = useRef(false);
 
   /* =======================
      FETCH FAVORITES
@@ -60,6 +63,8 @@ export default function FavoriteDetails() {
 
     const fetchFavorites = async () => {
       try {
+        setLoading(true);
+
         const res = await getListFavorites(projectId);
         const data: FavoriteItem[] = res.data || [];
 
@@ -69,6 +74,9 @@ export default function FavoriteDetails() {
           setActiveItem(data[0]);
           setPreviewItem(data[0]);
         }
+
+        // reset để fetch ảnh lại khi project đổi
+        fetchedImagesRef.current = false;
       } catch (error) {
         console.error("Lỗi khi lấy favorites:", error);
       } finally {
@@ -80,33 +88,40 @@ export default function FavoriteDetails() {
   }, [projectId]);
 
   /* =======================
-     FETCH IMAGES
+     FETCH IMAGES (LOGIC FIX)
   ======================= */
   useEffect(() => {
-    if (!projectId || favorites.length === 0) return;
+    if (
+      !projectId ||
+      favorites.length === 0 ||
+      fetchedImagesRef.current
+    )
+      return;
+
+    fetchedImagesRef.current = true;
 
     const fetchImages = async () => {
       const map: Record<string, string[]> = {};
 
-      await Promise.all(
-        favorites.map(async (item) => {
-          try {
-            const res: HomeImage[] = await Getlisthome({
-              project_id: projectId,
-              unit_code: item.unit_code,
-            });
+      // ❗ không Promise.all → tránh race condition
+      for (const item of favorites) {
+        try {
+          const res: HomeImage[] = await Getlisthome({
+            project_id: projectId,
+            unit_code: item.unit_code,
+          });
 
-            map[item.id] = res?.map((img) => img.url) || [];
-          } catch (error) {
-            console.error(
-              "Lỗi lấy ảnh:",
-              item.unit_code,
-              error
-            );
-            map[item.id] = [];
-          }
-        })
-      );
+          map[item.unit_code] =
+            res?.map((img) => img.url) || [];
+        } catch (error) {
+          console.error(
+            "Lỗi lấy ảnh:",
+            item.unit_code,
+            error
+          );
+          map[item.unit_code] = [];
+        }
+      }
 
       setImageMap(map);
     };
@@ -160,7 +175,7 @@ export default function FavoriteDetails() {
                     {/* IMAGE LEFT */}
                     <Image
                       src={
-                        imageMap[item.id]?.[0] ||
+                        imageMap[item.unit_code]?.[0] ||
                         "/no-image.png"
                       }
                       alt={item.unit_code}
@@ -219,15 +234,18 @@ export default function FavoriteDetails() {
                           item.favorite_id
                         );
 
-                        setFavorites((prev) =>
-                          prev.filter(
+                        setFavorites((prev) => {
+                          const next = prev.filter(
                             (f) =>
                               f.favorite_id !==
                               item.favorite_id
-                          )
-                        );
+                          );
 
-                        setPreviewItem(null);
+                          setActiveItem(next[0] || null);
+                          setPreviewItem(next[0] || null);
+
+                          return next;
+                        });
                       }}
                     >
                       <IconHeartFilled
@@ -250,7 +268,7 @@ export default function FavoriteDetails() {
               <div className={styles.gallery}>
                 <Image
                   src={
-                    imageMap[previewItem.id]?.[0] ||
+                    imageMap[previewItem.unit_code]?.[0] ||
                     "/no-image.png"
                   }
                   alt={previewItem.unit_code}
@@ -262,8 +280,9 @@ export default function FavoriteDetails() {
                 <div className={styles.subImages}>
                   <Image
                     src={
-                      imageMap[previewItem.id]?.[1] ||
-                      "/no-image.png"
+                      imageMap[
+                        previewItem.unit_code
+                      ]?.[1] || "/no-image.png"
                     }
                     alt={`${previewItem.unit_code} - ảnh phụ 1`}
                     fit="cover"
@@ -274,8 +293,9 @@ export default function FavoriteDetails() {
 
                   <Image
                     src={
-                      imageMap[previewItem.id]?.[2] ||
-                      "/no-image.png"
+                      imageMap[
+                        previewItem.unit_code
+                      ]?.[2] || "/no-image.png"
                     }
                     alt={`${previewItem.unit_code} - ảnh phụ 2`}
                     fit="cover"
