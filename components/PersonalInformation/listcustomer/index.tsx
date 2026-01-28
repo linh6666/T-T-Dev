@@ -11,7 +11,7 @@ import {
   Button,
 } from "@mantine/core";
 import styles from "./Interact.module.css";
-import { getListProject } from "../../../api/apigetlistProjectControl";
+import { getListProject } from "../../../api/apigetlistProject";
 import ProjectDetail from "./ProjectDetail";
 
 /* =======================
