@@ -185,13 +185,13 @@ export default function ProjectDetail({ project }: Props) {
                     router.push(`/chi-tiet-don/${order.id}`)
                   }
                 >
-                  <Group wrap="nowrap" align="flex-start">
+                 <Group wrap="nowrap" align="stretch">
                     {/* IMAGE */}
                     <Image
                       src={imageMap[order.id] || "/no-image.png"}
                       alt={order.unit_code}
-                      width={120}
-                      height={80}
+                      width={170}
+                      height={0}
                       style={{
                         borderRadius: 10,
                         objectFit: "cover",
