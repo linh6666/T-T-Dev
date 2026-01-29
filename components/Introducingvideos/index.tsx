@@ -50,7 +50,7 @@ export default function VideoPage() {
         src="https://www.youtube.com/embed/KwxqLtMP4jk?autoplay=1&mute=1"
         title="Video giới thiệu"
         frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;fullscreen"
         allowFullScreen
       ></iframe>
 

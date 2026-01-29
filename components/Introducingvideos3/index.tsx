@@ -46,13 +46,13 @@ export default function VideoPage() {
   return (
     <Container className={styles.videoContainer}>
       <iframe
-        className={styles.videoIframe}
-        src="https://www.youtube.com/embed/FbvLxeUz6bo?autoplay=1&mute=1"
-        title="Video giới thiệu"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+  className={styles.videoIframe}
+  src="https://www.youtube.com/embed/FbvLxeUz6bo?autoplay=1&mute=1"
+  title="Video giới thiệu"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+  allowFullScreen
+></iframe>
 
       <Button
         className={styles.backButton}

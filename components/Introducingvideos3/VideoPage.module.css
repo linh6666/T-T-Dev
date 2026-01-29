@@ -5,14 +5,7 @@
   /* margin: 20px; */
 }
 
-.videoIframe {
-  width: 100%;
-  max-width: 1100px;
-  height: 550px;
-  border: 5px solid #752E0B; /* Viền cho khung video */
-  border-radius: 10px; /* Bo góc */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Bóng đổ */
-}
+.videoIframe { width: 100%; max-width: 1100px; aspect-ratio: 16 / 9; border: 5px solid #752E0B; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
 
 .backButton {
   align-self: flex-end; /* Căn nút sang phải */
