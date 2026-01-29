@@ -325,12 +325,12 @@ export default function Menu({
       {/* Footer */}
       <div className={styles.footer}>
         <Stack align="center" gap="xs">
-          <Function
+          {/* <Function
             activeMode={isMultiMode}
             setActiveMode={setIsMultiMode}
             onMultiModeClick={handleMultiModeAPI}
             onSelectModel={onSelectModel}
-          />
+          /> */}
 
           <Group gap="xs">
             <Button

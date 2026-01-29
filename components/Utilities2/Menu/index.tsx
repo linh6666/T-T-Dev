@@ -248,11 +248,11 @@ const handleClickOn = async () => {
 
       <div className={styles.footer}>
        <Stack align="center" gap="xs">
-                 <Function
+                 {/* <Function
                    activeMode={isMultiMode}
                    setActiveMode={setIsMultiMode}
                    onMultiModeClick={handleMultiModeAPI}
-                 />
+                 /> */}
        
                  <Group gap="xs">
                    {/* ON */}

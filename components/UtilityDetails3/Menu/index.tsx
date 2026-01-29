@@ -253,12 +253,12 @@ if (subzone.toLowerCase() === "skip") return;
       {/* Footer */}
       <div className={styles.footer}>
         <Stack align="center" gap="xs">
-          <Function
+          {/* <Function
             activeMode={isMultiMode}
             setActiveMode={setIsMultiMode}
             onMultiModeClick={handleMultiModeAPI}
             onSelectModel={onSelectModel}
-          />
+          /> */}
 
           <Group gap="xs">
             {/* ON */}

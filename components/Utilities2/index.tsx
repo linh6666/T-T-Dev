@@ -39,7 +39,8 @@ const filteredPaths = useMemo(() => {
           if (activeMode === "multi") {
             el.setAttribute("fill", "#bb8d38");
             el.setAttribute("stroke", "white");
-          } else if (
+          } 
+          else if (
             selectedModel &&
             cleanElId.includes(selectedModel.replace(/\s+/g, "_").toUpperCase())
           ) {
@@ -108,7 +109,9 @@ const filteredPaths = useMemo(() => {
         >
           <TransformComponent>
         <div className={styles.imageWrapper}>
-          <Image src="/image/Home_ca_mau.png" alt="Ảnh" className={styles.img} />
+          <Image 
+         src="/Sales/ttcamau.jpg"
+          alt="Ảnh" className={styles.img} />
 
         {filteredPaths.map((item) => {
   console.log("🟩 SVG được render lên UI:", item.id);
