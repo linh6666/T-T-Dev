@@ -8,7 +8,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifilter";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
-import Function from "./Function";
+// import Function from "./Function";
 
 interface MenuProps {
   project_id: string | null;
@@ -52,8 +52,8 @@ export default function Menu({
   const valuelayer3 = searchParams.get("layer3") || initialLayer3 || "";
 
   // ⚙️ State
-  const [isMultiMode, setIsMultiMode] =
-    useState<"single" | "multi" | null>(null);
+  // const [isMultiMode, setIsMultiMode] =
+  //   useState<"single" | "multi" | null>(null);
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
   const [layer4, setlayer4] = useState<string>(valuelayer4 || "");
@@ -187,39 +187,39 @@ export default function Menu({
     }
   };
 
-  const handleMultiModeAPI = async () => {
-    if (!project_id || !phase || !layer4 || !layer3) return;
+  // const handleMultiModeAPI = async () => {
+  //   if (!project_id || !phase || !layer4 || !layer3) return;
 
-    try {
-      console.log("🔄 MULTI MODE → gọi lại API...");
+  //   try {
+  //     console.log("🔄 MULTI MODE → gọi lại API...");
 
-      const res = await createNodeAttribute({
-        project_id,
-        filters: [
-          { label: "layer6", values: ["ct"] },
-          { label: "layer5", values: [phase] },
-          { label: "layer4", values: [layer4] },
-          { label: "layer3", values: [layer3] },
-        ],
-      });
+  //     const res = await createNodeAttribute({
+  //       project_id,
+  //       filters: [
+  //         { label: "layer6", values: ["ct"] },
+  //         { label: "layer5", values: [phase] },
+  //         { label: "layer4", values: [layer4] },
+  //         { label: "layer3", values: [layer3] },
+  //       ],
+  //     });
 
-      console.log("🔥 MULTI MODE API:", res);
+  //     console.log("🔥 MULTI MODE API:", res);
 
-      // 🟢 Gửi layer2 về để SVG hiển thị
-      if (res?.data && Array.isArray(res.data)) {
-        const models = res.data
-          .map((i: NodeAttributeItem) => i.layer2)
-          .filter((v: string | undefined) => v && v !== "skip");
+  //     // 🟢 Gửi layer2 về để SVG hiển thị
+  //     if (res?.data && Array.isArray(res.data)) {
+  //       const models = res.data
+  //         .map((i: NodeAttributeItem) => i.layer2)
+  //         .filter((v: string | undefined) => v && v !== "skip");
 
-        console.log("🟢 MULTI MODE activeModels:", models);
+  //       console.log("🟢 MULTI MODE activeModels:", models);
 
-        // cập nhật lại danh sách model để SVG map đúng
-        onModelsLoaded?.(models);
-      }
-    } catch (error) {
-      console.error("❌ Lỗi MULTI MODE API:", error);
-    }
-  };
+  //       // cập nhật lại danh sách model để SVG map đúng
+  //       onModelsLoaded?.(models);
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Lỗi MULTI MODE API:", error);
+  //   }
+  // };
 
   const getButtonStyle = (isActive: boolean) => ({
     width: 30,
@@ -269,12 +269,12 @@ export default function Menu({
                 color="orange"
                 style={{
                   marginBottom: "10px",
-                  background:
-                    isMultiMode === "multi"
-                      ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                      : undefined,
+                  // background:
+                  //   isMultiMode === "multi"
+                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
+                  //     : undefined,
                 }}
-                disabled={isMultiMode === "multi"}
+                // disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>

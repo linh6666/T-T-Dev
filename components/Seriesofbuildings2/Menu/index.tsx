@@ -8,7 +8,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifilter3";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
-import Function from "./Function";
+// import Function from "./Function";
 import ModalItem from "./ModalItem"; // 👉 import modal riêng
 
 interface MenuProps {
@@ -75,7 +75,7 @@ export default function Menu({
   const valuelayer2 = searchParams.get("layer2") || initialLayer2 || "";
 
   // STATE
-  const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null);
+  // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null);
   const [active, setActive] = useState<"on" | "off" | null>(null);
   const [phase, setPhase] = useState<string>(phaseValue || "");
   const [layer2, setLayer2] = useState<string>(valuelayer2 || "");
@@ -186,9 +186,9 @@ export default function Menu({
       setSelectedData(itemData); // truyền trực tiếp vào modal
       setOpened(true);
 
-      if (isMultiMode !== "multi") {
+      
         onSelectModel?.(layer1);
-      }
+      
     }
   } catch (error) {
     console.error("❌ Lỗi khi gọi API:", error);
@@ -197,36 +197,36 @@ export default function Menu({
 
 
   // MULTI MODE – Lấy toàn bộ model thuộc tầng
-  const handleMultiModeAPI = async () => {
-    if (!project_id || !phase || !layer2) return;
+  // const handleMultiModeAPI = async () => {
+  //   if (!project_id || !phase || !layer2) return;
 
-    try {
-      console.log("🔄 MULTI MODE → gọi lại API...");
+  //   try {
+  //     console.log("🔄 MULTI MODE → gọi lại API...");
 
-      const res = await createNodeAttribute({
-        project_id,
-        filters: [
-          { values: ["ct"] },
-          { label: "layer3", values: [phase] },
-          { label: "layer2", values: [layer2] },
-        ],
-      });
+  //     const res = await createNodeAttribute({
+  //       project_id,
+  //       filters: [
+  //         { values: ["ct"] },
+  //         { label: "layer3", values: [phase] },
+  //         { label: "layer2", values: [layer2] },
+  //       ],
+  //     });
 
-      console.log("🔥 MULTI MODE API:", res);
+  //     console.log("🔥 MULTI MODE API:", res);
 
-      if (Array.isArray(res?.data)) {
-        const models = res.data
-          .map((i: NodeAttributeItem) => i.layer1)
-          .filter((v: string | undefined) => v && v !== "skip");
+  //     if (Array.isArray(res?.data)) {
+  //       const models = res.data
+  //         .map((i: NodeAttributeItem) => i.layer1)
+  //         .filter((v: string | undefined) => v && v !== "skip");
 
-        console.log("🟢 MULTI MODE activeModels:", models);
+  //       console.log("🟢 MULTI MODE activeModels:", models);
 
-        onModelsLoaded?.(models);
-      }
-    } catch (error) {
-      console.error("❌ Lỗi MULTI MODE API:", error);
-    }
-  };
+  //       onModelsLoaded?.(models);
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Lỗi MULTI MODE API:", error);
+  //   }
+  // };
 
   // Back
   const handleBack = () => {
@@ -304,12 +304,12 @@ export default function Menu({
                 color="orange"
                 style={{
                   marginBottom: "10px",
-                  background:
-                    isMultiMode === "multi"
-                      ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                      : undefined,
+                  // background:
+                  //   isMultiMode === "multi"
+                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
+                  //     : undefined,
                 }}
-                disabled={isMultiMode === "multi"}
+                // disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>

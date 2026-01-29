@@ -8,7 +8,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifiterutilities";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
-import Function from "./Function";
+// import Function from "./Function";
 
 interface MenuProps {
   project_id: string | null;
@@ -30,8 +30,8 @@ export default function Menu({ project_id,onModelsLoaded, onSelectModel }: MenuP
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
     const [active, setActive] = useState<"on" | "off" | null>(null);
-      const [isMultiMode, setIsMultiMode] =
-        useState<"single" | "multi" | null>(null);
+      // const [isMultiMode, setIsMultiMode] =
+      //   useState<"single" | "multi" | null>(null);
       // const [loading, setLoading] = useState(false);
       const [loadingOn, setLoadingOn] = useState(false);
 
@@ -95,28 +95,28 @@ useEffect(() => {
 }, [project_id, onModelsLoaded]);
 
 
-const handleMultiModeAPI = async () => {
-    if (!project_id ) return;
+// const handleMultiModeAPI = async () => {
+//     if (!project_id ) return;
 
-    try {
-      console.log("🔄 MULTI MODE → gọi lại API...");
-      const res = await createNodeAttribute({
-        project_id,
-        filters: [
-          { label: "layer6", values: ["ti"] },
+//     try {
+//       console.log("🔄 MULTI MODE → gọi lại API...");
+//       const res = await createNodeAttribute({
+//         project_id,
+//         filters: [
+//           { label: "layer6", values: ["ti"] },
          
-        ],
-      });
+//         ],
+//       });
 
-      console.log("🔥 MULTI MODE API:", res);
+//       console.log("🔥 MULTI MODE API:", res);
 
-      if (res?.data && Array.isArray(res.data)) {
-        onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.building_code));
-      }
-    } catch (error) {
-      console.error("❌ Lỗi MULTI MODE API:", error);
-    }
-  };
+//       if (res?.data && Array.isArray(res.data)) {
+//         onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.building_code));
+//       }
+//     } catch (error) {
+//       console.error("❌ Lỗi MULTI MODE API:", error);
+//     }
+//   };
 
 
 
@@ -227,12 +227,12 @@ const handleClickOn = async () => {
                 // onClick={() => handleNavigate(item.label)}
                  style={{
                   marginBottom: "10px",
-                  background:
-                    isMultiMode === "multi"
-                      ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                      : undefined,
+                  // background:
+                  //   isMultiMode === "multi"
+                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
+                  //     : undefined,
                 }}
-                disabled={isMultiMode === "multi"}
+                // disabled={isMultiMode === "multi"}
                 
               >
                 {item.label}

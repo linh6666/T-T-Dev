@@ -6,7 +6,6 @@ import {
   IconUser,
   IconCalendar,
   IconLogout,
-  // IconHeartFilled,
   IconBuildingWarehouse,
   IconList,
   
@@ -15,11 +14,15 @@ import {
 } from "@tabler/icons-react";
 import { Loader, Container,  Text } from "@mantine/core";
 import { getCurrentUser } from "../../api/apiProfile";
+import {getListProject } from "../../api/apigetlistProjectControl";
+import { releaseControl } from "../../api/DeleteControl";
+
 import ProfileInfo from "./Profile";
 import  Project from "./Project";
 import  Listcustomer from "./listcustomer";
 import  Order from "./Order";
 import ResetPasswword from "./ResetPasswword";
+// import { jwtDecode } from "jwt-decode";
 
 
 interface User {
@@ -74,18 +77,26 @@ export default function ProfilePage() {
   }
 
   // 🧠 Hàm xử lý đăng xuất
- const handleLogout = () => {
+ const handleLogout = async () => {
   const confirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất?");
   if (!confirmed) return;
-
+    const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("access_token") || ""
+      : "";
+  const projectData = await getListProject({token});
+  const projectId = projectData.data[0].id;
+  // console.log("ddd: ", projectData.data[0].id) 
+  await releaseControl(projectId!)
   // ✅ Xóa token trong localStorage
+
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
 
   // ✅ Xóa thông tin user trong state
   setUser(null);
 
-  // ✅ Load lại trang về /
+  // // ✅ Load lại trang về /
   window.location.href = "/";
 };
 

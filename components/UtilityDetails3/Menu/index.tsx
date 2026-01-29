@@ -8,7 +8,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifiterutilities3";
 import { createON } from "../../../api/apiON";
 import { createOFF } from "../../../api/apiOFF";
-import Function from "./Function";
+// import Function from "./Function";
 
 interface MenuProps {
   project_id: string | null;
@@ -41,8 +41,8 @@ export default function Menu({
   const phaseFromQuery = searchParams.get("layer2") || initiallayer2;
 
   const [active, setActive] = useState<"on" | "off" | null>(null);
-  const [isMultiMode, setIsMultiMode] =
-    useState<"single" | "multi" | null>(null);
+  // const [isMultiMode, setIsMultiMode] =
+  //   useState<"single" | "multi" | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingOn, setLoadingOn] = useState(false);
@@ -123,29 +123,29 @@ if (subzone.toLowerCase() === "skip") return;
   };
 
   // ❗❗ MULTI MODE API
-  const handleMultiModeAPI = async () => {
-    if (!project_id || !phaseFromQuery) return;
+  // const handleMultiModeAPI = async () => {
+  //   if (!project_id || !phaseFromQuery) return;
 
-    try {
-      console.log("🔄 MULTI MODE → gọi lại API...");
-      const res = await createNodeAttribute({
-        project_id,
-        filters: [
-          { values: ["ti"] },
-         { label: "layer2", values: [phaseFromQuery] },
+  //   try {
+  //     console.log("🔄 MULTI MODE → gọi lại API...");
+  //     const res = await createNodeAttribute({
+  //       project_id,
+  //       filters: [
+  //         { values: ["ti"] },
+  //        { label: "layer2", values: [phaseFromQuery] },
          
-        ],
-      });
+  //       ],
+  //     });
 
-      console.log("🔥 MULTI MODE API:", res);
+  //     console.log("🔥 MULTI MODE API:", res);
 
-      if (res?.data && Array.isArray(res.data)) {
-        onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.layer1));
-      }
-    } catch (error) {
-      console.error("❌ Lỗi MULTI MODE API:", error);
-    }
-  };
+  //     if (res?.data && Array.isArray(res.data)) {
+  //       onModelsLoaded?.(res.data.map((i: NodeAttributeItem) => i.layer1));
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Lỗi MULTI MODE API:", error);
+  //   }
+  // };
 
   // ON / OFF API
   const getButtonStyle = (isActive: boolean) => ({
@@ -232,12 +232,12 @@ if (subzone.toLowerCase() === "skip") return;
                 color="orange"
                 style={{
                   marginBottom: "10px",
-                  background:
-                    isMultiMode === "multi"
-                      ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                      : undefined,
+                  // background:
+                  //   isMultiMode === "multi"
+                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
+                  //     : undefined,
                 }}
-                disabled={isMultiMode === "multi"}
+                // disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>
