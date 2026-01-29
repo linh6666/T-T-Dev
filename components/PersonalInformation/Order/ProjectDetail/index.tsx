@@ -181,8 +181,10 @@ export default function ProjectDetail({ project }: Props) {
                   p="md"
                   bg="#ffffff"
                   style={{ cursor: "pointer" }}
-                  onClick={() =>
-                    router.push(`/chi-tiet-don/${order.id}`)
+                   onClick={() =>
+                      router.push(
+    `/chi-tiet-don/${order.id}?project_id=${order.project_id}`
+  )
                   }
                 >
                  <Group wrap="nowrap" align="stretch">

@@ -1,17 +1,16 @@
-import React from "react";
-import { Metadata } from "next";
+// import type { Metadata } from "next";
+import { Suspense } from "react";
+import InteractiveClient from "./InteractiveClient";
 
-import OrderDetailPage from "../../../../components/OrderDetail";
+// export const metadata: Metadata = {
+//   title: "Chi tiết đơn hàng | T&T Group",
+//   description: "Thông tin chi tiết đơn hàng trong hệ thống T&T Group",
+// };
 
-export const metadata: Metadata = {
-  title: "Chi tiết đơn hàng | T&T Group",
-  description: "Thông tin chi tiết đơn hàng trong hệ thống T&T Group",
-};
-
-export default function OrderDetail() {
+export default function Page() {
   return (
-    <>
-      <OrderDetailPage />
-    </>
+    <Suspense fallback={<div>Loading...</div>}>
+      <InteractiveClient />
+    </Suspense>
   );
 }

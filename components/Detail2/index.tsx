@@ -66,7 +66,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
                el.getAttribute("data-original-fill") || el.getAttribute("fill") || "#fff";
              if (!el.hasAttribute("data-original-fill")) el.setAttribute("data-original-fill", originalFill);
              el.setAttribute("fill", originalFill);
-             el.removeAttribute("stroke");
+            //  el.removeAttribute("stroke");
            }
          } else {
            el.setAttribute("style", "display:none");
@@ -143,7 +143,9 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
         >
           <TransformComponent>
             <div className={styles.imageWrapper}>
-              <Image src="/image/Home_ca_mau.png" alt="Ảnh" className={styles.img} />
+              <Image 
+                    src="/Sales/ttcamau.jpg"
+               alt="Ảnh" className={styles.img} />
 
            {filteredPaths.length > 0 ? (
                 filteredPaths.map((item) => (

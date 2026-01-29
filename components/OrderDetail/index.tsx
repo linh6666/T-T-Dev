@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Card,
   Text,
@@ -18,7 +19,16 @@ import { useDisclosure } from "@mantine/hooks";
 
 import CreatePaymentModal from "./CreatePaymentModal";
 
-export default function OrderDetailPage() {
+/* =======================
+   PROPS
+======================= */
+interface OrderDetailPageProps {
+  projectId: string | null;
+}
+
+export default function OrderDetailPage({
+  projectId,
+}: OrderDetailPageProps) {
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -131,156 +141,170 @@ export default function OrderDetailPage() {
             </Grid.Col>
 
             {/* CỘT PHẢI */}
-        <Grid.Col span={6} style={{ display: "flex" }}>
-            <Card
-              radius="lg"
-              p="xl"
-              bg="#efefef"
-              style={{
-                flex: 1,
-                minHeight: "75vh",
-              }}
-            >
-              <Card shadow="md" radius="sm" bg="white">
-                <Stack gap={30}>
-                  <Box>
-                    <Text fw={600} size="md">
-                      NGUYỄN VĂN A
-                    </Text>
-                    <Text size="xs" c="dimmed">
-                      SĐT: 098765432
-                    </Text>
-                    <Text size="xs" c="dimmed">
-                      Company@example.com
-                    </Text>
-                  </Box>
-
-                  <Grid gutter={5}>
-                    <Grid.Col span={6}>
+            <Grid.Col span={6} style={{ display: "flex" }}>
+              <Card
+                radius="lg"
+                p="xl"
+                bg="#efefef"
+                style={{
+                  flex: 1,
+                  minHeight: "75vh",
+                }}
+              >
+                <Card shadow="md" radius="sm" bg="white">
+                  <Stack gap={30}>
+                    <Box>
+                      <Text fw={600} size="md">
+                        NGUYỄN VĂN A
+                      </Text>
                       <Text size="xs" c="dimmed">
-                        Mã đơn hàng:
+                        SĐT: 098765432
                       </Text>
-                    </Grid.Col>
-                    <Grid.Col span={6} ta="right">
-                      <Text size="xs">#856432</Text>
-                    </Grid.Col>
-
-                    <Grid.Col span={6}>
                       <Text size="xs" c="dimmed">
-                        Ngày tạo đơn:
+                        Company@example.com
                       </Text>
-                    </Grid.Col>
-                    <Grid.Col span={6} ta="right">
-                      <Text size="xs">23/01/2026</Text>
-                    </Grid.Col>
+                    </Box>
 
-                    <Grid.Col span={6}>
-                      <Text size="xs" c="dimmed">
-                        Người tạo đơn:
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col span={6} ta="right">
-                      <Text size="xs">Phạm Thị Sale</Text>
-                    </Grid.Col>
-                  </Grid>
+                    <Grid gutter={5}>
+                      <Grid.Col span={6}>
+                        <Text size="xs" c="dimmed">
+                          Mã đơn hàng:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={6} ta="right">
+                        <Text size="xs">#856432</Text>
+                      </Grid.Col>
 
-                  <Stack gap="md">
-                    {[
-                      { label: "Đặt cọc", date: "01/01/2026", price: "500.000.000" },
-                      {
-                        label: "Thanh toán lần 2",
-                        date: "08/01/2026",
-                        price: "1.000.000.000",
-                      },
-                      {
-                        label: "Thanh toán lần 3",
-                        date: "15/01/2026",
-                        price: "5.000.000.000",
-                      },
-                      {
-                        label: "Thanh toán toàn bộ",
-                        date: "23/01/2026",
-                        price: "2.300.000.000",
-                      },
-                    ].map((item, idx) => (
-                      <Box key={idx}>
-                        <Group justify="space-between">
-                          <Text size="sm" fw={600}>
-                            {item.label}
-                          </Text>
-                          <Text size="sm" c="dimmed">
-                            {item.date}
-                          </Text>
-                          <Text size="sm" fw={600}>
-                            {item.price}
-                          </Text>
-                        </Group>
-                        <Divider mt="sm" />
-                      </Box>
-                    ))}
-                  </Stack>
+                      <Grid.Col span={6}>
+                        <Text size="xs" c="dimmed">
+                          Ngày tạo đơn:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={6} ta="right">
+                        <Text size="xs">23/01/2026</Text>
+                      </Grid.Col>
 
-                  <Group align="flex-start" wrap="nowrap" gap="lg">
-                    <Stack align="center" gap={5}>
-                      <Box bg="gray.1" p="sm">
-                        <IconCheck size={36} color="#adb5bd" />
-                      </Box>
-                      <Text size="10px" c="dimmed" ta="center">
-                        Ấn để tải file đính kèm
-                      </Text>
+                      <Grid.Col span={6}>
+                        <Text size="xs" c="dimmed">
+                          Người tạo đơn:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={6} ta="right">
+                        <Text size="xs">Phạm Thị Sale</Text>
+                      </Grid.Col>
+                    </Grid>
+
+                    <Stack gap="md">
+                      {[
+                        {
+                          label: "Đặt cọc",
+                          date: "01/01/2026",
+                          price: "500.000.000",
+                        },
+                        {
+                          label: "Thanh toán lần 2",
+                          date: "08/01/2026",
+                          price: "1.000.000.000",
+                        },
+                        {
+                          label: "Thanh toán lần 3",
+                          date: "15/01/2026",
+                          price: "5.000.000.000",
+                        },
+                        {
+                          label: "Thanh toán toàn bộ",
+                          date: "23/01/2026",
+                          price: "2.300.000.000",
+                        },
+                      ].map((item, idx) => (
+                        <Box key={idx}>
+                          <Group justify="space-between">
+                            <Text size="sm" fw={600}>
+                              {item.label}
+                            </Text>
+                            <Text size="sm" c="dimmed">
+                              {item.date}
+                            </Text>
+                            <Text size="sm" fw={600}>
+                              {item.price}
+                            </Text>
+                          </Group>
+                          <Divider mt="sm" />
+                        </Box>
+                      ))}
                     </Stack>
 
-                    <Box bg="#f1f3f5" p="md" style={{ flex: 1 }}>
-                      <Stack gap={5}>
-                        <Group justify="space-between">
-                          <Text size="xs">Tổng chi phí cần thanh toán</Text>
-                          <Text size="xs" fw={700}>
-                            9.000.000.000
-                          </Text>
-                        </Group>
-
-                        <Group justify="space-between">
-                          <Text size="xs">Tổng chi phí đã thanh toán</Text>
-                          <Text size="xs" fw={700}>
-                            8.800.000.000
-                          </Text>
-                        </Group>
-
-                        <Group justify="space-between">
-                          <Text size="xs">Chiết khấu</Text>
-                          <Text size="xs" fw={700}>
-                            -200.000.000
-                          </Text>
-                        </Group>
-
-                        <Divider my={6} />
-
-                        <Group justify="space-between" align="flex-end">
-                          <Text size="xs" fw={700}>
-                            Chi phí còn phải thanh toán
-                          </Text>
-                          <Stack gap={0} align="flex-end">
-                            <Text fw={800} size="xl" lh={1}>
-                              0
-                            </Text>
-                            <Text size="10px">(VNĐ)</Text>
-                          </Stack>
-                        </Group>
+                    <Group align="flex-start" wrap="nowrap" gap="lg">
+                      <Stack align="center" gap={5}>
+                        <Box bg="gray.1" p="sm">
+                          <IconCheck size={36} color="#adb5bd" />
+                        </Box>
+                        <Text size="10px" c="dimmed" ta="center">
+                          Ấn để tải file đính kèm
+                        </Text>
                       </Stack>
-                    </Box>
-                  </Group>
-                </Stack>
+
+                      <Box bg="#f1f3f5" p="md" style={{ flex: 1 }}>
+                        <Stack gap={5}>
+                          <Group justify="space-between">
+                            <Text size="xs">
+                              Tổng chi phí cần thanh toán
+                            </Text>
+                            <Text size="xs" fw={700}>
+                              9.000.000.000
+                            </Text>
+                          </Group>
+
+                          <Group justify="space-between">
+                            <Text size="xs">
+                              Tổng chi phí đã thanh toán
+                            </Text>
+                            <Text size="xs" fw={700}>
+                              8.800.000.000
+                            </Text>
+                          </Group>
+
+                          <Group justify="space-between">
+                            <Text size="xs">Chiết khấu</Text>
+                            <Text size="xs" fw={700}>
+                              -200.000.000
+                            </Text>
+                          </Group>
+
+                          <Divider my={6} />
+
+                          <Group
+                            justify="space-between"
+                            align="flex-end"
+                          >
+                            <Text size="xs" fw={700}>
+                              Chi phí còn phải thanh toán
+                            </Text>
+                            <Stack gap={0} align="flex-end">
+                              <Text fw={800} size="xl" lh={1}>
+                                0
+                              </Text>
+                              <Text size="10px">(VNĐ)</Text>
+                            </Stack>
+                          </Group>
+                        </Stack>
+                      </Box>
+                    </Group>
+                  </Stack>
+                </Card>
               </Card>
-            </Card>
-          </Grid.Col>
-
-
+            </Grid.Col>
           </Grid>
         </Container>
       </Box>
 
       {/* MODAL */}
-      <CreatePaymentModal opened={opened} onClose={close} />
+      <CreatePaymentModal
+        opened={opened}
+        onClose={close}
+        projectId={projectId}
+      />
     </>
   );
 }
+
