@@ -144,6 +144,11 @@ EDIT_DETAILE_HOME:"/api/v1/node_attribute/node_by_leaf/{project_id}/{leaf_id}",
 GET_DETAILE_HOME:"/api/v1/node_attribute/node_by_leaf/{project_id}/{leaf_id}",
 
 
+///tạo đơn hàng thanh toán
+CREATE_ODER_PAYMENT:"/api/v1/order_payment/",
+UPDATE_ODER_PAYMENT:"/api/v1/order_payment/{order_payment_id}",
+GET_LIST_ODER_PAYMENT:"/api/v1/order_payment/{order_id}",
+GET_LIST_PAYMENT:"/api/v1/order_payment/by_id/{order_id}"
 
 
 

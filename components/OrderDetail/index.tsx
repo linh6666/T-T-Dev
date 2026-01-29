@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Card,
   Text,
@@ -15,125 +14,124 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useDisclosure } from "@mantine/hooks";
+
+import CreatePaymentModal from "./CreatePaymentModal";
 
 export default function OrderDetailPage() {
   const router = useRouter();
+  const [opened, { open, close }] = useDisclosure(false);
 
   return (
-    <Box py={10}>
-      <Container size="xl">
-        {/* ======================= BACK ======================= */}
-        <Group mb="md">
-          <Button
-            variant="subtle"
-            leftSection={<IconArrowLeft size={18} />}
-            onClick={() => router.back()}
-            px={0}
-          >
-            Quay lại
-          </Button>
-        </Group>
-
-        {/* ======================= GRID ======================= */}
-        <Grid gutter={32} align="stretch">
-          {/* ======================= CỘT TRÁI ======================= */}
-          <Grid.Col span={6} style={{ display: "flex" }}>
-            <Card
-              radius="lg"
-              p="md"
-              bg="#efefef"
-              style={{
-                flex: 1,
-                minHeight: "75vh",
-                display: "flex",
-                flexDirection: "column",
-              }}
+    <>
+      <Box py={10}>
+        <Container size="xl">
+          {/* BACK */}
+          <Group mb="md">
+            <Button
+              variant="subtle"
+              leftSection={<IconArrowLeft size={18} />}
+              onClick={() => router.back()}
+              px={0}
             >
-              <Group justify="space-between" mb="sm">
-                <Title order={3} fw={700}>
-                  SH1.13
-                </Title>
+              Quay lại
+            </Button>
+          </Group>
 
-                <Badge
-                  color="#d3f9d8"
-                  c="#2b8a3e"
-                  variant="filled"
-                  radius="xl"
-                  px={15}
-                >
-                  Đã thanh toán
-                </Badge>
-              </Group>
+          <Grid gutter={32} align="stretch">
+            {/* CỘT TRÁI */}
+            <Grid.Col span={6} style={{ display: "flex" }}>
+              <Card
+                radius="lg"
+                p="md"
+                bg="#efefef"
+                style={{
+                  flex: 1,
+                  minHeight: "75vh",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Group justify="space-between" mb="sm">
+                  <Title order={3} fw={700}>
+                    SH1.13
+                  </Title>
 
-              <Card shadow="xs" radius="lg" p={0} style={{ overflow: "hidden" }}>
-                <Box p="xl" bg="white">
-                  <Grid gutter="xs">
-                    <Grid.Col span={3}>
+                  <Badge
+                    color="#d3f9d8"
+                    c="#2b8a3e"
+                    variant="filled"
+                    radius="xl"
+                    px={15}
+                  >
+                    Đã thanh toán
+                  </Badge>
+                </Group>
+
+                <Card shadow="xs" radius="lg" p={0}>
+                  <Box p="xl" bg="white">
+                    <Grid gutter="xs">
+                      <Grid.Col span={3}>
+                        <Text size="sm" c="dimmed">
+                          Mã đơn hàng:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={9}>
+                        <Text size="sm">#856432</Text>
+                      </Grid.Col>
+
+                      <Grid.Col span={3}>
+                        <Text size="sm" c="dimmed">
+                          Ngày tạo đơn:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={9}>
+                        <Text size="sm">24/12/2025</Text>
+                      </Grid.Col>
+
+                      <Grid.Col span={3}>
+                        <Text size="sm" c="dimmed">
+                          Người tạo đơn:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={9}>
+                        <Text size="sm">Phạm Thị Sale</Text>
+                      </Grid.Col>
+                    </Grid>
+
+                    <Group mt="xl" align="flex-start" wrap="nowrap">
                       <Text size="sm" c="dimmed">
-                        Mã đơn hàng:
+                        Lời nhắn từ Sale:
                       </Text>
-                    </Grid.Col>
-                    <Grid.Col span={9}>
-                      <Text size="sm">#856432</Text>
-                    </Grid.Col>
-
-                    <Grid.Col span={3}>
-                      <Text size="sm" c="dimmed">
-                        Ngày tạo đơn:
+                      <Text size="sm">
+                        Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp
+                        theo trước ngày xx/xx/xxxx theo hợp đồng.
                       </Text>
-                    </Grid.Col>
-                    <Grid.Col span={9}>
-                      <Text size="sm">24/12/2025</Text>
-                    </Grid.Col>
+                    </Group>
+                  </Box>
+                </Card>
 
-                    <Grid.Col span={3}>
-                      <Text size="sm" c="dimmed">
-                        Người tạo đơn:
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col span={9}>
-                      <Text size="sm">Phạm Thị Sale</Text>
-                    </Grid.Col>
-                  </Grid>
+                {/* NÚT DÍNH ĐÁY */}
+                <Group mt="auto" pt="md" justify="center" gap="sm">
+                  <Button
+                    variant="outline"
+                    color="dark"
+                    radius="md"
+                    leftSection={<span style={{ fontSize: 18 }}>+</span>}
+                    onClick={open}
+                  >
+                    Tạo đơn thanh toán mới
+                  </Button>
 
-                  <Group mt="xl" align="flex-start" wrap="nowrap">
-                    <Text size="sm" c="dimmed" style={{ whiteSpace: "nowrap" }}>
-                      Lời nhắn từ Sale:
-                    </Text>
-                    <Text size="sm">
-                      Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp
-                      theo trước ngày xx/xx/xxxx theo hợp đồng.
-                    </Text>
-                  </Group>
-                </Box>
+                  <Button color="red" radius="md">
+                    ✕ Hủy đơn hàng
+                  </Button>
+                </Group>
               </Card>
+            </Grid.Col>
 
-              {/* ======================= CHỈ THÊM 2 NÚT (GIỐNG HÌNH) ======================= */}
-             <Group
-  mt="auto"
-  pt="md"
-  justify="center"
-  gap="sm"
->
-  <Button
-    variant="outline"
-    color="dark"
-    radius="md"
-    leftSection={<span style={{ fontSize: 18 }}>+</span>}
-  >
-    Tạo đơn thanh toán mới
-  </Button>
-
-  <Button color="red" radius="md">
-    ✕ Hủy đơn hàng
-  </Button>
-</Group>
-
-            </Card>
-          </Grid.Col>
-
-          {/* ======================= CỘT PHẢI ======================= */}
-          <Grid.Col span={6} style={{ display: "flex" }}>
+            {/* CỘT PHẢI */}
+        <Grid.Col span={6} style={{ display: "flex" }}>
             <Card
               radius="lg"
               p="xl"
@@ -275,8 +273,14 @@ export default function OrderDetailPage() {
               </Card>
             </Card>
           </Grid.Col>
-        </Grid>
-      </Container>
-    </Box>
+
+
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* MODAL */}
+      <CreatePaymentModal opened={opened} onClose={close} />
+    </>
   );
 }
