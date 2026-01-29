@@ -56,7 +56,7 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          {  values: ["ti"] },
+          {label: "layer4",values: ["ti"] },
           { label: "layer2", values: [phaseFromQuery] },
         ],
       });

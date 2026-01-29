@@ -35,7 +35,7 @@ useEffect(() => {
     try {
       const body = {
         project_id,
-        filters: [{values: ["ti"] }],
+        filters: [{label: "layer4",values: ["ti"] }],
       };
 
       const data = await createNodeAttribute(body);
