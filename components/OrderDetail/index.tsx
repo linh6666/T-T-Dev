@@ -17,11 +17,13 @@ import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
 export default function OrderDetailPage() {
-    const router = useRouter();
+  const router = useRouter();
+
   return (
-    <Box  py={10}>
+    <Box py={10}>
       <Container size="xl">
-           <Group mb="md">
+        {/* ======================= BACK ======================= */}
+        <Group mb="md">
           <Button
             variant="subtle"
             leftSection={<IconArrowLeft size={18} />}
@@ -32,37 +34,39 @@ export default function OrderDetailPage() {
           </Button>
         </Group>
 
-        <Grid gutter={32} align="flex-start">
-          {/* ======================= CỘT TRÁI (66%) ======================= */}
-          <Grid.Col span={6}>
-            <Card radius="lg" p="md" bg="#efefef">
-         <Group justify="space-between" mb="sm">
-  <Title order={3} fw={700}>
-    SH1.13
-  </Title>
+        {/* ======================= GRID ======================= */}
+        <Grid gutter={32} align="stretch">
+          {/* ======================= CỘT TRÁI ======================= */}
+          <Grid.Col span={6} style={{ display: "flex" }}>
+            <Card
+              radius="lg"
+              p="md"
+              bg="#efefef"
+              style={{
+                flex: 1,
+                minHeight: "75vh",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Group justify="space-between" mb="sm">
+                <Title order={3} fw={700}>
+                  SH1.13
+                </Title>
 
-  <Badge
-    color="#d3f9d8"
-    c="#2b8a3e"
-    variant="filled"
-    radius="xl"
-    px={15}
-  >
-    Đã thanh toán
-  </Badge>
-</Group>
+                <Badge
+                  color="#d3f9d8"
+                  c="#2b8a3e"
+                  variant="filled"
+                  radius="xl"
+                  px={15}
+                >
+                  Đã thanh toán
+                </Badge>
+              </Group>
 
               <Card shadow="xs" radius="lg" p={0} style={{ overflow: "hidden" }}>
-                {/* Header */}
-                <Box
-                  p="xl"
-                  style={{
-                    background:
-                      "white",
-                  }}
-                >
-                 
-
+                <Box p="xl" bg="white">
                   <Grid gutter="xs">
                     <Grid.Col span={3}>
                       <Text size="sm" c="dimmed">
@@ -103,21 +107,44 @@ export default function OrderDetailPage() {
                   </Group>
                 </Box>
               </Card>
+
+              {/* ======================= CHỈ THÊM 2 NÚT (GIỐNG HÌNH) ======================= */}
+             <Group
+  mt="auto"
+  pt="md"
+  justify="center"
+  gap="sm"
+>
+  <Button
+    variant="outline"
+    color="dark"
+    radius="md"
+    leftSection={<span style={{ fontSize: 18 }}>+</span>}
+  >
+    Tạo đơn thanh toán mới
+  </Button>
+
+  <Button color="red" radius="md">
+    ✕ Hủy đơn hàng
+  </Button>
+</Group>
+
             </Card>
           </Grid.Col>
 
-          {/* ======================= CỘT PHẢI (33%) ======================= */}
-          <Grid.Col span={6}>
-            <Card radius="lg" p="xl" bg="#efefef">
-              <Card
-                shadow="md"
-                radius="sm"
-                bg="white"
-                
-               
-              >
+          {/* ======================= CỘT PHẢI ======================= */}
+          <Grid.Col span={6} style={{ display: "flex" }}>
+            <Card
+              radius="lg"
+              p="xl"
+              bg="#efefef"
+              style={{
+                flex: 1,
+                minHeight: "75vh",
+              }}
+            >
+              <Card shadow="md" radius="sm" bg="white">
                 <Stack gap={30}>
-                  {/* Thông tin khách hàng */}
                   <Box>
                     <Text fw={600} size="md">
                       NGUYỄN VĂN A
@@ -130,7 +157,6 @@ export default function OrderDetailPage() {
                     </Text>
                   </Box>
 
-                  {/* Thông tin đơn */}
                   <Grid gutter={5}>
                     <Grid.Col span={6}>
                       <Text size="xs" c="dimmed">
@@ -160,7 +186,6 @@ export default function OrderDetailPage() {
                     </Grid.Col>
                   </Grid>
 
-                  {/* Danh sách thanh toán */}
                   <Stack gap="md">
                     {[
                       { label: "Đặt cọc", date: "01/01/2026", price: "500.000.000" },
@@ -197,10 +222,9 @@ export default function OrderDetailPage() {
                     ))}
                   </Stack>
 
-                  {/* Tổng kết */}
                   <Group align="flex-start" wrap="nowrap" gap="lg">
                     <Stack align="center" gap={5}>
-                      <Box bg="gray.1" p="sm" >
+                      <Box bg="gray.1" p="sm">
                         <IconCheck size={36} color="#adb5bd" />
                       </Box>
                       <Text size="10px" c="dimmed" ta="center">
@@ -247,40 +271,6 @@ export default function OrderDetailPage() {
                       </Stack>
                     </Box>
                   </Group>
-
-                  {/* Footer */}
-                  <Box>
-                    <Text fw={700} size="sm">
-                      T&T GROUP
-                    </Text>
-
-                    <Grid mt={5}>
-                      <Grid.Col span={7}>
-                        <Text size="10px" c="dimmed">
-                          Hotline: 0666888868
-                        </Text>
-                        <Text size="10px" c="dimmed">
-                          Phone: 012345678
-                        </Text>
-                        <Text size="10px" c="dimmed">
-                          Email: ttgroup@example.com
-                        </Text>
-                      </Grid.Col>
-
-                      <Grid.Col span={5} ta="right">
-                        <Text size="10px" c="dimmed">
-                          Website
-                        </Text>
-                        <Text size="10px" c="dimmed">
-                          ttgroup.example.com
-                        </Text>
-                      </Grid.Col>
-                    </Grid>
-
-                    <Text size="10px" c="dimmed" ta="center" mt="lg">
-                      For any question please contact us at ttgroup@example.com
-                    </Text>
-                  </Box>
                 </Stack>
               </Card>
             </Card>
