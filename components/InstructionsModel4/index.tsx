@@ -11,13 +11,13 @@ export default function PdfViewer() {
   const project_id = searchParams.get("id");
       const handleBack = () => {
     if (!project_id) return;
-    router.push(`/Tuong-tac/Times-Square?id=${project_id}`);
+    router.push(`/Tuong-tac/Ca-mau?id=${project_id}`);
   };
 
   return (
     <div  className={styles.pdfContainer}>
          <iframe
-      src="/huong-dan/timesquet.pdf"
+      src="/huong-dan/camau.pdf"
       width="100%"
       height="700px"
       style={{ border: "none" }}
