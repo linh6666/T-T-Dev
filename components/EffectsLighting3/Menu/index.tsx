@@ -29,11 +29,11 @@ export default function Menu({ project_id }: MenuProps) {
   // 🧩 Khởi tạo danh sách menu (cứng 5 nút)
   useEffect(() => {
     setMenuItems([
-      { id: 1, label: "Hiệu ứng ánh sáng 1" },
-      { id: 2, label: "Hiệu ứng ánh sáng 2" },
-      { id: 3, label: "Hiệu ứng ánh sáng 3" },
-      { id: 4, label: "Hiệu ứng ánh sáng 4" },
-      { id: 5, label: "Hiệu ứng ánh sáng 5" },
+      { id: 1, label: "Dòng chảy" },
+      { id: 2, label: "Sóng quận" },
+      { id: 3, label: "T&T GROUP" },
+      { id: 4, label: "Mưa rơi" },
+      { id: 5, label: "Random hoặc Ngẫu nhiên" },
     ]);
   }, []);
 
