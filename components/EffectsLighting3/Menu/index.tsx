@@ -33,7 +33,7 @@ export default function Menu({ project_id }: MenuProps) {
       { id: 2, label: "Sóng quận" },
       { id: 3, label: "T&T GROUP" },
       { id: 4, label: "Mưa rơi" },
-      { id: 5, label: "Random hoặc Ngẫu nhiên" },
+      { id: 5, label: "Ngẫu nhiên" },
     ]);
   }, []);
 
