@@ -51,7 +51,7 @@ export default function LoginButton() {
           }}
         >
           <Link
-            href="/Tai-khoan"
+            href="/Tai-khoan/thong-tin-cua-ban"
             style={{
               textDecoration: "none",
               display: "flex",

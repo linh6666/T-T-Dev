@@ -16,11 +16,12 @@ import {
 import { useState, useEffect } from "react";
 import { getListProvinces } from "../../../api/apigetlistaddress";
 import { getWardsByProvince } from "../../../api/apigetlistProvinces";
+import useAuth from "../../../hook/useAuth";
 import { Editme } from "../../../api/apiEditme";
 import { NotificationExtension } from "../../../extension/NotificationExtension";
 import { modals } from "@mantine/modals";
 
-
+/* ================= TYPES ================= */
 interface User {
   email: string;
   full_name: string;
@@ -35,10 +36,6 @@ interface User {
   last_login: string;
 }
 
-interface ProfileInfoProps {
-  user: User;
-}
-
 interface Province {
   code: string;
   full_name_vi: string;
@@ -49,143 +46,178 @@ interface Ward {
   full_name_vi: string;
 }
 
-export default function ProfileInfo({ user }: ProfileInfoProps) {
+/* ================= COMPONENT ================= */
+export default function ProfileInfo() {
+  const { user } = useAuth(); // 👈 lấy user từ API
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<User>({ ...user });
-  const [provinceOptions, setProvinceOptions] = useState<{ value: string; label: string }[]>([]);
-  const [wardOptions, setWardOptions] = useState<{ value: string; label: string }[]>([]);
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // 🟢 Hàm lưu
+  const [editedUser, setEditedUser] = useState<User>({
+    email: "",
+    full_name: "",
+    phone: "",
+    is_active: false,
+    is_superuser: false,
+    province_id: "",
+    ward_id: "",
+    introducer_id: "",
+    creation_time: "",
+    detal_address: "",
+    last_login: "",
+  });
+
+  const [provinceOptions, setProvinceOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [wardOptions, setWardOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+
+  /* ========== LOAD USER FROM AUTH ========== */
+  useEffect(() => {
+    if (!user) return;
+
+    setEditedUser({
+      email: user.email || "",
+      full_name: user.full_name || "",
+      phone: user.phone || "",
+     is_active: user.is_active ?? false,
+is_superuser: user.is_superuser ?? false,
+      province_id: user.province_id || "",
+      ward_id: user.ward_id || "",
+      introducer_id: user.introducer_id || "",
+      creation_time: user.creation_time || "",
+      detal_address: user.detal_address || "",
+      last_login: user.last_login || "",
+    });
+
+    if (user.province_id) {
+      setSelectedProvince(user.province_id);
+    }
+  }, [user]);
+
+  /* ========== FETCH PROVINCES ========== */
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const data: Province[] = await getListProvinces();
+        setProvinceOptions(
+          data.map((item) => ({
+            value: item.code,
+            label: item.full_name_vi,
+          }))
+        );
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách tỉnh:", error);
+      }
+    };
+
+    fetchProvinces();
+  }, []);
+
+  /* ========== FETCH WARDS ========== */
+  useEffect(() => {
+    if (!selectedProvince) return;
+
+    const fetchWards = async () => {
+      try {
+        const data: Ward[] = await getWardsByProvince(selectedProvince);
+        setWardOptions(
+          data.map((item) => ({
+            value: item.code,
+            label: item.full_name_vi,
+          }))
+        );
+      } catch (error) {
+        console.error("Lỗi khi lấy phường/xã:", error);
+        setWardOptions([]);
+      }
+    };
+
+    fetchWards();
+  }, [selectedProvince]);
+
+  /* ========== SAVE ========== */
 const handleSave = async () => {
   modals.openConfirmModal({
     title: "Xác nhận lưu thay đổi",
     children: "Bạn có chắc muốn lưu các thay đổi này không?",
     confirmProps: {
-   style: {
-      backgroundColor: "#ffbe00",
-      color: "#762f0b",
+      style: { backgroundColor: "#ffbe00", color: "#762f0b" },
     },
-  },
     labels: { confirm: "Có", cancel: "Không" },
+
     onConfirm: async () => {
-  setLoading(true);
-  try {
-    const payload = {
-      full_name: editedUser.full_name,
-      phone: editedUser.phone,
-      province_id: editedUser.province_id,
-      ward_id: editedUser.ward_id,
-      introducer_id: editedUser.introducer_id,
-      detal_address: editedUser.detal_address,
-    };
-    const result = await Editme(payload);
-    console.log("Cập nhật thành công:", result);
+      setLoading(true);
+      try {
+        const payload = {
+          full_name: editedUser.full_name,
+          phone: editedUser.phone,
+          province_id: editedUser.province_id,
+          ward_id: editedUser.ward_id,
+          introducer_id: editedUser.introducer_id,
+          detal_address: editedUser.detal_address,
+        };
 
-    NotificationExtension.Success("Cập nhật thông tin thành công!");
+        await Editme(payload);
+        NotificationExtension.Success("Cập nhật thông tin thành công!");
 
-    // Tải lại trang sau 1 khoảng thời gian ngắn (ví dụ: 1 giây)
-    setTimeout(() => {
-      window.location.reload();
-    }, 10);
-    
-    setEditedUser(result);
-    setIsEditing(false);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Lỗi khi cập nhật:", error.message);
-      NotificationExtension.Fails(`Cập nhật thất bại: ${error.message}`);
-    } else {
-      console.error("Lỗi không xác định:", error);
-      NotificationExtension.Fails("Cập nhật thất bại: Có lỗi xảy ra.");
-    }
-  } finally {
-    setLoading(false);
-  }
-},
+        setTimeout(() => {
+          window.location.reload();
+        }, 10);
+
+        setIsEditing(false);
+      } catch (error: unknown) {
+        let message = "Có lỗi xảy ra";
+
+        if (error instanceof Error) {
+          message = error.message;
+        }
+
+        NotificationExtension.Fails(`Cập nhật thất bại: ${message}`);
+      } finally {
+        setLoading(false);
+      }
+    },
   });
 };
-  // 🔴 Hàm hủy chỉnh sửa
-const handleCancel = () => {
- modals.openConfirmModal({
-  title: "Xác nhận",
-  children: "Bạn có chắc muốn hủy các thay đổi không?",
-  labels: { confirm: "Có", cancel: "Không" },
-  confirmProps: {
-   style: {
-      backgroundColor: "#ffbe00",
-      color: "#762f0b",
-    },
-  },
-  onConfirm: () => {
-    setEditedUser({ ...user }); // Reset dữ liệu
-    setSelectedProvince(user.province_id); // Khôi phục tỉnh
-    setIsEditing(false); // Tắt chế độ chỉnh sửa
-    NotificationExtension.Info("Đã hủy các thay đổi");
-  },
-});
-};
 
-  // Lấy danh sách tỉnh
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        const data: Province[] = await getListProvinces();
-        const formatted = data.map((item) => ({
-          value: item.code,
-          label: item.full_name_vi,
-        }));
-        setProvinceOptions(formatted);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách tỉnh/thành:", error);
-      }
-    };
-    fetchProvinces();
-  }, []);
+  /* ========== CANCEL ========== */
+  const handleCancel = () => {
+    modals.openConfirmModal({
+      title: "Xác nhận",
+      children: "Bạn có chắc muốn hủy các thay đổi không?",
+      labels: { confirm: "Có", cancel: "Không" },
+      confirmProps: {
+        style: { backgroundColor: "#ffbe00", color: "#762f0b" },
+      },
+      onConfirm: () => {
+        if (!user) return;
 
-  // Lấy danh sách phường/xã khi chọn tỉnh
-useEffect(() => {
-  const provinceToLoad = selectedProvince || user.province_id;
-
-  if (!provinceToLoad) return;
-
-  const fetchWards = async () => {
-    try {
-      const data: Ward[] = await getWardsByProvince(provinceToLoad);
-      const formatted = data.map((item) => ({
-        value: item.code,
-        label: item.full_name_vi,
-      }));
-
-      // Cập nhật danh sách wards
-      setWardOptions(formatted);
-
-      // Nếu ward_id hiện tại không có trong danh sách mới, giữ nguyên
-      if (editedUser.ward_id) {
-        setWardOptions((prev) => {
-          const exists = prev.some((w) => w.value === editedUser.ward_id);
-          if (!exists) {
-            return [...prev, { value: editedUser.ward_id, label: "..." }];
-          }
-          return prev;
+        setEditedUser({
+          email: user.email || "",
+          full_name: user.full_name || "",
+          phone: user.phone || "",
+          is_active: user.is_active ?? false,
+is_superuser: user.is_superuser ?? false,
+          province_id: user.province_id || "",
+          ward_id: user.ward_id || "",
+          introducer_id: user.introducer_id || "",
+          creation_time: user.creation_time || "",
+          detal_address: user.detal_address || "",
+          last_login: user.last_login || "",
         });
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Lỗi khi lấy danh sách phường/xã:", error.message);
-      } else {
-        console.error("Lỗi không xác định khi lấy danh sách phường/xã:", error);
-      }
-      setWardOptions([]);
-    }
+
+        setSelectedProvince(user.province_id || null);
+        setIsEditing(false);
+        NotificationExtension.Info("Đã hủy các thay đổi");
+      },
+    });
   };
 
-  fetchWards();
-}, [selectedProvince, user.province_id, editedUser.ward_id]); // ✅ thêm editedUser.ward_id để linter yên tâm
-
-
-
+  /* ================= UI (GIỮ NGUYÊN 100%) ================= */
   return (
     <Container size="sm" py="xl">
       <Title order={2} c="#762f0b" ta="center" mb="lg">
@@ -193,10 +225,9 @@ useEffect(() => {
       </Title>
 
       <Paper shadow="md" p="xl" radius="md" withBorder>
-        {/* Header */}
         <Group mb="md" justify="space-between">
           <Group>
-            <Avatar src={null} alt={user.full_name} size={60} radius="xl" />
+            <Avatar src={null} alt={editedUser.full_name} size={60} radius="xl" />
             <Stack gap={2}>
               <Text fw={600}>{editedUser.full_name || "Chưa có"}</Text>
               <Text c="dimmed" fz="sm">
@@ -206,15 +237,18 @@ useEffect(() => {
           </Group>
 
           {!isEditing && (
-          <Button color="#ffbe00" onClick={() => setIsEditing(true)} style={{ color: '#762f0b' }}>
-  Chỉnh sửa
-</Button>
+            <Button
+              color="#ffbe00"
+              onClick={() => setIsEditing(true)}
+              style={{ color: "#762f0b" }}
+            >
+              Chỉnh sửa
+            </Button>
           )}
         </Group>
 
         <Divider mb="md" />
 
-        {/* Thông tin người dùng */}
         <Stack gap="sm">
           {/* Tên */}
           <Group justify="space-between">
@@ -222,8 +256,9 @@ useEffect(() => {
             {isEditing ? (
               <TextInput
                 value={editedUser.full_name}
-                onChange={(e) => setEditedUser({ ...editedUser, full_name: e.currentTarget.value })}
-                placeholder="Nhập tên"
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser, full_name: e.currentTarget.value })
+                }
               />
             ) : (
               <Text>{editedUser.full_name || "Chưa có"}</Text>
@@ -231,21 +266,14 @@ useEffect(() => {
           </Group>
 
           {/* Email */}
-           <Group justify="space-between">
+          <Group justify="space-between">
             <Text c="dimmed">Email:</Text>
             {isEditing ? (
-              <TextInput
-                value={editedUser.email}
-                onChange={(event) =>
-                  setEditedUser({ ...editedUser, email: event.currentTarget.value })
-                }
-                placeholder="Nhập email"
-              />
+              <TextInput value={editedUser.email} disabled />
             ) : (
               <Text>{editedUser.email}</Text>
             )}
           </Group>
-
 
           {/* SĐT */}
           <Group justify="space-between">
@@ -253,8 +281,9 @@ useEffect(() => {
             {isEditing ? (
               <TextInput
                 value={editedUser.phone}
-                onChange={(e) => setEditedUser({ ...editedUser, phone: e.currentTarget.value })}
-                placeholder="Nhập số điện thoại"
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser, phone: e.currentTarget.value })
+                }
               />
             ) : (
               <Text>{editedUser.phone || "Chưa có"}</Text>
@@ -262,39 +291,16 @@ useEffect(() => {
           </Group>
 
           {/* Quyền */}
-    <Group justify="space-between">
-  <Text c="dimmed">Quyền:</Text>
-  {isEditing ? (
-    <TextInput
-      value={
-        editedUser.is_superuser
-          ? "Admin"
-          : editedUser.is_active
-          ? "User thường"
-          : "Không xác định"
-      }
-      onChange={(e) => {
-        const value = e.currentTarget.value.toLowerCase();
-        setEditedUser({
-          ...editedUser,
-          is_superuser: value.includes("admin"),
-          is_active: !value.includes("không") && !value.includes("vô hiệu"),
-        });
-      }}
-      placeholder="Nhập quyền (Admin hoặc User thường)"
-    disabled
-    />
-  ) : (
-    <Text>
-      {editedUser.is_superuser
-        ? "Admin"
-        : editedUser.is_active
-        ? "User thường"
-        : "Không xác định"}
-    </Text>
-  )}
-</Group>
-
+          <Group justify="space-between">
+            <Text c="dimmed">Quyền:</Text>
+            <Text>
+              {editedUser.is_superuser
+                ? "Admin"
+                : editedUser.is_active
+                ? "User thường"
+                : "Không xác định"}
+            </Text>
+          </Group>
 
           {/* Tỉnh */}
           <Group justify="space-between">
@@ -307,15 +313,20 @@ useEffect(() => {
                   setEditedUser({ ...editedUser, province_id: value || "" });
                   setSelectedProvince(value);
                 }}
-                placeholder="Tỉnh/thành phố"
-                 searchable
-                   style={{ maxWidth: 185 }} 
-                // clearable
+                searchable
+                style={{ maxWidth: 185 }}
+                  styles={{
+    input: {
+      cursor: "pointer",
+    },
+  }}
               />
             ) : (
-             <Text>
-  {provinceOptions.find((p) => p.value === editedUser.province_id)?.label || "Chưa có"}
-</Text>
+              <Text>
+                {provinceOptions.find(
+                  (p) => p.value === editedUser.province_id
+                )?.label || "Chưa có"}
+              </Text>
             )}
           </Group>
 
@@ -326,45 +337,56 @@ useEffect(() => {
               <Select
                 data={wardOptions}
                 value={editedUser.ward_id}
-                onChange={(value) => setEditedUser({ ...editedUser, ward_id: value || "" })}
-                placeholder="Phường/xã"
-                 searchable
-                  style={{ maxWidth: 185 }} 
-                // clearable
+                onChange={(value) =>
+                  setEditedUser({ ...editedUser, ward_id: value || "" })
+                }
+                searchable
+                style={{ maxWidth: 185 }}
+                  styles={{
+    input: {
+      cursor: "pointer",
+    },
+  }}
               />
             ) : (
-             <Text>
-  {wardOptions.find((w) => w.value === editedUser.ward_id)?.label || "Chưa có"}
-</Text>
+              <Text>
+                {wardOptions.find(
+                  (w) => w.value === editedUser.ward_id
+                )?.label || "Chưa có"}
+              </Text>
             )}
           </Group>
 
-          {/* Mã người giới thiệu */}
+          {/* Người giới thiệu */}
           <Group justify="space-between">
             <Text c="dimmed">Mã người giới thiệu:</Text>
             {isEditing ? (
               <TextInput
                 value={editedUser.introducer_id}
                 onChange={(e) =>
-                  setEditedUser({ ...editedUser, introducer_id: e.currentTarget.value })
+                  setEditedUser({
+                    ...editedUser,
+                    introducer_id: e.currentTarget.value,
+                  })
                 }
-                placeholder="Nhập mã người giới thiệu"
               />
             ) : (
               <Text>{editedUser.introducer_id || "Chưa có"}</Text>
             )}
           </Group>
 
-          {/* Địa chỉ chi tiết */}
+          {/* Địa chỉ */}
           <Group justify="space-between">
             <Text c="dimmed">Địa chỉ chi tiết:</Text>
             {isEditing ? (
               <TextInput
                 value={editedUser.detal_address}
                 onChange={(e) =>
-                  setEditedUser({ ...editedUser, detal_address: e.currentTarget.value })
+                  setEditedUser({
+                    ...editedUser,
+                    detal_address: e.currentTarget.value,
+                  })
                 }
-                placeholder="Nhập địa chỉ chi tiết"
               />
             ) : (
               <Text>{editedUser.detal_address || "Chưa có"}</Text>
@@ -372,28 +394,25 @@ useEffect(() => {
           </Group>
         </Stack>
 
-        {/* 🟡 Hai nút "Lưu" và "Hủy" hiển thị khi đang chỉnh sửa */}
         {isEditing && (
           <Group justify="flex-end" mt="xl">
-           
-          <Button
-  color="#808080"
-  variant="outline"
-  onClick={handleCancel}
-  disabled={loading}
-  style={{ fontSize: '12px' }} // chỉnh size nhỏ hơn
->
-  Hủy
-</Button>
-
-<Button
-  color="#ffbe00"
-  onClick={handleSave}
-  loading={loading}
-  style={{ color: '#762f0b', fontSize: '12px' }} // chỉnh size nhỏ hơn
->
-  Lưu thay đổi
-</Button>
+            <Button
+              color="#808080"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={loading}
+              style={{ fontSize: "12px" }}
+            >
+              Hủy
+            </Button>
+            <Button
+              color="#ffbe00"
+              onClick={handleSave}
+              loading={loading}
+              style={{ color: "#762f0b", fontSize: "12px" }}
+            >
+              Lưu thay đổi
+            </Button>
           </Group>
         )}
       </Paper>

@@ -3,10 +3,20 @@ import { loginUser } from "../api/apiLogin";
 import { getUserInfo } from "../api/apiLoginusename";
 
 interface User {
-  full_name: string;
-  email: string;
-  system_rank?: number;
-    is_active?: boolean;
+ email?: string;
+  full_name?: string;
+  phone?: string;
+
+  is_active?: boolean;
+  is_superuser?: boolean;
+
+  province_id?: string;
+  ward_id?: string;
+  introducer_id?: string;
+
+  creation_time?: string;
+  detal_address?: string;
+  last_login?: string;
 }
 
 const useAuth = () => {
