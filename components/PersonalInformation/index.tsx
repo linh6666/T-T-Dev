@@ -80,25 +80,32 @@ export default function ProfilePage() {
  const handleLogout = async () => {
   const confirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất?");
   if (!confirmed) return;
-    const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("access_token") || ""
-      : "";
-  const projectData = await getListProject({token});
-  const projectId = projectData.data[0].id;
-  // console.log("ddd: ", projectData.data[0].id) 
-  await releaseControl(projectId!)
-  // ✅ Xóa token trong localStorage
 
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
+  try {
+    const token = localStorage.getItem("access_token") || "";
 
-  // ✅ Xóa thông tin user trong state
-  setUser(null);
+    if (token) {
+      const projectData = await getListProject({ token });
+      const projectId = projectData?.data?.[0]?.id;
 
-  // // ✅ Load lại trang về /
-  window.location.href = "/";
+      if (projectId) {
+        await releaseControl(projectId);
+      }
+    }
+  } catch (error) {
+    console.error("Logout API error (ignored):", error);
+    // ❗ CỐ TÌNH BỎ QUA LỖI
+  } finally {
+    // 🔥 LUÔN LUÔN ĐĂNG XUẤT
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    setUser(null);
+
+    // Nếu dùng Next.js App Router thì dùng router.replace("/")
+    window.location.href = "/";
+  }
 };
+
 
   // ✅ Nội dung main theo tab
   const renderContent = () => {
