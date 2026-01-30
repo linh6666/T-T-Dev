@@ -1338,8 +1338,8 @@ export const pathsData: SvgItem[] = [
 
 
 `,
- topPercent: 5,
-    leftPercent: 24,
+ topPercent: 10.5,
+    leftPercent: 27,
      
   },
 ];

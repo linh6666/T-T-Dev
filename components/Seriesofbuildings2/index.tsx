@@ -125,7 +125,7 @@ export default function ZoningSystem({ project_id }: ZoningSystemProps) {
     ) as HTMLElement | null;
 
     if (el && transformRef.current) {
-      transformRef.current.zoomToElement(el, 1.5, 300);
+      transformRef.current.zoomToElement(el, 1.4, 300);
     }
   };
 
