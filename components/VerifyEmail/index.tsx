@@ -33,7 +33,11 @@ const VerifyEmail = () => {
       );
 
       NotificationExtension.Success("Xác thực email thành công!");
-      router.push("/");
+      
+      // Chờ 2s để người dùng kịp đọc thông báo rồi mới chuyển trang
+      setTimeout(() => {
+        router.push("/");
+      }, 20);
     } catch (error: unknown) {
       const err = error as AxiosError<{ detail?: string }>;
       const msg =
