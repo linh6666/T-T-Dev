@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Button, Space, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { api } from "../../libray/axios";
 import { AxiosError } from "axios";
@@ -12,16 +12,8 @@ const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token"); // 👈 Lấy token từ URL
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
-  // Nếu đã login thì không cần verify nữa
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token");
-    if (accessToken) {
-      window.location.href = "/";
-    }
-  }, []);
 
   const handleVerifyEmail = async () => {
     if (!token) {
