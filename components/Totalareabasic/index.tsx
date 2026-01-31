@@ -13,7 +13,7 @@ interface WarehouseDetailProps {
 const folderImages = [
   "ttphuoctho.png",
   "ttcitymillennia.png",
-  "ttcamau.png",
+  "ttcamau.jpg",
   "tttimessquare.png",
 ];
 
@@ -250,7 +250,7 @@ const handleBack = () => {
     </text>
   </svg>
 )}
-     {matchedImage === "ttcamau.png" && (
+     {matchedImage === "ttcamau.jpg" && (
  <svg
   className={styles.overlaySvg2}
   xmlns="http://www.w3.org/2000/svg"

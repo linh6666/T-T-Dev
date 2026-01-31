@@ -45,23 +45,26 @@ export default function ProfileLayout({
     const confirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất?");
     if (!confirmed) return;
 
-    try {
-      const token = localStorage.getItem("access_token") || "";
+    // 1. Xóa token và chuyển hướng NGAY LẬP TỨC để đảm bảo UX
+    const token = localStorage.getItem("access_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    
+    // Dùng window.location.href để load lại trang hoàn toàn, xóa sạch state
+    window.location.href = "/";
 
-      if (token) {
+    // 2. Gọi API release control ngầm (nếu có lỗi cũng không ảnh hưởng user)
+    if (token) {
+      try {
         const projectData = await getListProject({ token });
         const projectId = projectData?.data?.[0]?.id;
 
         if (projectId) {
           await releaseControl(projectId);
         }
+      } catch (error) {
+        console.error("Logout API error (background):", error);
       }
-    } catch (error) {
-      console.error("Logout API error (ignored):", error);
-    } finally {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      router.replace("/");
     }
   };
 

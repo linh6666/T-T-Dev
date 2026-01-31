@@ -13,27 +13,13 @@ export default function LoginButton() {
 
   const [mounted, setMounted] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [checkedActive, setCheckedActive] = useState(false);
 
   // ✅ Fix hydration
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // ✅ Tự động check is_active sau khi login
-  useEffect(() => {
-    if (!mounted) return;
 
-    if (
-      isLoggedIn &&
-      user &&
-      user.is_active === false &&
-      !checkedActive
-    ) {
-      setIsProfileOpen(true);
-      setCheckedActive(true); // tránh mở lại nhiều lần
-    }
-  }, [isLoggedIn, user, mounted, checkedActive]);
 
   if (!mounted) return null;
 
@@ -106,6 +92,7 @@ export default function LoginButton() {
       <ProfileModal
         opened={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
+        email={user?.email || ""}
       />
 
       {/* 🔹 Hiển thị lỗi */}
