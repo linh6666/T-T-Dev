@@ -119,7 +119,7 @@ export default function Menu({ project_id, onModelsLoaded, }: MenuProps) {
       </div>
 
       <div className={styles.title}>
-        <h1>TIỆN ÍCHKKK</h1>
+        <h1>TIỆN ÍCH</h1>
       </div>
 
       <div className={styles.Function}>

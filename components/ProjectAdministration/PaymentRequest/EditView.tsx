@@ -9,11 +9,11 @@ import {
 } from "@mantine/core";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useEffect, useCallback, useState } from "react";
 import { getListOrder } from "../../../api/apiGetlistOrder";
-import { IconEye, IconFileText } from "@tabler/icons-react";
-import { Button as MantineButton, Anchor } from "@mantine/core";
+import {  IconFileText } from "@tabler/icons-react";
+import { Anchor } from "@mantine/core";
 
 interface EditViewProps {
   id: string; // project_id
@@ -33,7 +33,7 @@ interface OrderDataType {
 }
 
 const EditView = ({ id }: EditViewProps) => {
-  const router = useRouter();
+
   const [data, setData] = useState<OrderDataType[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -122,21 +122,7 @@ const EditView = ({ id }: EditViewProps) => {
         return <Badge color={config.color} variant="light">{config.label}</Badge>;
       },
     },
-    {
-      title: "Hành động",
-      key: "action",
-      width: 100,
-      render: (record: OrderDataType) => (
-        <MantineButton
-          variant="subtle"
-          size="xs"
-          leftSection={<IconEye size={16} />}
-          onClick={() => router.push(`/chi-tiet-don/${record.id}?project_id=${id}`)}
-        >
-          Chi tiết
-        </MantineButton>
-      ),
-    },
+ 
   ];
 
   return (

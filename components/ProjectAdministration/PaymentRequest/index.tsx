@@ -7,8 +7,9 @@ import type { ColumnsType } from "antd/es/table";
 import { modals } from "@mantine/modals";
 import { getListProject } from "../../../api/apigetlistProject";
 import { EuiButtonIcon, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
-import { Group } from "@mantine/core";
+import { Group, Indicator } from "@mantine/core";
 import EditView from "./EditView";
+import { getListOrder } from "../../../api/apiGetlistOrder";
 
 
 interface DataType {
@@ -19,6 +20,7 @@ interface DataType {
   investor: string;
   overview_image: string;
   rank: number;
+  notification_count?: number; // Thêm trường count nếu có
 }
 
 export default function LargeFixedTable() {
@@ -47,10 +49,10 @@ export default function LargeFixedTable() {
         token,
         skip: 0,
         limit: 100,
-     // ⬅️ thêm lang vào API
       });
 
-      const users = result.data.map((user: DataType) => ({
+      // Lấy danh sách project cơ bản
+      const projects = result.data.map((user: DataType) => ({
         id: user.id,
         name: user.name,
         rank: user.rank,
@@ -58,9 +60,25 @@ export default function LargeFixedTable() {
         address: user.address,
         investor: user.investor,
         overview_image: user.overview_image,
+        notification_count: 0,
       }));
 
-      setData(users);
+      setData(projects);
+
+      // 🔥 FETCH COUNT THỰC TẾ CHO TỪNG PROJECT
+      const projectsWithCounts = await Promise.all(
+        projects.map(async (p: DataType) => {
+          try {
+            const orders = await getListOrder(p.id, { token });
+            return { ...p, notification_count: orders.total || 0 };
+          } catch (e) {
+            console.error(`Lỗi lấy count cho project ${p.id}:`, e);
+            return p;
+          }
+        })
+      );
+
+      setData(projectsWithCounts);
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("Đã xảy ra lỗi khi tải dữ liệu.");
@@ -137,12 +155,22 @@ const openEditUserModal = (role: DataType) => {
       render: (user: DataType) => (
         <EuiFlexGroup wrap={false} gutterSize="s" alignItems="center">
           <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              iconType="bell"
-              aria-label="Thông báo"
-              color="primary"
-              onClick={() => openEditUserModal(user)}
-            />
+            <Indicator 
+              label={user.notification_count} 
+              size={18} 
+              offset={2}
+              position="top-end"
+              color="red"
+              withBorder
+              disabled={!user.notification_count}
+            >
+              <EuiButtonIcon
+                iconType="bell"
+                aria-label="Thông báo"
+                color="primary"
+                onClick={() => openEditUserModal(user)}
+              />
+            </Indicator>
           </EuiFlexItem>
        
         </EuiFlexGroup>
