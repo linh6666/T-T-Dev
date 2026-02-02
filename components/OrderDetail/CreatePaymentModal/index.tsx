@@ -20,6 +20,7 @@ interface CreatePaymentModalProps {
   opened: boolean;
   onClose: () => void;
   projectId: string | null;
+  orderId: string;
 }
 
 interface PaymentFileItem {
@@ -28,42 +29,21 @@ interface PaymentFileItem {
   description_vi: string;
 }
 
-/* =========================
-   INITIAL STATE
-========================= */
-
-const initialFiles: PaymentFileItem[] = [
-  { file: null, name_vi: "", description_vi: "" },
-];
-
 export default function CreatePaymentModal({
   opened,
   onClose,
   projectId,
+  orderId,
 }: CreatePaymentModalProps) {
-  const [orderId, setOrderId] = useState("");
   const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
   const [paymentStage, setPaymentStage] = useState("");
   const [saleNote, setSaleNote] = useState("");
-  const [files, setFiles] = useState<PaymentFileItem[]>(initialFiles);
+
+  const [files, setFiles] = useState<PaymentFileItem[]>([
+    { file: null, name_vi: "", description_vi: "" },
+  ]);
+
   const [loading, setLoading] = useState(false);
-
-  /* =========================
-     RESET FORM
-  ========================= */
-
-  const resetForm = () => {
-    setOrderId("");
-    setTotalAmount(undefined);
-    setPaymentStage("");
-    setSaleNote("");
-    setFiles(initialFiles);
-  };
-
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
 
   /* =========================
      FILE HANDLERS
@@ -101,7 +81,7 @@ export default function CreatePaymentModal({
 
   const canSubmit =
     !!projectId &&
-    !!orderId.trim() &&
+    !!orderId &&
     totalAmount !== undefined &&
     !!paymentStage.trim() &&
     !hasInvalidFile;
@@ -130,7 +110,6 @@ export default function CreatePaymentModal({
           })),
       });
 
-      resetForm(); // ✅ reset sau khi tạo thành công
       onClose();
     } catch (error) {
       console.error("Create order payment error:", error);
@@ -146,21 +125,14 @@ export default function CreatePaymentModal({
   return (
     <Modal
       opened={opened}
-      onClose={handleClose}
+      onClose={onClose}
       radius="md"
       size={800}
       title={<Title order={1} size="h3">Tạo đơn thanh toán mới</Title>}
     >
       <Stack gap="md">
         <SimpleGrid cols={2} spacing="md">
-          <TextInput
-            label="Mã Hóa Đơn"
-            placeholder="Nhập mã hóa đơn"
-            value={orderId}
-            onChange={(e) => setOrderId(e.currentTarget.value)}
-            radius="md"
-            required
-          />
+
 
           <NumberInput
             label="Số Tiền Thanh Toán (VNĐ)"
@@ -206,15 +178,15 @@ export default function CreatePaymentModal({
                   placeholder="Chọn file"
                   accept="image/*,.pdf"
                   value={item.file}
-                  onChange={(file) =>
+                  onChange={(file) => {
                     updateFile(index, {
                       file,
                       name_vi:
                         file && !item.name_vi
                           ? file.name
                           : item.name_vi,
-                    })
-                  }
+                    });
+                  }}
                   radius="md"
                 />
 
@@ -270,7 +242,7 @@ export default function CreatePaymentModal({
         </Stack>
 
         <Group justify="flex-end" mt="md">
-          <Button variant="default" onClick={handleClose}>
+          <Button variant="default" onClick={onClose}>
             Hủy
           </Button>
           <Button

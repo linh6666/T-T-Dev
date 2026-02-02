@@ -17,6 +17,10 @@ import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
 import CreatePaymentModal from "./CreatePaymentModal";
+import { getOrderPaymentByOrderId } from "../../api/apiGetlistdetailOder";
+import { useEffect, useState } from "react";
+import { Loader, Center } from "@mantine/core";
+
 
 
 /* =======================
@@ -24,13 +28,82 @@ import CreatePaymentModal from "./CreatePaymentModal";
 ======================= */
 interface OrderDetailPageProps {
   projectId: string | null;
+  orderId: string;
+}
+
+interface OrderPaymentItem {
+  id: string;
+  unit_code?: string;
+  product_name?: string;
+  order_status?: string;
+  status?: string;
+  manager_status?: string;
+  contract_code?: string;
+  order_code?: string;
+  order_date?: string;
+  created_at?: string;
+  payment_date?: string;
+  created_by_name?: string;
+  seller_id?: string;
+  sale_note?: string;
+  full_name?: string;
+  customer_id?: string;
+  phone_number?: string;
+  email?: string;
+  payment_stage?: string;
+  title?: string;
+  amount?: number;
+  total_amount_vn?: number;
+  total_price_at_sale_vi?: number;
+  total_amount?: number;
+  paid_amount?: number;
+  discount_amount?: number;
+  remaining_amount?: number;
+}
+
+interface OrderPaymentResponse {
+  items: OrderPaymentItem[];
+  total: number;
 }
 
 export default function OrderDetailPage({
+  orderId,
   projectId,
 }: OrderDetailPageProps) {
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
+  const [paymentData, setPaymentData] = useState<OrderPaymentResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        setLoading(true);
+        const data = await getOrderPaymentByOrderId(orderId, projectId);
+        console.log("Order Payment Data:", data); // Adding log to see details
+        setPaymentData(data);
+      } catch (error) {
+        console.error("Error fetching order details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (orderId) {
+      fetchOrderDetails();
+    }
+  }, [orderId, projectId]);
+
+  if (loading) {
+    return (
+      <Center style={{ height: "100vh" }}>
+        <Loader color="blue" size="xl" type="dots" />
+      </Center>
+    );
+  }
+
+  const payments = paymentData?.items || [];
+  const orderInfo = payments[0] || {}; // Fallback: Take info from the first payment item if metadata is missing
 
   return (
     <>
@@ -64,18 +137,54 @@ export default function OrderDetailPage({
               >
                 <Group justify="space-between" mb="sm">
                   <Title order={3} fw={700}>
-                    SH1.13
+                    {orderInfo?.unit_code || orderInfo?.product_name || "N/A"}
                   </Title>
 
-                  <Badge
-                    color="#d3f9d8"
-                    c="#2b8a3e"
-                    variant="filled"
-                    radius="xl"
-                    px={15}
-                  >
-                    Đã thanh toán
-                  </Badge>
+                  {(() => {
+                    const status = orderInfo?.manager_status || orderInfo?.order_status || orderInfo?.status;
+                    const statusConfig: Record<string, { label: string; color: string }> = {
+                      pending: {
+                        label: "Đang chờ manager khóa căn hộ",
+                        color: "yellow",
+                      },
+                      pending_deposit: {
+                        label: "Đang chờ đơn thanh toán đầu tiên được duyệt",
+                        color: "orange",
+                      },
+                      paying: {
+                        label: "Đang thanh toán",
+                        color: "blue",
+                      },
+                      completed: {
+                        label: "Đã thanh toán hoàn tất",
+                        color: "green",
+                      },
+                      cancelled: {
+                        label: "Đã hủy đơn hàng",
+                        color: "red",
+                      },
+                      expired: {
+                        label: "Đơn thanh toán chưa được tạo hoặc không được duyệt - hết hạn",
+                        color: "gray",
+                      },
+                    };
+
+                    const config = (status && statusConfig[status]) || {
+                      label: status || "N/A",
+                      color: "gray",
+                    };
+
+                    return (
+                      <Badge
+                        color={config.color}
+                        variant="filled"
+                        radius="xl"
+                        px={15}
+                      >
+                        {config.label}
+                      </Badge>
+                    );
+                  })()}
                 </Group>
 
                 <Card shadow="xs" radius="lg" p={0}>
@@ -87,7 +196,7 @@ export default function OrderDetailPage({
                         </Text>
                       </Grid.Col>
                       <Grid.Col span={9}>
-                        <Text size="sm">#856432</Text>
+                        <Text size="sm">#{orderInfo?.contract_code || orderInfo?.order_code || "N/A"}</Text>
                       </Grid.Col>
 
                       <Grid.Col span={3}>
@@ -96,7 +205,7 @@ export default function OrderDetailPage({
                         </Text>
                       </Grid.Col>
                       <Grid.Col span={9}>
-                        <Text size="sm">24/12/2025</Text>
+                        <Text size="sm">{ (orderInfo?.order_date || orderInfo?.created_at) ? new Date((orderInfo.order_date || orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
                       </Grid.Col>
 
                       <Grid.Col span={3}>
@@ -105,7 +214,7 @@ export default function OrderDetailPage({
                         </Text>
                       </Grid.Col>
                       <Grid.Col span={9}>
-                        <Text size="sm">Phạm Thị Sale</Text>
+                        <Text size="sm">{orderInfo?.created_by_name || orderInfo?.seller_id || "N/A"}</Text>
                       </Grid.Col>
                     </Grid>
 
@@ -114,8 +223,7 @@ export default function OrderDetailPage({
                         Lời nhắn từ Sale:
                       </Text>
                       <Text size="sm">
-                        Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp
-                        theo trước ngày xx/xx/xxxx theo hợp đồng.
+                        {orderInfo?.sale_note || "Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp theo theo hợp đồng."}
                       </Text>
                     </Group>
                   </Box>
@@ -133,9 +241,7 @@ export default function OrderDetailPage({
                     Tạo đơn thanh toán mới
                   </Button>
 
-                  <Button color="red" radius="md">
-                    ✕ Hủy đơn hàng
-                  </Button>
+               
                 </Group>
               </Card>
             </Grid.Col>
@@ -155,13 +261,13 @@ export default function OrderDetailPage({
                   <Stack gap={30}>
                     <Box>
                       <Text fw={600} size="md">
-                        NGUYỄN VĂN A
+                        {orderInfo?.full_name || orderInfo?.customer_id || "N/A"}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        SĐT: 098765432
+                        SĐT: {orderInfo?.phone_number || "N/A"}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        Company@example.com
+                        {orderInfo?.email || "N/A"}
                       </Text>
                     </Box>
 
@@ -172,7 +278,7 @@ export default function OrderDetailPage({
                         </Text>
                       </Grid.Col>
                       <Grid.Col span={6} ta="right">
-                        <Text size="xs">#856432</Text>
+                        <Text size="xs">#{orderInfo?.contract_code || orderInfo?.order_code || "N/A"}</Text>
                       </Grid.Col>
 
                       <Grid.Col span={6}>
@@ -181,7 +287,7 @@ export default function OrderDetailPage({
                         </Text>
                       </Grid.Col>
                       <Grid.Col span={6} ta="right">
-                        <Text size="xs">23/01/2026</Text>
+                        <Text size="xs">{(orderInfo?.order_date || orderInfo?.created_at) ? new Date((orderInfo.order_date || orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
                       </Grid.Col>
 
                       <Grid.Col span={6}>
@@ -190,43 +296,22 @@ export default function OrderDetailPage({
                         </Text>
                       </Grid.Col>
                       <Grid.Col span={6} ta="right">
-                        <Text size="xs">Phạm Thị Sale</Text>
+                        <Text size="xs">{orderInfo?.created_by_name || orderInfo?.seller_id || "N/A"}</Text>
                       </Grid.Col>
                     </Grid>
 
                     <Stack gap="md">
-                      {[
-                        {
-                          label: "Đặt cọc",
-                          date: "01/01/2026",
-                          price: "500.000.000",
-                        },
-                        {
-                          label: "Thanh toán lần 2",
-                          date: "08/01/2026",
-                          price: "1.000.000.000",
-                        },
-                        {
-                          label: "Thanh toán lần 3",
-                          date: "15/01/2026",
-                          price: "5.000.000.000",
-                        },
-                        {
-                          label: "Thanh toán toàn bộ",
-                          date: "23/01/2026",
-                          price: "2.300.000.000",
-                        },
-                      ].map((item, idx) => (
+                      {payments.map((item: OrderPaymentItem, idx: number) => (
                         <Box key={idx}>
                           <Group justify="space-between">
                             <Text size="sm" fw={600}>
-                              {item.label}
+                              {item.payment_stage || item.title || "Thanh toán"}
                             </Text>
                             <Text size="sm" c="dimmed">
-                              {item.date}
+                              {(item.created_at || item.payment_date) ? new Date((item.created_at || item.payment_date) as string).toLocaleDateString("vi-VN") : "N/A"}
                             </Text>
                             <Text size="sm" fw={600}>
-                              {item.price}
+                              {(item.total_amount_vn || item.amount)?.toLocaleString("vi-VN")}
                             </Text>
                           </Group>
                           <Divider mt="sm" />
@@ -251,7 +336,7 @@ export default function OrderDetailPage({
                               Tổng chi phí cần thanh toán
                             </Text>
                             <Text size="xs" fw={700}>
-                              9.000.000.000
+                              {(orderInfo?.total_price_at_sale_vi || orderInfo?.total_amount)?.toLocaleString("vi-VN") || 0}
                             </Text>
                           </Group>
 
@@ -260,14 +345,14 @@ export default function OrderDetailPage({
                               Tổng chi phí đã thanh toán
                             </Text>
                             <Text size="xs" fw={700}>
-                              8.800.000.000
+                              {orderInfo?.paid_amount?.toLocaleString("vi-VN") || 0}
                             </Text>
                           </Group>
 
                           <Group justify="space-between">
                             <Text size="xs">Chiết khấu</Text>
                             <Text size="xs" fw={700}>
-                              -200.000.000
+                              {(orderInfo?.discount_amount || 0).toLocaleString("vi-VN")}
                             </Text>
                           </Group>
 
@@ -282,7 +367,7 @@ export default function OrderDetailPage({
                             </Text>
                             <Stack gap={0} align="flex-end">
                               <Text fw={800} size="xl" lh={1}>
-                                0
+                                {(orderInfo?.remaining_amount || 0).toLocaleString("vi-VN")}
                               </Text>
                               <Text size="10px">(VNĐ)</Text>
                             </Stack>
@@ -303,6 +388,7 @@ export default function OrderDetailPage({
         opened={opened}
         onClose={close}
         projectId={projectId}
+        orderId={orderId}
       />
     </>
   );

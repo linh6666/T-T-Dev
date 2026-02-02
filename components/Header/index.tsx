@@ -171,10 +171,6 @@ const isActive = (href: string, highlight?: boolean) => {
             
           </div>
             </Tooltip>
-    
-        
-
-
 
   <Group justify="center">
       <Popover

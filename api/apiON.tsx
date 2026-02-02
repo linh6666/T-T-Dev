@@ -24,8 +24,8 @@ export const createON = async (body: CreateNodeAttributeBody) => {
 
     console.log("✅ API response:", response.data);
     return response.data;
-  } catch (error: any) {
-    console.error("❌ Error calling createNodeAttribute:", error);
+  } catch (error: unknown) {
+    console.error("❌ Error calling createNodeAttribute:", error instanceof Error ? error.message : error);
     throw error;
   }
 };
