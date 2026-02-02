@@ -80,16 +80,15 @@ const openEditUserModal = (role: DataType) => {
   modals.openConfirmModal({
     title: 
       <div style={{ fontWeight: 600, fontSize: 18 }}>
-        Chỉnh sửa dự án
+        Danh sách đơn hàng dự án
       </div>
     ,
     children: (
       <EditView
         id={role.id}
-         // ⬅️ TRUYỀN LANG VÀO EDITVIEW
-        onSearch={fetchData}
       />
     ),
+    size: 1200,
     confirmProps: { display: "none" },
     cancelProps: { display: "none" },
   });
