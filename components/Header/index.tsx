@@ -83,6 +83,7 @@ export default function Header() {
         "MÔ HÌNH TƯƠNG TÁC",
         "QUẢN LÝ BÁN HÀNG",
        "THÔNG TIN SẢN PHẨM", 
+       "QUẢN TRỊ DỰ ÁN",
        
       ].includes(link.label);
     }

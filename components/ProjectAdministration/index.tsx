@@ -16,6 +16,7 @@ import Roles from './Roles';
 import UserProjectRole from './UserProjectRole';
 import Order from './Order'; 
 import  ProjectDetails from './ProjectDetails';
+import  PaymentRequest from './PaymentRequest';
 import HomeAdmin from '../HomeAdmin/index';  
 // import ProjectManagere from './ProjectManagere'; 
 
@@ -52,7 +53,7 @@ const mockdata = [
     links: [
       { label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
       { label: 'Quản lý đơn hàng', link: 'Order' },
-      { label: 'Duyệt đơn thanh toán kế tiếp', link: 'Test1' },
+      { label: 'Duyệt đơn thanh toán kế tiếp', link: 'PaymentRequest' },
       
     ],
   },
@@ -89,8 +90,8 @@ export function ProjectManagement() {
         return <ProjectDetails />;
       case 'JionProject':
        return <JionProject/>;
-      // case 'user-list':
-      //   return <UserProjectRole/>;
+      case 'PaymentRequest':
+        return <PaymentRequest/>;
          
       default:
          return <HomeAdmin/>;
