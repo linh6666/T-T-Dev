@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-react";
 
 import { getCurrentUser } from "../../../api/apiProfile";
-import { getListProject } from "../../../api/apigetlistProjectControl";
+import { getListProject } from "../../../api/apigetlistProject";
 import { releaseControl } from "../../../api/DeleteControl";
 
 export default function ProfileLayout({
@@ -26,9 +26,11 @@ export default function ProfileLayout({
   const pathname = usePathname();
 
   /**
-   * Check đăng nhập
+   * =========================
+   * CHECK ĐĂNG NHẬP
+   * =========================
    * - Token hợp lệ → cho vào
-   * - Token lỗi → đá về trang "/"
+   * - Token lỗi → đá về "/"
    */
   useEffect(() => {
     getCurrentUser().catch(() => {
@@ -37,37 +39,47 @@ export default function ProfileLayout({
   }, [router]);
 
   /**
-   * Logout
-   * - Cố gắng release control (nếu có)
-   * - Dù lỗi API vẫn logout bình thường
+   * =========================
+   * LOGOUT
+   * =========================
+   * 1. Gọi API releaseControl (nếu có)
+   * 2. Sau đó mới logout + redirect
    */
   const handleLogout = async () => {
     const confirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất?");
     if (!confirmed) return;
 
-    // 1. Xóa token và chuyển hướng NGAY LẬP TỨC để đảm bảo UX
     const token = localStorage.getItem("access_token");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    
-    // Dùng window.location.href để load lại trang hoàn toàn, xóa sạch state
-    window.location.href = "/";
 
-    // 2. Gọi API release control ngầm (nếu có lỗi cũng không ảnh hưởng user)
-    if (token) {
-      try {
+    try {
+      if (token) {
         const projectData = await getListProject({ token });
         const projectId = projectData?.data?.[0]?.id;
 
         if (projectId) {
-          await releaseControl(projectId);
+          await releaseControl(projectId); // ✅ GỌI TRƯỚC KHI LOGOUT
         }
-      } catch (error) {
-        console.error("Logout API error (background):", error);
       }
+    } catch (error) {
+      console.error("Release control error:", error);
+      // ❗ Tuỳ nghiệp vụ: có thể vẫn cho logout tiếp
     }
+
+    // =========================
+    // LOGOUT SAU KHI GỌI API
+    // =========================
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+
+    // Reload toàn bộ app để xoá sạch state
+    window.location.href = "/";
   };
 
+  /**
+   * =========================
+   * MENU SIDEBAR
+   * =========================
+   */
   const menu = [
     {
       label: "Tài khoản của bạn",
@@ -103,6 +115,7 @@ export default function ProfileLayout({
 
   return (
     <div className={styles.Box}>
+      {/* ================= SIDEBAR ================= */}
       <aside className={styles.sidebar}>
         <ul>
           {menu.map((item) => (
@@ -131,6 +144,7 @@ export default function ProfileLayout({
         </ul>
       </aside>
 
+      {/* ================= CONTENT ================= */}
       <main className={styles.content}>{children}</main>
     </div>
   );
