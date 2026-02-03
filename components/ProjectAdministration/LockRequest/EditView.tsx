@@ -6,12 +6,18 @@ import {
   Badge,
   Text,
   Group,
+ 
 } from "@mantine/core";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useCallback, useState } from "react";
 import { getListOrder } from "../../../api/apiGetlistOrder";
-
+import { getOrderPaymentByOrderId } from "../../../api/apiGetlistdetailOder";
+import { updateRequest } from "../../../api/apiLockRequest";
+import { getCurrentUser } from "../../../api/apiProfile";
+import { ActionIcon, Tooltip } from "@mantine/core";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface EditViewProps {
   id: string; // project_id
@@ -25,24 +31,57 @@ interface OrderDataType {
   total_price_at_sale_vi: number;
   order_date: string;
   order_status: string;
+  manager_status?: string;
   customer_name: string;
   customer_phone: string;
   seller_name: string;
 }
 
 const EditView = ({ id }: EditViewProps) => {
-
   const [data, setData] = useState<OrderDataType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
 
   const token = localStorage.getItem("access_token") || "";
+
+  // Lấy thông tin người dùng hiện tại để làm approver_id
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Lỗi lấy thông tin user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const fetchOrders = useCallback(async () => {
     if (!id || !token) return;
     setLoading(true);
     try {
       const res = await getListOrder(id, { token });
-      setData(res.items || []);
+      const orders = res.items || [];
+
+      // 🔥 Enrich orders with manager_status from detail API
+      const enrichedOrders = await Promise.all(
+        orders.map(async (order: OrderDataType) => {
+          try {
+            const detailRes = await getOrderPaymentByOrderId(order.id, id);
+            const detail = detailRes?.items?.[0] || {};
+            return {
+              ...order,
+              manager_status: detail.manager_status || order.order_status,
+            };
+          } catch (error) {
+            console.error(`Lỗi khi lấy chi tiết đơn ${order.id}:`, error);
+            return order;
+          }
+        })
+      );
+
+      setData(enrichedOrders);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách đơn hàng:", error);
     } finally {
@@ -53,6 +92,28 @@ const EditView = ({ id }: EditViewProps) => {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  const handleStatusUpdate = async (request_id: string, status: "granted" | "rejected", message: string = "") => {
+    try {
+      setLoading(true);
+      const res = await updateRequest(request_id, id, { 
+        status,
+        approver_id: currentUser?.id,
+        approver_at: new Date().toISOString(),
+        response_message_vi: message,
+        response_message_en: message
+      });
+      
+      NotificationExtension.Success(res?.message || `Đã ${status === "granted" ? "duyệt" : "từ chối"} yêu cầu thành công.`);
+      fetchOrders(); // Refresh table
+    } catch (error: unknown) {
+      console.error("Lỗi khi cập nhật trạng thái:", error);
+      const err = error as { response?: { data?: { detail?: string } } };
+      NotificationExtension.Fails(err?.response?.data?.detail || "Không thể cập nhật trạng thái yêu cầu.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns: ColumnsType<OrderDataType> = [
     {
@@ -99,23 +160,51 @@ const EditView = ({ id }: EditViewProps) => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "order_status",
-      key: "order_status",
+      dataIndex: "manager_status",
+      key: "manager_status",
       width: 150,
       render: (status: string) => {
         const statusConfig: Record<string, { label: string; color: string }> = {
           pending: { label: "Chờ duyệt", color: "yellow" },
-          pending_deposit: { label: "Chờ cọc", color: "orange" },
-          paying: { label: "Đang thanh toán", color: "blue" },
-          completed: { label: "Hoàn tất", color: "green" },
-          cancelled: { label: "Đã hủy", color: "red" },
-          expired: { label: "Hết hạn", color: "gray" },
+          granted: { label: "Đã duyệt", color: "green" },
+          rejected: { label: "Từ chối", color: "red" },
         };
-        const config = statusConfig[status] || { label: status, color: "gray" };
-        return <Badge color={config.color} variant="light">{config.label}</Badge>;
+        const config = statusConfig[status] || { label: status || "N/A", color: "gray" };
+        return <Badge color={config.color} variant="filled">{config.label}</Badge>;
       },
     },
- 
+    {
+      title: "Hành động",
+      key: "action",
+      width: 150,
+      render: (record: OrderDataType) => (
+        <Group gap="xs">
+          
+          {record.manager_status === "pending" && (
+            <>
+              <Tooltip label="Duyệt yêu cầu">
+                <ActionIcon 
+                  color="green" 
+                  variant="light" 
+                  onClick={() => handleStatusUpdate(record.id, "granted")}
+                >
+                  <IconCheck size={18} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Từ chối yêu cầu">
+                <ActionIcon 
+                  color="red" 
+                  variant="light"
+                  onClick={() => handleStatusUpdate(record.id, "rejected")}
+                >
+                  <IconX size={18} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
+        </Group>
+      ),
+    },
   ];
 
   return (

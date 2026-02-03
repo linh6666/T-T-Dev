@@ -12,6 +12,7 @@ import EditView from "./EditView";
 import { getListOrder } from "../../../api/apiGetlistOrder";
 
 
+
 interface DataType {
   id: string;
   name: string;
@@ -187,17 +188,7 @@ const openEditUserModal = (role: DataType) => {
 
         {/* 🔥 SELECT LANG */}
         <div style={{ marginBottom: 12 }}>
-          {/* <label htmlFor="language-select" style={{ marginRight: 8 }}>
-            {language === "vi" ? "Chọn ngôn ngữ:" : "Select Language:"}
-          </label>
-          <select
-            id="language-select"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value as "vi" | "en")}
-          >
-            <option value="vi">Tiếng Việt</option>
-            <option value="en">English</option>
-          </select> */}
+         
         </div>
       </Group>
 

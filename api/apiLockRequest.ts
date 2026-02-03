@@ -3,6 +3,10 @@ import { API_ROUTE } from "../const/apiRouter"; // object chứa hằng số
 
 export interface UpdateRequestPayload {
   status: "pending" | "granted" | "rejected";
+  approver_id?: string;
+  approver_at?: string;
+  response_message_vi?: string;
+  response_message_en?: string;
 }
 
 // Hàm update request theo project_id và request_id
