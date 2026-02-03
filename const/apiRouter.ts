@@ -151,6 +151,9 @@ GET_LIST_ODER_PAYMENT:"/api/v1/order_payment/{order_id}",
 GET_LIST_PAYMENT:"/api/v1/order_payment/by_id/{order_id}",
 
 //xóa điều khiển
-DELETE_CONTROL:"/api/v1/control/release_control/{project_id}"
+DELETE_CONTROL:"/api/v1/control/release_control/{project_id}",
+
+///lockrequest
+LOCK_REQUEST:"/api/v1/request_lock//{request_id}",
 
 }
