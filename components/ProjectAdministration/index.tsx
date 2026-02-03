@@ -17,6 +17,7 @@ import UserProjectRole from './UserProjectRole';
 import Order from './Order'; 
 import  ProjectDetails from './ProjectDetails';
 import  PaymentRequest from './PaymentRequest';
+import  LockRequest from './LockRequest';
 import HomeAdmin from '../HomeAdmin/index';  
 // import ProjectManagere from './ProjectManagere'; 
 
@@ -54,6 +55,7 @@ const mockdata = [
       { label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
       { label: 'Quản lý đơn hàng', link: 'Order' },
       { label: 'Duyệt đơn thanh toán kế tiếp', link: 'PaymentRequest' },
+         { label: 'Duyệt yêu cầu', link: 'LockRequest' }
       
     ],
   },
@@ -92,7 +94,8 @@ export function ProjectManagement() {
        return <JionProject/>;
       case 'PaymentRequest':
         return <PaymentRequest/>;
-         
+            case 'LockRequest':
+        return <LockRequest/>;
       default:
          return <HomeAdmin/>;
     }
