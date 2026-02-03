@@ -12,8 +12,8 @@ import type { ColumnsType } from "antd/es/table";
 // import { useRouter } from "next/navigation";
 import { useEffect, useCallback, useState } from "react";
 import { getListOrder } from "../../../api/apiGetlistOrder";
-import {  IconFileText } from "@tabler/icons-react";
-import { Anchor } from "@mantine/core";
+// import {  IconFileText } from "@tabler/icons-react";
+// import { Anchor } from "@mantine/core";
 
 interface EditViewProps {
   id: string; // project_id
@@ -81,11 +81,6 @@ const EditView = ({ id }: EditViewProps) => {
       render: (record: OrderDataType) => (
         <Group gap="xs">
           <Text size="sm">{record.contract_code || "N/A"}</Text>
-          {record.contract_url && (
-            <Anchor href={record.contract_url} target="_blank">
-              <IconFileText size={16} color="#3598dc" />
-            </Anchor>
-          )}
         </Group>
       ),
     },
