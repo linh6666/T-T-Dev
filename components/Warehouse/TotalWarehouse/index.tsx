@@ -11,7 +11,7 @@ import {
   Autocomplete,
   MultiSelect,
 } from "@mantine/core";
-import { createWarehouse } from "../../../api/apiFilterWarehouse";
+import { createWarehouse } from "../../../api/apiFilterWarehousebasic";
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail";
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
@@ -104,7 +104,7 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
           filters: [{ label: "type_info", values: ["bh"] }],
         };
 
-        const res = await createWarehouse(projectId as string, body);
+        const res = await createWarehouse(body);
         const warehouseList: WarehouseItem[] = Array.isArray(res) ? res : res.data || [];
 
         const finalList = target
