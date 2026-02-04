@@ -68,7 +68,7 @@ export default function Menu({ project_id }: MenuProps) {
         <div className={styles.innerBtn} onClick={() => setShowFilter(!showFilter)}>
           <IconSearch size={16} /> Bộ lọc sản phẩm
         </div>
-        {showFilter && <FilterMenu onClose={() => setShowFilter(false)} />}
+        {showFilter && <FilterMenu project_id={project_id} onClose={() => setShowFilter(false)} />}
       </div>
 
 
