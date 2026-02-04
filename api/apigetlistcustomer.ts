@@ -23,7 +23,7 @@ export const getListCustomer = async (
   });
 
   return {
-    items: response.data.items,
-    total: response.data.total,
+    items: response.data.data,
+    total: response.data.count,
   };
 };
