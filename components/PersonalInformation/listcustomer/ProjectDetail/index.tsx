@@ -10,7 +10,7 @@ import {
   ScrollArea,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { getListOrder } from "../../../../api/apiGetlistOrder";
+import { getListCustomer } from "../../../../api/apigetlistcustomer";
 
 /* =======================
    TYPE
@@ -61,11 +61,11 @@ export default function ProjectDetail({ project }: Props) {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const res = await getListOrder(project.id);
-        setOrders(res.items);
-        setTotalOrder(res.total);
+        const res = await getListCustomer(project.id);
+        setOrders(res.items || []);
+        setTotalOrder(res.total || 0);
       } catch (error) {
-        console.error("Lỗi lấy danh sách order:", error);
+        console.error("Lỗi lấy danh sách khách hàng:", error);
       } finally {
         setLoading(false);
       }
@@ -94,11 +94,12 @@ export default function ProjectDetail({ project }: Props) {
         <Stack gap="md">
           {loading && <Text>Đang tải dữ liệu...</Text>}
 
-          {!loading && orders.length === 0 && (
-            <Text c="dimmed">Không có order nào</Text>
+          {!loading && orders && orders.length === 0 && (
+            <Text c="dimmed">Không có khách hàng nào</Text>
           )}
 
           {!loading &&
+            orders &&
             orders.map((order) => (
               <Card key={order.id} withBorder radius="sm" p="sm">
                 <Stack gap={4}>
