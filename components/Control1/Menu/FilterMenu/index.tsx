@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styles from './FilterMenu.module.css';
 import { IconSearch, IconX, IconLoader2 } from '@tabler/icons-react';
+import {  Text as MantineText,  } from '@mantine/core';
 import { createNodeAttribute } from "../../../../api/apifilter4";
 import { NotificationExtension } from "../../../../extension/NotificationExtension";
+import SearchResultModal from './SearchResultModal';
 
 interface FilterMenuProps {
   onClose: () => void;
@@ -10,7 +12,15 @@ interface FilterMenuProps {
 }
 
 interface NodeAttributeItem {
-  layer3?: string;
+  building_type?: string;
+  layer4?: string;
+  status_unit?: string;
+  id?: number | string;
+  unit_code?: string;
+  direction?: string;
+  main_door_direction?: string;
+  bedroom?: string | number;
+  bathroom?: string | number;
 }
 
 interface ApiResponse {
@@ -18,26 +28,22 @@ interface ApiResponse {
   message?: string;
 }
 
-interface MenuItem {
-  label: string;
-}
-
 export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
   // State for filters
   const [activePhanKhu, setActivePhanKhu] = useState<string>('');
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(['Shophouse']);
-  
-  // Explicitly typing numbers for state:
-  const [floors, setFloors] = useState<number[]>([]); 
-  const [bedrooms, setBedrooms] = useState<number[]>([3]);
-  const [bathrooms, setBathrooms] = useState<number[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   
   const [direction, setDirection] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-
-  // const phanKhuOptions = ['Gia An', 'Gia Khang', 'Gia Lộc', 'Gia Phúc'];
-  const typeOptions = ['Shophouse', 'Biệt thự', 'Nhà ở xã hội', 'Thương mại', 'Liền kề', 'Trường học', 'Giao thông', 'Cảnh quan'];
+  const [phanKhuOptions, setPhanKhuOptions] = useState<string[]>([]);
+  const [typeOptions, setTypeOptions] = useState<string[]>([]);
+  const [statusOptions, setStatusOptions] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState<string>('');
+  
+  // Results states
+  const [searchResults, setSearchResults] = useState<NodeAttributeItem[]>([]);
+  const [resultOpened, setResultOpened] = useState(false);
 
   const toggleType = (type: string) => {
     setSelectedTypes(prev => 
@@ -65,33 +71,44 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
           }
   
           if (data?.data && Array.isArray(data.data)) {
+            // 📍 Lấy danh sách Phân khu từ layer4
             const allPhases: string[] = data.data.flatMap(
               (item: NodeAttributeItem) =>
-                String(item.layer3 || "")
+                String(item.layer4 || "")
                   .split(";")
                   .map((z) => z.trim())
                   .filter(Boolean)
             );
   
-            // 🆕 BƯỚC LỌC MỚI: Loại bỏ các phase có giá trị là "skip" (không phân biệt chữ hoa/thường)
+            // 📍 Lấy danh sách Loại công trình từ building_type
+            const allTypes: string[] = data.data.flatMap(
+              (item: NodeAttributeItem) =>
+                String(item.building_type || "")
+                  .split(";")
+                  .map((z) => z.trim())
+                  .filter(Boolean)
+            );
+  
+            // 📍 Lấy danh sách Trạng thái từ status_unit
+            const allStatus: string[] = data.data.flatMap(
+              (item: NodeAttributeItem) =>
+                String(item.status_unit || "")
+                  .split(";")
+                  .map((z) => z.trim())
+                  .filter(Boolean)
+            );
+
             const filteredPhases = allPhases.filter((phase) => phase.toLowerCase() !== "skip");
+            const filteredTypes = allTypes.filter((type) => type.toLowerCase() !== "skip");
+            const filteredStatus = allStatus.filter((status) => status.toLowerCase() !== "skip");
+
+            const uniquePhases = Array.from(new Set(filteredPhases)).sort((a, b) => a.localeCompare(b, "vi"));
+            const uniqueTypes = Array.from(new Set(filteredTypes)).sort((a, b) => a.localeCompare(b, "vi"));
+            const uniqueStatus = Array.from(new Set(filteredStatus)).sort((a, b) => a.localeCompare(b, "vi"));
   
-            const uniquePhases = Array.from(new Set(filteredPhases));
-  
-            const sortedPhases = uniquePhases.sort((a, b) => {
-              const numA = a.match(/\d+/)?.[0];
-              const numB = b.match(/\d+/)?.[0];
-              if (numA && numB) return Number(numA) - Number(numB);
-              return a.localeCompare(b, "vi", { sensitivity: "base" });
-            });
-  
-            const items: MenuItem[] = sortedPhases.map((phase) => ({
-              label: phase,
-            }));
-            setMenuItems(items);
-            if (items.length > 0) {
-              setActivePhanKhu(items[0].label);
-            }
+            setPhanKhuOptions(uniquePhases);
+            setTypeOptions(uniqueTypes);
+            setStatusOptions(uniqueStatus);
           } else {
             console.warn("⚠️ Dữ liệu trả về không đúng định dạng:", data);
             NotificationExtension.Fails("Dữ liệu trả về không hợp lệ từ API!");
@@ -122,13 +139,76 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
       fetchData();
     }, [project_id]);
 
+  // 🔄 Tự động cập nhật ô tìm kiếm khi các bộ lọc thay đổi
+  useEffect(() => {
+    const activeFilters: string[] = [];
+    
+    if (activePhanKhu) activeFilters.push(activePhanKhu);
+    if (selectedTypes.length > 0) activeFilters.push(...selectedTypes);
+    if (selectedStatus.length > 0) activeFilters.push(...selectedStatus);
+    if (direction) activeFilters.push(direction);
+
+    // Chuyển mảng thành chuỗi cách nhau bằng dấu phẩy
+    setSearchValue(activeFilters.join(', '));
+  }, [activePhanKhu, selectedTypes, selectedStatus, direction]);
+
+  const handleSearch = async () => {
+    if (!project_id) return;
+
+    setResultOpened(true); // Open modal to show loading or results
+    
+    try {
+      const filters = [
+        { label: "layer5", values: ["ct", "ti"] },
+      ];
+
+      if (activePhanKhu) filters.push({ label: "zone", values: [activePhanKhu] });
+      if (selectedTypes.length > 0) filters.push({ label: "building_type", values: selectedTypes });
+      if (selectedStatus.length > 0) filters.push({ label: "status_unit", values: selectedStatus });
+      if (direction) filters.push({ label: "main_door_direction", values: [direction] });
+
+      const body = {
+        project_id,
+        filters: filters
+      };
+
+      const data = await createNodeAttribute(body);
+      
+      if (data?.data && Array.isArray(data.data)) {
+        setSearchResults(data.data);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("❌ Search error:", error);
+      NotificationExtension.Fails("Tìm kiếm thất bại!");
+      setSearchResults([]);
+    }
+  };
+
+  const handleReset = () => {
+    setActivePhanKhu('');
+    setSelectedTypes([]);
+    setSelectedStatus([]);
+    setDirection('');
+    setSearchValue('');
+    setSearchResults([]);
+    setResultOpened(false);
+  };
+
   return (
     <div className={styles.container}>
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.searchInputWrapper}>
           <IconSearch size={16} className={styles.searchIcon} />
-          <input type="text" placeholder="Tìm kiếm..." className={styles.searchInput} />
+          <input 
+            type="text" 
+            placeholder="Tìm kiếm..." 
+            className={styles.searchInput} 
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
         </div>
         <button className={styles.closeBtn} onClick={onClose}>
             <IconX size={18} />
@@ -144,14 +224,14 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
               <IconLoader2 size={18} className={styles.spinner} />
               <span>Đang tải...</span>
             </div>
-          ) : menuItems.length > 0 ? (
-            menuItems.map(item => (
+          ) : phanKhuOptions.length > 0 ? (
+            phanKhuOptions.map(pk => (
               <div 
-                key={item.label} 
-                className={`${styles.chip} ${activePhanKhu === item.label ? styles.active : ''}`}
-                onClick={() => setActivePhanKhu(item.label)}
+                key={pk} 
+                className={`${styles.chip} ${activePhanKhu === pk ? styles.active : ''}`}
+                onClick={() => setActivePhanKhu(activePhanKhu === pk ? '' : pk)}
               >
-                {item.label}
+                {pk}
               </div>
             ))
           ) : (
@@ -164,26 +244,49 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Loại công trình</div>
         <div className={styles.checkboxGroup}>
-          {typeOptions.map(type => (
-            <label key={type} className={styles.checkboxItem}>
-              <input 
-                type="checkbox" 
-                checked={selectedTypes.includes(type)}
-                onChange={() => toggleType(type)}
-                className={styles.checkbox}
-              />
-              {type}
-            </label>
-          ))}
+          {loading ? (
+             <MantineText size="xs" c="dimmed">Đang tải loại công trình...</MantineText>
+          ) : typeOptions.length > 0 ? (
+            typeOptions.map(type => (
+              <label key={type} className={styles.checkboxItem}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedTypes.includes(type)}
+                  onChange={() => toggleType(type)}
+                  className={styles.checkbox}
+                />
+                {type}
+              </label>
+            ))
+          ) : (
+            <MantineText size="xs" c="dimmed">Không có dữ liệu loại công trình</MantineText>
+          )}
         </div>
       </div>
 
       <div className={styles.gridSection}>
           {/* Numbers Sections */}
           <div className={styles.quantityGroup}>
-             <QuantityRow label="Số lượng tầng" values={[1, 2, 3, 4]} activeValues={floors} onChange={(nums) => setFloors(nums)} />
-             <QuantityRow label="Số lượng phòng ngủ" values={[1, 2, 3, 4]} activeValues={bedrooms} onChange={(nums) => setBedrooms(nums)} />
-             <QuantityRow label="Số lượng nhà tắm" values={[1, 2, 3, 4]} activeValues={bathrooms} onChange={(nums) => setBathrooms(nums)} />
+             <div className={styles.section}>
+                <div className={styles.sectionTitle}>Trạng Thái</div>
+                <div className={styles.chipGroup}>
+                  {loading ? (
+                    <MantineText size="xs" c="dimmed">Đang tải trạng thái...</MantineText>
+                  ) : statusOptions.length > 0 ? (
+                    statusOptions.map(status => (
+                      <div 
+                        key={status} 
+                        className={`${styles.chip} ${selectedStatus.includes(status) ? styles.active : ''}`}
+                        onClick={() => setSelectedStatus(prev => prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status])}
+                      >
+                        {status}
+                      </div>
+                    ))
+                  ) : (
+                    <MantineText size="xs" c="dimmed">Không có dữ liệu trạng thái</MantineText>
+                  )}
+                </div>
+             </div>
           </div>
 
           {/* Compass */}
@@ -196,7 +299,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
                         <div 
                             key={dir} 
                             className={`${styles.diamondCell} ${direction === dir ? styles.active : ''}`}
-                            onClick={() => setDirection(dir)}
+                            onClick={() => setDirection(direction === dir ? '' : dir)}
                         >
                             <span>{dir}</span>
                         </div>
@@ -207,28 +310,15 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
 
       {/* Footer */}
       <div className={styles.footer}>
-        <button className={`${styles.actionBtn} ${styles.btnReset}`}>Làm mới</button>
-        <button className={`${styles.actionBtn} ${styles.btnSearch}`}>Tìm kiếm</button>
+        <button className={`${styles.actionBtn} ${styles.btnReset}`} onClick={handleReset}>Làm mới</button>
+        <button className={`${styles.actionBtn} ${styles.btnSearch}`} onClick={handleSearch}>Tìm kiếm</button>
       </div>
+
+      <SearchResultModal 
+        opened={resultOpened}
+        onClose={() => setResultOpened(false)}
+        results={searchResults}
+      />
     </div>
   );
-}
-
-const QuantityRow = ({ label, values, activeValues, onChange }: { label: string, values: number[], activeValues: number[], onChange: (val: number[]) => void }) => {
-    return (
-        <div className={styles.section}>
-            <div className={styles.sectionTitle}>{label}</div>
-            <div className={styles.circleBtnGroup}>
-                {values.map(val => (
-                    <div 
-                        key={val} 
-                        className={`${styles.circleBtn} ${activeValues.includes(val) ? styles.active : ''}`}
-                        onClick={() => onChange(activeValues.includes(val) ? activeValues.filter(v => v !== val) : [...activeValues, val])}
-                    >
-                        {val}
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
 }
