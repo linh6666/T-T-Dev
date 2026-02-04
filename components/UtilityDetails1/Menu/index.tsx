@@ -23,7 +23,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  building_code?: string;
+  layer1?: string;
   group?: string;
   [key: string]: unknown;
 }
@@ -53,8 +53,8 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ti"] },
-          { label: "model_building_vi", values: [phaseFromQuery] },
+          { label: "layer5", values: ["ti"] },
+          { label: "layer2", values: [phaseFromQuery] },
         ],
       });
 
@@ -65,7 +65,7 @@ export default function Menu({
         const uniqueMap = new Map<string, MenuItem>();
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const subzone: string = item.building_code || "";
+          const subzone: string = item.layer1 || "";
           if (
             subzone.trim() &&
             !subzone.includes(";") &&
@@ -130,9 +130,9 @@ export default function Menu({
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ti"] },
-          { label: "model_building_vi", values: [phaseFromQuery] },
-          { label: "building_code", values: [subzoneLabel] },
+          { label: "layer5", values: ["ti"] },
+          { label: "layer2", values: [phaseFromQuery] },
+          { label: "layer1", values: [subzoneLabel] },
         ],
       });
 

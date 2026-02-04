@@ -36,7 +36,7 @@ export default function Menu({ project_id, onModelsLoaded, }: MenuProps) {
     try {
       const body = {
         project_id,
-        filters: [{ label: "group", values: ["ti"] }],
+        filters: [{ label: "layer5", values: ["ti"] }],
       };
 
       const data = await createNodeAttribute(body);
@@ -54,7 +54,7 @@ export default function Menu({ project_id, onModelsLoaded, }: MenuProps) {
         // Lấy tất cả item từ API
         const allZones: string[] = data.data
           .flatMap((item: NodeAttributeItem) =>
-            String(item.model_building_vi || "")
+            String(item.layer2 || "")
               .split(";")
               .map((z) => z.trim())
               .filter(Boolean)
@@ -96,10 +96,10 @@ export default function Menu({ project_id, onModelsLoaded, }: MenuProps) {
 
   fetchData();
 }, [project_id, onModelsLoaded]);
-  const handleNavigate = (model_building_vi: string) => {
+  const handleNavigate = (layer2: string) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Phuoc-tho/Chi-tiet-tien-ich?id=${project_id}&model_building_vi=${encodeURIComponent(model_building_vi)}`
+      `/Tuong-tac/Phuoc-tho/Chi-tiet-tien-ich?id=${project_id}&layer2=${encodeURIComponent(layer2)}`
     );
   };
 
