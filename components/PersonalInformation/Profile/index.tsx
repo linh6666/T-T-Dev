@@ -30,7 +30,7 @@ interface User {
   is_superuser: boolean;
   province_id: string;
   ward_id: string;
-  introducer_id: string;
+  introducer_email: string;
   creation_time: string;
   detal_address: string;
   last_login: string;
@@ -61,7 +61,7 @@ export default function ProfileInfo() {
     is_superuser: false,
     province_id: "",
     ward_id: "",
-    introducer_id: "",
+    introducer_email: "",
     creation_time: "",
     detal_address: "",
     last_login: "",
@@ -87,7 +87,7 @@ export default function ProfileInfo() {
 is_superuser: user.is_superuser ?? false,
       province_id: user.province_id || "",
       ward_id: user.ward_id || "",
-      introducer_id: user.introducer_id || "",
+      introducer_email: user.introducer_email || "",
       creation_time: user.creation_time || "",
       detal_address: user.detal_address || "",
       last_login: user.last_login || "",
@@ -157,7 +157,7 @@ const handleSave = async () => {
           phone: editedUser.phone,
           province_id: editedUser.province_id,
           ward_id: editedUser.ward_id,
-          introducer_id: editedUser.introducer_id,
+          introducer_email: editedUser.introducer_email,
           detal_address: editedUser.detal_address,
         };
 
@@ -204,7 +204,7 @@ const handleSave = async () => {
 is_superuser: user.is_superuser ?? false,
           province_id: user.province_id || "",
           ward_id: user.ward_id || "",
-          introducer_id: user.introducer_id || "",
+          introducer_email: user.introducer_email || "",
           creation_time: user.creation_time || "",
           detal_address: user.detal_address || "",
           last_login: user.last_login || "",
@@ -362,16 +362,16 @@ is_superuser: user.is_superuser ?? false,
             <Text c="dimmed">Mã người giới thiệu:</Text>
             {isEditing ? (
               <TextInput
-                value={editedUser.introducer_id}
+                value={editedUser.introducer_email}
                 onChange={(e) =>
                   setEditedUser({
                     ...editedUser,
-                    introducer_id: e.currentTarget.value,
+                    introducer_email: e.currentTarget.value,
                   })
                 }
               />
             ) : (
-              <Text>{editedUser.introducer_id || "Chưa có"}</Text>
+              <Text>{editedUser.introducer_email || "Chưa có"}</Text>
             )}
           </Group>
 

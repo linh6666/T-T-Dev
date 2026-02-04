@@ -7,7 +7,7 @@ export interface CreateUserPayload {
     phone: string;
     province_id: string;
     ward_id: string;
-    introducer_id: string;
+    introducer_email: string;
     detal_address: string;
 
 

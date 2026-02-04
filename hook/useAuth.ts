@@ -12,7 +12,7 @@ interface User {
 
   province_id?: string;
   ward_id?: string;
-  introducer_id?: string;
+  introducer_email?: string;
 
   creation_time?: string;
   detal_address?: string;
