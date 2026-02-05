@@ -33,7 +33,7 @@ export default function SearchResultModal({
       <Drawer
         opened={opened}
         onClose={onClose}
-        title={<Text fw={700} fz="lg">Kết quả tìm kiếm ({results.length})</Text>}
+        title={<Text fw={700} fz="lg">Kết quả lọc ({results.length})</Text>}
         size="lg"
         position="left"
         styles={{

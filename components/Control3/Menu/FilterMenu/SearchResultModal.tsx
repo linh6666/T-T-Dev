@@ -12,6 +12,7 @@ interface UnitResult {
   layer4?: string;
   layer3?: string;
   status_unit?: string;
+  bedroom?: string | number;
   direction?: string;
   main_door_direction?: string;
 }
@@ -33,7 +34,7 @@ export default function SearchResultModal({
       <Drawer
         opened={opened}
         onClose={onClose}
-        title={<Text fw={700} fz="lg">Kết quả tìm kiếm ({results.length})</Text>}
+        title={<Text fw={700} fz="lg">Kết quả lọc ({results.length})</Text>}
         size="lg"
         position="left"
         styles={{
@@ -59,7 +60,7 @@ export default function SearchResultModal({
               <Table.Thead style={{ backgroundColor: '#f8f9fa' }}>
                 <Table.Tr>
                   <Table.Th>Mã Căn</Table.Th>
-                  <Table.Th>Loại</Table.Th>
+                  <Table.Th>Phòng ngủ</Table.Th>
                   
                   <Table.Th>Trạng Thái</Table.Th>
                   <Table.Th>Hướng</Table.Th>
@@ -73,16 +74,48 @@ export default function SearchResultModal({
                       <Text fw={700} color="#752E0B">{item.unit_code}</Text>
                     </Table.Td>
                     <Table.Td>
-                      <Badge size="xs" variant="light" color="orange">
-                        {item.building_type || item.layer4 || item.layer3}
-                      </Badge>
-                    </Table.Td>
+                  
+  <Badge size="xs" variant="light" color="orange">
+    {(() => {
+      const val =
+        item.bedroom ;
+
+      if (val == null) return "không có";
+      if (typeof val === "string" && val.toLowerCase() === "skip")
+        return "không có";
+
+      return val;
+    })()}
+  </Badge>
+</Table.Td>
+
                    
                     <Table.Td>
-                      <Badge size="xs" variant="outline" color={item.status_unit === 'Đang bán' ? 'green' : 'gray'}>
-                        {item.status_unit || 'N/A'}
-                      </Badge>
-                    </Table.Td>
+  <Badge
+    size="xs"
+    variant="outline"
+    color={(() => {
+      const val = item.status_unit;
+
+      if (val == null) return "gray";
+      if (typeof val === "string" && val.toLowerCase() === "skip")
+        return "gray";
+
+      return val === "Đang bán" ? "green" : "gray";
+    })()}
+  >
+    {(() => {
+      const val = item.status_unit;
+
+      if (val == null) return "không có";
+      if (typeof val === "string" && val.toLowerCase() === "skip")
+        return "không có";
+
+      return val;
+    })()}
+  </Badge>
+</Table.Td>
+
                     <Table.Td>
                       <Text size="xs">
                         {(() => {

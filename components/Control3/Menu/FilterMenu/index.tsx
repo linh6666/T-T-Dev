@@ -47,6 +47,17 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
   const [searchResults, setSearchResults] = useState<NodeAttributeItem[]>([]);
   const [resultOpened, setResultOpened] = useState(false);
 
+  // Direction mapping: compass labels -> API values
+  const directionMap: { [key: string]: string } = {
+    'B': 'Bắc',
+    'N': 'Nam',
+    'Đ': 'Đông',
+    'T': 'Tây',
+    'ĐB': 'Đông Bắc',
+    'TB': 'Tây Bắc',
+    'ĐN': 'Đông Nam',
+    'TN': 'Tây Nam'
+  };
 
    useEffect(() => {
       const fetchData = async () => {
@@ -174,7 +185,12 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
       if (selectedTypes.length > 0) filters.push({ label: "building_type", values: selectedTypes });
       if (selectedStatus.length > 0) filters.push({ label: "status_unit", values: selectedStatus });
       if (selectedBedrooms.length > 0) filters.push({ label: "bedroom", values: selectedBedrooms });
-      if (direction) filters.push({ label: "main_door_direction", values: [direction] });
+      if (direction) {
+        // Convert compass label to full direction name
+        const fullDirection = directionMap[direction] || direction;
+        console.log('🧭 Direction mapping:', direction, '→', fullDirection);
+        filters.push({ label: "main_door_direction", values: [fullDirection] });
+      }
 
       const body = {
         project_id,
@@ -227,7 +243,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
 
       {/* Phân khu */}
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Phân khu</div>
+        <div className={styles.sectionTitle}>Tòa</div>
         <div className={styles.chipGroup}>
           {loading ? (
             <div className={styles.loadingWrapper}>
@@ -250,29 +266,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
         </div>
       </div>
 
-      {/* Loại công trình */}
-      {/* <div className={styles.section}>
-        <div className={styles.sectionTitle}>Loại công trình</div>
-        <div className={styles.checkboxGroup}>
-          {loading ? (
-             <MantineText size="xs" c="dimmed">Đang tải loại công trình...</MantineText>
-          ) : typeOptions.length > 0 ? (
-            typeOptions.map(type => (
-              <label key={type} className={styles.checkboxItem}>
-                <input 
-                  type="checkbox" 
-                  checked={selectedTypes.includes(type)}
-                  onChange={() => toggleType(type)}
-                  className={styles.checkbox}
-                />
-                {type}
-              </label>
-            ))
-          ) : (
-            <MantineText size="xs" c="dimmed">Không có dữ liệu loại công trình</MantineText>
-          )}
-        </div>
-      </div> */}
+     
 
       <div className={styles.gridSection}>
           {/* Numbers Sections */}
@@ -339,29 +333,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
                 </div>
              </div>
           </div>
-          {/* <div className={styles.quantityGroup}>
-             <div className={styles.section}>
-                <div className={styles.sectionTitle}>Phòng tắm</div>
-                <div className={styles.chipGroup}>
-                  {loading ? (
-                    <MantineText size="xs" c="dimmed">Đang tải phòng tắm...</MantineText>
-                  ) : bathroomOptions.length > 0 ? (
-                    bathroomOptions.map(bathroom => (
-                      <div 
-                        key={bathroom} 
-                        className={`${styles.chip} ${selectedBathrooms.includes(bathroom) ? styles.active : ''}`}
-                        onClick={() => setSelectedBathrooms(prev => prev.includes(bathroom) ? prev.filter(b => b !== bathroom) : [...prev, bathroom])}
-                      >
-                        {bathroom}
-                      </div>
-                    ))
-                  ) : (
-                    <MantineText size="xs" c="dimmed">Không có dữ liệu phòng tắm</MantineText>
-                  )}
-                </div>
-             </div>
-          </div> */}
-      
+       
 
       {/* Footer */}
       <div className={styles.footer}>
