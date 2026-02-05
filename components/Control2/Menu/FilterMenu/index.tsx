@@ -69,7 +69,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
           const body = {
             project_id,
             filters: [
-              { label: "layer7", values: ["ct","ti"] },
+              { label: "layer6", values: ["ct","ti"] },
             ],
           };
   
@@ -180,7 +180,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
     
     try {
       const filters = [
-        { label: "layer7", values: ["ct", "ti"] },
+        { label: "layer6", values: ["ct", "ti"] },
       ];
 
       if (activePhanKhu) filters.push({ label: "zone", values: [activePhanKhu] });
@@ -319,7 +319,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
           </div>
 
           {/* Compass */}
-           <div className={styles.compassSection}>
+           {/* <div className={styles.compassSection}>
                 <div className={styles.sectionTitle}>Hướng</div>
                 <div className={styles.diamondGrid}>
                     {['B', 'ĐB', 'Đ', 'TB', '', 'ĐN', 'T', 'TN', 'N'].map((dir, idx) => (
@@ -334,7 +334,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
       </div>
         
        

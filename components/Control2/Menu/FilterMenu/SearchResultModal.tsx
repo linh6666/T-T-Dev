@@ -66,7 +66,7 @@ export default function SearchResultModal({
                   {/* <Table.Th>Phòng ngủ</Table.Th> */}
                   
                   <Table.Th>Trạng Thái</Table.Th>
-                  <Table.Th>Hướng</Table.Th>
+                  {/* <Table.Th>Hướng</Table.Th> */}
               
                 </Table.Tr>
               </Table.Thead>
@@ -74,8 +74,16 @@ export default function SearchResultModal({
                 {results.map((item, index) => (
                   <Table.Tr key={item.id || index}>
                        <Table.Td>
-                     <Text style={{ fontSize: 12 }} color="#752E0B">
-  {item.zone}
+<Text style={{ fontSize: 12 }} color="#752E0B">
+  {(() => {
+    const val = item.zone;
+
+    if (val == null) return "không có";
+    if (typeof val === "string" && val.toLowerCase() === "skip")
+      return "không có";
+
+    return val;
+  })()}
 </Text>
                     </Table.Td>
                      <Table.Td>
@@ -128,7 +136,7 @@ export default function SearchResultModal({
   </Badge>
 </Table.Td>
 
-                    <Table.Td>
+                    {/* <Table.Td>
                       <Text size="xs">
                         {(() => {
                            const val = item.direction || item.main_door_direction;
@@ -136,7 +144,7 @@ export default function SearchResultModal({
                            return val;
                         })()}
                       </Text>
-                    </Table.Td>
+                    </Table.Td> */}
                   
                   </Table.Tr>
                 ))}
