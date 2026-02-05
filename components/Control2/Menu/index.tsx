@@ -4,8 +4,10 @@ import React from "react";
 import styles from "./Menu.module.css";
 import { Button, Group, Image, Stack } from "@mantine/core";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Sun from "./Sun";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { IconArrowLeft, IconSearch } from "@tabler/icons-react";
+import FilterMenu from "./FilterMenu";
 
 interface MenuProps {
   project_id: string | null;
@@ -13,6 +15,7 @@ interface MenuProps {
 
 export default function Menu({ project_id }: MenuProps) {
   const router = useRouter();
+    const [showFilter, setShowFilter] = useState(false);
   // const [active, setActive] = useState(false);
 
   // 🧠 Tạo sẵn link kèm project_id (nếu có)
@@ -46,7 +49,7 @@ export default function Menu({ project_id }: MenuProps) {
 
       {/* Danh sách nút */}
       <div className={styles.Function}>
-     <Stack align="center" style={{ gap: "20px", marginTop: "30px" }}>
+     <Stack align="center" style={{ gap: "20px", marginTop: "10px" }}>
   {menuItems.map((item) => (
     <Button
       key={item.link}
@@ -59,6 +62,12 @@ export default function Menu({ project_id }: MenuProps) {
   ))}
 </Stack>
 
+      </div>
+       <div className={styles.searchParams}>
+        <div className={styles.innerBtn} onClick={() => setShowFilter(!showFilter)}>
+          <IconSearch size={16} /> Bộ lọc sản phẩm
+        </div>
+        {showFilter && <FilterMenu project_id={project_id} onClose={() => setShowFilter(false)} />}
       </div>
 
       {/* Footer */}

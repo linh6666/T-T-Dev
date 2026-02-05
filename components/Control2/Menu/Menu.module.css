@@ -1,5 +1,5 @@
 .logo {
-  height: 140px;
+  height: 130px;
   border: 1px solid #762f0b;
   margin-bottom: 10px;
   border-radius: 13px;
@@ -29,7 +29,7 @@
 }
 /* nút chức năng */
 .Function {
-  height: 410px;
+  height: 380px;
   border: 1px solid #762f0b;
   margin-bottom: 10px;
   padding: 10px;
@@ -63,7 +63,7 @@ border-radius: 15px;
 
 /* hàng nút cuối cùng */
 .footer {
-  height: 90px;
+  height: 70px;
   border: 1px solid #762f0b;
   display: flex;
   border-radius: 13px;
@@ -300,4 +300,29 @@ border-radius: 15px;
   background: linear-gradient(to top, #FFE09A,#FFF1D2);
   color: #752E0B;
   border-color: #762f0b;
+}
+.searchParams {
+  height: 50px;
+  border: 1px solid #762f0b;
+  border-radius: 13px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.innerBtn {
+  background-color: #FFEFD0;
+  border-radius: 50px;
+  padding: 8px 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #752E0B;
+  font-size: 10px;
+  cursor: pointer;
 }
