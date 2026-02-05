@@ -9,6 +9,7 @@ interface UnitResult {
   id?: number | string;
   unit_code?: string;
   building_type?: string;
+  zone?:string;
   layer4?: string;
   layer3?: string;
   status_unit?: string;
@@ -59,8 +60,10 @@ export default function SearchResultModal({
             >
               <Table.Thead style={{ backgroundColor: '#f8f9fa' }}>
                 <Table.Tr>
-                  <Table.Th>Mã Căn</Table.Th>
-                  <Table.Th>Phòng ngủ</Table.Th>
+                   <Table.Th>Phân khu</Table.Th>
+                    <Table.Th>Loại công trình </Table.Th>
+                  <Table.Th>Mã căn</Table.Th>
+                  {/* <Table.Th>Phòng ngủ</Table.Th> */}
                   
                   <Table.Th>Trạng Thái</Table.Th>
                   <Table.Th>Hướng</Table.Th>
@@ -70,10 +73,19 @@ export default function SearchResultModal({
               <Table.Tbody>
                 {results.map((item, index) => (
                   <Table.Tr key={item.id || index}>
-                    <Table.Td>
-                      <Text fw={700} color="#752E0B">{item.unit_code}</Text>
+                       <Table.Td>
+                     <Text style={{ fontSize: 12 }} color="#752E0B">
+  {item.zone}
+</Text>
+                    </Table.Td>
+                     <Table.Td>
+                      <Text style={{ fontSize: 12 }} color="#752E0B">{item.building_type
+}</Text>
                     </Table.Td>
                     <Table.Td>
+                      <Text style={{ fontSize: 12 }}fw={700} color="#752E0B">{item.unit_code}</Text>
+                    </Table.Td>
+                    {/* <Table.Td>
                   
   <Badge size="xs" variant="light" color="orange">
     {(() => {
@@ -87,7 +99,7 @@ export default function SearchResultModal({
       return val;
     })()}
   </Badge>
-</Table.Td>
+</Table.Td> */}
 
                    
                     <Table.Td>

@@ -15,6 +15,7 @@ interface NodeAttributeItem {
   building_type?: string;
   layer4?: string;
   layer3?: string;
+  zone?:string;
   status_unit?: string;
   id?: number | string;
   unit_code?: string;
@@ -48,16 +49,16 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
   const [resultOpened, setResultOpened] = useState(false);
 
   // Direction mapping: compass labels -> API values
-  const directionMap: { [key: string]: string } = {
-    'B': 'Bắc',
-    'N': 'Nam',
-    'Đ': 'Đông',
-    'T': 'Tây',
-    'ĐB': 'Đông Bắc',
-    'TB': 'Tây Bắc',
-    'ĐN': 'Đông Nam',
-    'TN': 'Tây Nam'
-  };
+  // const directionMap: { [key: string]: string } = {
+  //   'B': 'Bắc',
+  //   'N': 'Nam',
+  //   'Đ': 'Đông',
+  //   'T': 'Tây',
+  //   'ĐB': 'Đông Bắc',
+  //   'TB': 'Tây Bắc',
+  //   'ĐN': 'Đông Nam',
+  //   'TN': 'Tây Nam'
+  // };
 
    useEffect(() => {
       const fetchData = async () => {
@@ -83,7 +84,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
             // 📍 Lấy danh sách Phân khu từ layer3
             const allPhases: string[] = data.data.flatMap(
               (item: NodeAttributeItem) =>
-                String(item.layer3 || "")
+                String(item.zone || "")
                   .split(";")
                   .map((z) => z.trim())
                   .filter(Boolean)
@@ -110,7 +111,8 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
             // 📍 Lấy danh sách Phòng ngủ từ bedroom
             const allBedrooms: string[] = data.data.flatMap(
               (item: NodeAttributeItem) =>
-                String(item.bedroom || "")
+                String(item.building_type
+ || "")
                   .split(";")
                   .map((z) => z.trim())
                   .filter(Boolean)
@@ -184,13 +186,15 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
       if (activePhanKhu) filters.push({ label: "zone", values: [activePhanKhu] });
       if (selectedTypes.length > 0) filters.push({ label: "building_type", values: selectedTypes });
       if (selectedStatus.length > 0) filters.push({ label: "status_unit", values: selectedStatus });
-      if (selectedBedrooms.length > 0) filters.push({ label: "bedroom", values: selectedBedrooms });
-      if (direction) {
-        // Convert compass label to full direction name
-        const fullDirection = directionMap[direction] || direction;
-        console.log('🧭 Direction mapping:', direction, '→', fullDirection);
-        filters.push({ label: "main_door_direction", values: [fullDirection] });
-      }
+      if (selectedBedrooms.length > 0) filters.push({ label: "building_type", values: selectedBedrooms });
+   if (direction) {
+  console.log('🧭 Direction:', direction);
+
+  filters.push({
+    label: "main_door_direction",
+    values: [direction],
+  });
+}
 
       const body = {
         project_id,
@@ -243,7 +247,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
 
       {/* Phân khu */}
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Phân khu</div>
+        <div className={styles.sectionTitle}>Khu Vực</div>
         <div className={styles.chipGroup}>
           {loading ? (
             <div className={styles.loadingWrapper}>
@@ -266,7 +270,28 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
         </div>
       </div>
 
-     
+       <div className={styles.quantityGroup}>
+             <div className={styles.section}>
+                <div className={styles.sectionTitle}>Loại công trình</div>
+                <div className={styles.chipGroup}>
+                  {loading ? (
+                    <MantineText size="xs" c="dimmed">Đang tải loại công trình...</MantineText>
+                  ) : bedroomOptions.length > 0 ? (
+                    bedroomOptions.map(bedroom => (
+                      <div 
+                        key={bedroom} 
+                        className={`${styles.chip} ${selectedBedrooms.includes(bedroom) ? styles.active : ''}`}
+                        onClick={() => setSelectedBedrooms(prev => prev.includes(bedroom) ? prev.filter(b => b !== bedroom) : [...prev, bedroom])}
+                      >
+                        {bedroom}
+                      </div>
+                    ))
+                  ) : (
+                    <MantineText size="xs" c="dimmed">Không có dữ liệu phòng ngủ</MantineText>
+                  )}
+                </div>
+             </div>
+          </div>
 
       <div className={styles.gridSection}>
           {/* Numbers Sections */}
@@ -311,28 +336,7 @@ export default function FilterMenu({ onClose, project_id }: FilterMenuProps) {
                 </div>
             </div>
       </div>
-          <div className={styles.quantityGroup}>
-             <div className={styles.section}>
-                <div className={styles.sectionTitle}>Phòng ngủ</div>
-                <div className={styles.chipGroup}>
-                  {loading ? (
-                    <MantineText size="xs" c="dimmed">Đang tải phòng ngủ...</MantineText>
-                  ) : bedroomOptions.length > 0 ? (
-                    bedroomOptions.map(bedroom => (
-                      <div 
-                        key={bedroom} 
-                        className={`${styles.chip} ${selectedBedrooms.includes(bedroom) ? styles.active : ''}`}
-                        onClick={() => setSelectedBedrooms(prev => prev.includes(bedroom) ? prev.filter(b => b !== bedroom) : [...prev, bedroom])}
-                      >
-                        {bedroom}
-                      </div>
-                    ))
-                  ) : (
-                    <MantineText size="xs" c="dimmed">Không có dữ liệu phòng ngủ</MantineText>
-                  )}
-                </div>
-             </div>
-          </div>
+        
        
 
       {/* Footer */}
