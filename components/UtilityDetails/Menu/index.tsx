@@ -8,7 +8,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { createNodeAttribute } from "../../../api/apifiterutilities";
 import { createON } from "../../../api/apiON"; 
 import { createOFF } from "../../../api/apiOFF";
-import Function from "./Function";
+// import Function from "./Function";
 
 interface MenuProps {
   project_id: string | null;
@@ -24,7 +24,7 @@ interface MenuItem {
 }
 
 interface NodeAttributeItem {
-  model_building_vi?: string;
+  layer1?: string;
   group?: string;
   [key: string]: unknown;
 }
@@ -36,7 +36,7 @@ export default function Menu({ project_id, initialBuildingType,onModelsLoaded,
   const phaseFromQuery = searchParams.get("building") || initialBuildingType;
 
   const [active, setActive] = useState<"on" | "off" | null>(null);
-  const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null); // ✅ ban đầu null
+  // const [isMultiMode, setIsMultiMode] = useState<"single" | "multi" | null>(null); 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingOn, setLoadingOn] = useState(false);
@@ -50,19 +50,19 @@ export default function Menu({ project_id, initialBuildingType,onModelsLoaded,
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ti"] },
-          { label: "building_type_vi", values: [phaseFromQuery] },
+          { label: "layer7", values: ["ti"] },
+          { label: "layer2", values: [phaseFromQuery] },
         ],
       });
 
       if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
          onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
+          data.data.map((i: NodeAttributeItem) => i.layer1)
         );
         const uniqueMap = new Map<string, MenuItem>();
 
         data.data.forEach((item: NodeAttributeItem) => {
-          const subzone: string = item.model_building_vi || "";
+          const subzone: string = item.layer1 || "";
 
           if (
             subzone.trim() &&
@@ -102,9 +102,9 @@ export default function Menu({ project_id, initialBuildingType,onModelsLoaded,
       const data = await createNodeAttribute({
         project_id,
         filters: [
-          { label: "group", values: ["ti"] },
-          { label: "building_type_vi", values: [phaseFromQuery] },
-          { label: "model_building_vi", values: [subzoneLabel] },
+          { label: "layer7", values: ["ti"] },
+          { label: "layer2", values: [phaseFromQuery] },
+          { label: "layer1", values: [subzoneLabel] },
         ],
       });
 
@@ -121,11 +121,11 @@ export default function Menu({ project_id, initialBuildingType,onModelsLoaded,
   };
 
   // ✅ Khi nhấn MULTI
-  const handleMultiModeClick = () => {
-    // Bấm lần đầu: kích hoạt multi, bấm lại thì tắt (null)
-    setIsMultiMode(prev => (prev === "multi" ? null : "multi"));
-    fetchData();
-  };
+  // const handleMultiModeClick = () => {
+  //   // Bấm lần đầu: kích hoạt multi, bấm lại thì tắt (null)
+  //   setIsMultiMode(prev => (prev === "multi" ? null : "multi"));
+  //   fetchData();
+  // };
 
   const getButtonStyle = (isActive: boolean) => ({
     width: 30,
@@ -206,12 +206,12 @@ export default function Menu({ project_id, initialBuildingType,onModelsLoaded,
                 color="orange"
                 style={{
                   marginBottom: "10px",
-                  background:
-                    isMultiMode === "multi"
-                      ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
-                      : undefined,
+                  // background:
+                  //   isMultiMode === "multi"
+                  //     ? "linear-gradient(to top, #FFE09A,#FFF1D2)"
+                  //     : undefined,
                 }}
-                disabled={isMultiMode === "multi"}
+                // disabled={isMultiMode === "multi"}
               >
                 {item.label}
               </Button>
@@ -227,11 +227,11 @@ export default function Menu({ project_id, initialBuildingType,onModelsLoaded,
       {/* Footer */}
       <div className={styles.footer}>
         <Stack align="center" gap="xs">
-          <Function
+          {/* <Function
             activeMode={isMultiMode}
             setActiveMode={setIsMultiMode}
             onMultiModeClick={handleMultiModeClick}
-          />
+          /> */}
           <Group gap="xs">
             {/* Nút ON */}
             <Button

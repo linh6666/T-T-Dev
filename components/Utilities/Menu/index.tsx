@@ -34,7 +34,7 @@ useEffect(() => {
     try {
       const body = {
         project_id,
-        filters: [{ label: "group", values: ["ti"] }],
+        filters: [{ label: "layer7", values: ["ti"] }],
       };
 
       const data = await createNodeAttribute(body);
@@ -42,12 +42,12 @@ useEffect(() => {
       if (data?.data && Array.isArray(data.data)) {
         // ✅ Gọi callback khi models đã load xong
         onModelsLoaded?.(
-          data.data.map((i: NodeAttributeItem) => i.building_code)
+          data.data.map((i: NodeAttributeItem) => i.layer1)
         );
 
         const allZones: string[] = data.data
           .flatMap((item: NodeAttributeItem) =>
-            String(item.building_type_vi || "")
+            String(item.layer2 || "")
               .split(";")
               .map((z) => z.trim())
               .filter(Boolean)
@@ -85,10 +85,10 @@ useEffect(() => {
 }, [project_id, onModelsLoaded]);
 
 
-  const handleNavigate = (building_type_vi: string) => {
+  const handleNavigate = (layer2: string) => {
     if (!project_id) return;
     router.push(
-      `/Tuong-tac/Millennia-City/Chi-tiet-tien-ich?id=${project_id}&building_type_vi=${encodeURIComponent(building_type_vi)}`
+      `/Tuong-tac/Millennia-City/Chi-tiet-tien-ich?id=${project_id}&layer2=${encodeURIComponent(layer2)}`
     );
   };
 
