@@ -11,6 +11,8 @@ import {
   LoadingOverlay,
   Box,
   Textarea,
+  Text,
+  Grid,
 } from "@mantine/core";
 import { createOrder } from "../../../../api/apiCreateOder";
 import { useDisclosure } from "@mantine/hooks";
@@ -59,7 +61,7 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
     },
   });
 
-  /* ================= UPDATE PRICE KHI ĐỔI CĂN ================= */
+  /* ================= UPDATE PRICE ================= */
   useEffect(() => {
     form.setFieldValue(
       "total_price_at_sale_vi",
@@ -67,7 +69,7 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
     );
   }, [house]);
 
-  /* ================= AUTO FILL USER KHI MỞ MODAL ================= */
+  /* ================= AUTO FILL USER ================= */
   useEffect(() => {
     if (!opened || !user) return;
 
@@ -91,11 +93,6 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
       return;
     }
 
-    if (!values.file || !(values.file instanceof File)) {
-      NotificationExtension.Warn("Vui lòng chọn file đính kèm hợp lệ");
-      return;
-    }
-
     open();
 
     try {
@@ -107,7 +104,7 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
         total_price_at_sale_vi: Number(values.total_price_at_sale_vi),
         total_price_at_sale_en: Number(values.total_price_at_sale_en),
         id_cccd: values.id_cccd,
-        file: values.file,
+        file: values.file as File,
 
         bedroom: house.bedroom,
         bathroom: house.bathroom,
@@ -172,6 +169,7 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
         opened={opened}
         onClose={handleCloseModal}
         title={<div style={{ fontWeight: 600, fontSize: 18 }}>Liên hệ</div>}
+        size="lg"
       >
         <Box
           component="form"
@@ -181,57 +179,77 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
         >
           <LoadingOverlay visible={visible} />
 
-          {/* ===== INFO CĂN ===== */}
-          <TextInput
-            label="Phân khu / Tòa"
-            value={house.zone || house.layer3 || "Không có"}
-            readOnly
-            mt="md"
-          />
+          <Grid gutter="xl">
+            {/* ===== LEFT - HOUSE INFO ===== */}
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Text fw={700} size="md"  mb="xs">
+                Thông tin căn hộ
+              </Text>
 
-          <TextInput
-            label="Loại công trình/Vị trí"
-            value={house.building_type || house.layer2 || "Không có"}
-            readOnly
-            mt="md"
-          />
+              <TextInput
+                label="Phân khu / Tòa"
+                value={house.zone || house.layer3 || "Không có"}
+                readOnly
+              />
 
-          <TextInput label="Mã căn" value={house.unit_code} readOnly mt="md" />
+              <TextInput
+                label="Loại công trình/Vị trí"
+                value={house.building_type || house.layer2 || "Không có"}
+                readOnly
+                mt="md"
+              />
 
-          {/* ===== USER INFO ===== */}
-          <TextInput
-            label="Họ và tên"
-            mt="md"
-            {...form.getInputProps("full_name")}
-          />
+              <TextInput
+                label="Mã căn"
+                value={house.unit_code}
+                readOnly
+                mt="md"
+              />
+            </Grid.Col>
 
-          <TextInput
-            label="Email"
-            mt="md"
-            readOnly
-            {...form.getInputProps("email")}
-          />
+            {/* ===== RIGHT - USER INFO ===== */}
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Text fw={700} size="md" mb="xs">
+                Thông tin người dùng
+              </Text>
 
-          <TextInput
-            label="Số điện thoại"
-            mt="md"
-            {...form.getInputProps("phone")}
-          />
+              <TextInput
+                label="Họ và tên"
+                 readOnly
+                {...form.getInputProps("full_name")}
+              />
 
-          <TextInput
-            label="Chủ đề"
-            withAsterisk
-            mt="md"
-            {...form.getInputProps("subject")}
-          />
+              <TextInput
+                label="Email"
+                mt="md"
+                readOnly
+                {...form.getInputProps("email")}
+              />
 
-          <Textarea
-            withAsterisk
-            resize="vertical"
-            label="Nội dung"
-            placeholder="Nhập nội dung liên hệ"
-            {...form.getInputProps("content")}
-          />
+              <TextInput
+                label="Số điện thoại"
+                 readOnly
+                mt="md"
+                {...form.getInputProps("phone")}
+              />
+
+              <TextInput
+                label="Chủ đề"
+                withAsterisk
+                mt="md"
+                {...form.getInputProps("subject")}
+              />
+
+              <Textarea
+                withAsterisk
+                resize="vertical"
+                label="Nội dung"
+                placeholder="Nhập nội dung liên hệ"
+                mt="md"
+                {...form.getInputProps("content")}
+              />
+            </Grid.Col>
+          </Grid>
 
           <Group justify="flex-end" mt="lg">
             <Button
