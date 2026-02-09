@@ -2,51 +2,90 @@
 
 import { Textarea, TextInput, Button } from "@mantine/core";
 import styles from "./Contact.module.css";
-import React from "react";
+import useAuth from "../../hook/useAuth";
+import React, { useEffect, useState } from "react";
 
 export default function ContactPage() {
+  const { user } = useAuth();
+
+  const [form, setForm] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  });
+
+  // ⭐ Khi user load xong → fill form
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        full_name: user.full_name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user]);
+
+  const handleChange =
+    (field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+    };
+
   return (
     <div className={styles.wrapper}>
       <h1 className={styles.pageTitle}>Liên hệ với chúng tôi</h1>
 
       <div className={styles.card}>
-      
-
         <div className={styles.grid}>
           <TextInput
             label="Họ và tên"
-            placeholder="Nhập họ và tên"
+            withAsterisk
+            readOnly
+            value={form.full_name}
+            onChange={handleChange("full_name")}
             className={styles.input}
-                  withAsterisk
           />
 
           <TextInput
             label="Email"
-            placeholder="Nhập email"
-                  withAsterisk
+            withAsterisk
+            readOnly
+            value={form.email}
+            onChange={handleChange("email")}
             className={styles.input}
           />
 
           <TextInput
             label="Chủ đề"
-            placeholder="Nhập chủ đề"
-                  withAsterisk
+                   placeholder="Nhập chủ đề liên hệ..."
+            withAsterisk
+            value={form.subject}
+            onChange={handleChange("subject")}
             className={styles.input}
           />
 
           <TextInput
             label="Số điện thoại"
-            placeholder="Nhập số điện thoại"
-                  withAsterisk
+            withAsterisk
+            value={form.phone}
+            readOnly
+            onChange={handleChange("phone")}
             className={styles.input}
           />
         </div>
 
         <Textarea
-              withAsterisk
           label="Nội dung"
-          placeholder="Nhập nội dung tin nhắn"
+                 placeholder="Nhập nội dung liên hệ..."
+          withAsterisk
           minRows={4}
+          value={form.message}
+          onChange={handleChange("message")}
           className={styles.textarea}
         />
 
