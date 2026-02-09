@@ -33,7 +33,7 @@ export default function Managent({ projectId,target,projectName }: AppProps) {
     >
       Kho hàng
     </h1>
-    <h1
+    {/* <h1
       className={`${styles.titleTab} ${activeView === "amenities" ? styles.titleTabActive : ""}`}
       onClick={() => setActiveView("amenities")}
     >
@@ -50,7 +50,7 @@ export default function Managent({ projectId,target,projectName }: AppProps) {
       onClick={() => setActiveView("note")}
     >
       Ghi chú
-    </h1>
+    </h1> */}
   </Group>
 
   {/* Nút Quay lại bên phải */}

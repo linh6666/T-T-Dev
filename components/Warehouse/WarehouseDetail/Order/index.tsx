@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import {
+  // IconAddressBook,
   IconCheck,
-  IconPlus,
+  IconMail,
+  // IconPlus,
   IconUpload,
   IconX,
 } from "@tabler/icons-react";
@@ -115,7 +117,9 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
     whiteSpace: "nowrap",
   }}
 >
-  <IconPlus size={20} color="#752E0B" />
+  <IconMail
+
+ size={20} color="#752E0B" />
   <span
     style={{
       fontSize: "14px",
@@ -123,7 +127,7 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
       color: "#752E0B",
     }}
   >
-    Tạo đơn hàng
+    Liên hệ
   </span>
 </button>
 
@@ -133,7 +137,7 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
         onClose={handleCloseModal}
         title={
           <div style={{ fontWeight: 600, fontSize: 18 }}>
-            Tạo đơn hàng mới
+            Liên hệ
           </div>
         }
       >
