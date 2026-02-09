@@ -1,14 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import {
-  // IconAddressBook,
-  IconCheck,
-  IconMail,
-  // IconPlus,
-  IconUpload,
-  IconX,
-} from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { IconCheck, IconMail } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import {
   Modal,
@@ -17,56 +10,97 @@ import {
   TextInput,
   LoadingOverlay,
   Box,
-  FileInput,
+  Textarea,
 } from "@mantine/core";
 import { createOrder } from "../../../../api/apiCreateOder";
 import { useDisclosure } from "@mantine/hooks";
+import useAuth from "../../../../hook/useAuth";
 import { modals } from "@mantine/modals";
 import { NotificationExtension } from "../../../../extension/NotificationExtension";
 import { AxiosError } from "axios";
 
+interface HouseData {
+  unit_code: string;
+  zone?: string;
+  layer3?: string;
+  layer2?: string;
+  building_type?: string;
+  bedroom?: string | number;
+  bathroom?: string | number;
+  direction?: string;
+  price?: number;
+}
+
 interface OrderButtonProps {
-  unitCode: string;
+  house: HouseData;
   projectId: string;
 }
 
-export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
+export default function OrderButton({ house, projectId }: OrderButtonProps) {
   const [opened, setOpened] = useState(false);
   const [visible, { open, close }] = useDisclosure(false);
 
+  const { user, isLoggedIn } = useAuth();
+
+  /* ================= FORM ================= */
   const form = useForm({
     initialValues: {
+      full_name: "",
       email: "",
+      phone: "",
+      subject: "",
+      content: "",
+
       contract_code: "",
-      total_price_at_sale_vi: "",
+      total_price_at_sale_vi: house.price ? String(house.price) : "",
       total_price_at_sale_en: "",
       id_cccd: "",
       file: null as File | null,
     },
   });
 
+  /* ================= UPDATE PRICE KHI ĐỔI CĂN ================= */
+  useEffect(() => {
+    form.setFieldValue(
+      "total_price_at_sale_vi",
+      house.price ? String(house.price) : ""
+    );
+  }, [house]);
+
+  /* ================= AUTO FILL USER KHI MỞ MODAL ================= */
+  useEffect(() => {
+    if (!opened || !user) return;
+
+    form.setValues({
+      full_name: user.full_name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+    });
+  }, [opened, user]);
+
+  /* ================= CLOSE MODAL ================= */
   const handleCloseModal = () => {
     setOpened(false);
     form.reset();
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (values: typeof form.values) => {
-    console.log("Giá trị file trong form:", values.file);
+    if (!isLoggedIn) {
+      NotificationExtension.Warn("Vui lòng đăng nhập trước");
+      return;
+    }
 
     if (!values.file || !(values.file instanceof File)) {
       NotificationExtension.Warn("Vui lòng chọn file đính kèm hợp lệ");
       return;
     }
 
-    console.log("File name:", values.file.name);
-    console.log("File size:", values.file.size);
-    console.log("File type:", values.file.type);
-
     open();
 
     try {
       const payload = {
-        unit_code: unitCode,
+        unit_code: house.unit_code,
         project_id: projectId,
         email: values.email,
         contract_code: values.contract_code,
@@ -74,6 +108,11 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
         total_price_at_sale_en: Number(values.total_price_at_sale_en),
         id_cccd: values.id_cccd,
         file: values.file,
+
+        bedroom: house.bedroom,
+        bathroom: house.bathroom,
+        direction: house.direction,
+        building_type: house.building_type,
       };
 
       const res = await createOrder(payload);
@@ -85,8 +124,6 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
       handleCloseModal();
       modals.closeAll();
     } catch (error: unknown) {
-      console.error("Lỗi khi tạo đơn hàng:", error);
-
       let message = "Đã xảy ra lỗi";
 
       if (error instanceof AxiosError) {
@@ -101,45 +138,40 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
 
   return (
     <div style={{ display: "flex", gap: "12px", zIndex: 10 }}>
-    <button
-  onClick={() => setOpened(true)}
-  style={{
-    height: "40px",
-    padding: "0 14px",
-    borderRadius: "20px",
-    border: "none",
-    backgroundColor: "#fff",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    whiteSpace: "nowrap",
-  }}
->
-  <IconMail
+      {/* ================= BUTTON ================= */}
+      <button
+        onClick={() => setOpened(true)}
+        style={{
+          height: "40px",
+          padding: "0 14px",
+          borderRadius: "20px",
+          border: "none",
+          backgroundColor: "#fff",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <IconMail size={20} color="#752E0B" />
+        <span
+          style={{
+            fontSize: "14px",
+            fontWeight: 500,
+            color: "#752E0B",
+          }}
+        >
+          Liên hệ
+        </span>
+      </button>
 
- size={20} color="#752E0B" />
-  <span
-    style={{
-      fontSize: "14px",
-      fontWeight: 500,
-      color: "#752E0B",
-    }}
-  >
-    Liên hệ
-  </span>
-</button>
-
-
+      {/* ================= MODAL ================= */}
       <Modal
         opened={opened}
         onClose={handleCloseModal}
-        title={
-          <div style={{ fontWeight: 600, fontSize: 18 }}>
-            Liên hệ
-          </div>
-        }
+        title={<div style={{ fontWeight: 600, fontSize: 18 }}>Liên hệ</div>}
       >
         <Box
           component="form"
@@ -149,75 +181,65 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
         >
           <LoadingOverlay visible={visible} />
 
+          {/* ===== INFO CĂN ===== */}
           <TextInput
-            label="Email khách hàng"
-            placeholder="Nhập email khách hàng"
-            withAsterisk
+            label="Phân khu / Tòa"
+            value={house.zone || house.layer3 || "Không có"}
+            readOnly
             mt="md"
+          />
+
+          <TextInput
+            label="Loại công trình/Vị trí"
+            value={house.building_type || house.layer2 || "Không có"}
+            readOnly
+            mt="md"
+          />
+
+          <TextInput label="Mã căn" value={house.unit_code} readOnly mt="md" />
+
+          {/* ===== USER INFO ===== */}
+          <TextInput
+            label="Họ và tên"
+            mt="md"
+            {...form.getInputProps("full_name")}
+          />
+
+          <TextInput
+            label="Email"
+            mt="md"
+            readOnly
             {...form.getInputProps("email")}
           />
 
           <TextInput
-            label="Mã hợp đồng"
-            placeholder="Nhập mã hợp đồng"
-            withAsterisk
+            label="Số điện thoại"
             mt="md"
-            {...form.getInputProps("contract_code")}
+            {...form.getInputProps("phone")}
           />
 
           <TextInput
-            label="Giá trị đơn hàng (VND)"
-            placeholder="Nhập giá trị đơn hàng (VND)"
-            type="number"
+            label="Chủ đề"
             withAsterisk
             mt="md"
-            {...form.getInputProps("total_price_at_sale_vi")}
+            {...form.getInputProps("subject")}
           />
 
-          <TextInput
-            label="Giá trị đơn hàng (USD)"
-            placeholder="Nhập giá trị đơn hàng (USD)"
-            type="number"
+          <Textarea
             withAsterisk
-            mt="md"
-            {...form.getInputProps("total_price_at_sale_en")}
+            resize="vertical"
+            label="Nội dung"
+            placeholder="Nhập nội dung liên hệ"
+            {...form.getInputProps("content")}
           />
 
-          <TextInput
-            label="Số CCCD / CMND"
-            placeholder="Nhập số CCCD / CMND"
-            withAsterisk
-            mt="md"
-            {...form.getInputProps("id_cccd")}
-          />
-
-          {/* FileInput bind đúng value và onChange */}
-        <FileInput
-  label="File đính kèm"
-  placeholder="Chọn file PDF"
-  withAsterisk
-  mt="md"
-  leftSection={<IconUpload size={16} />}
-  accept="application/pdf"
-  value={form.values.file}
-  onChange={(file) => form.setFieldValue("file", file)}
-/>
           <Group justify="flex-end" mt="lg">
             <Button
               type="submit"
               loading={visible}
               leftSection={<IconCheck size={18} />}
             >
-              Lưu
-            </Button>
-
-            <Button
-              variant="outline"
-              type="button"
-              onClick={handleCloseModal}
-              leftSection={<IconX size={18} />}
-            >
-              Đóng
+              Gửi
             </Button>
           </Group>
         </Box>

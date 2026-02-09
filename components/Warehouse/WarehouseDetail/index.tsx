@@ -201,8 +201,8 @@ export default function WarehouseDetail({ item, onBack, projectId }: WarehouseDe
   projectId={projectId}
 />
 
-           <OrderButton
-  unitCode={item.unit_code}
+<OrderButton
+  house={item}
   projectId={projectId}
 />
 
