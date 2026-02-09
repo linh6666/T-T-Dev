@@ -146,32 +146,33 @@ const isActive = (href: string, highlight?: boolean) => {
           className={`hidden md:flex ${styles.loginLangBlock}`}
           style={{ display: "flex", gap: "20px" }}
         >
-            <Tooltip label="Liên Hệ" position="bottom"
-      
-  styles={{
-    tooltip: {
-      backgroundColor: "#f1eeeeff",
-      color: "#000",
-    },
-  }}
-            >
-      <div
-            style={{
-              border: "1px solid #752E0B",
-              borderRadius: "50%",
-              width: 26,
-              height: 26,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-               
-<IconPhoneCall size={17} color="#752E0B" stroke={1.5} />
-            
-            
-          </div>
-            </Tooltip>
+       <Link href="/lien-he">
+  <Tooltip
+    label="Liên Hệ"
+    position="bottom"
+    styles={{
+      tooltip: {
+        backgroundColor: "#f1eeeeff",
+        color: "#000",
+      },
+    }}
+  >
+    <div
+      style={{
+        border: "1px solid #752E0B",
+        borderRadius: "50%",
+        width: 26,
+        height: 26,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+      }}
+    >
+      <IconPhoneCall size={17} color="#752E0B" stroke={1.5} />
+    </div>
+  </Tooltip>
+</Link>
 
   <Group justify="center">
       <Popover
