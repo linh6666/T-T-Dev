@@ -71,19 +71,21 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
           borderTopRightRadius: "var(--mantine-radius-md)",
         }}
       />
+        <Text className={styles.projectName}>{project.name}</Text>
       <Group wrap="nowrap" p="md" align="flex-start" style={{ flexGrow: 1 }}>
+        
         <Stack gap="xs" style={{ flex: 1 }}>
-          <Text fw={700} size="lg" c="#762f0b">{project.name}</Text>
+        
           <Text size="xs" c="dimmed">Loại dự án: {project.type || "Thông tin chưa có"}</Text>
           <Text size="xs" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
           <Text size="xs" c="dimmed">Chủ đầu tư: {project.investor || "Thông tin chưa có"}</Text>
         </Stack>
 
-        <Stack align="center" gap={0} style={{ minWidth: 120 }}>
+        <Stack align="center" gap={0} style={{ minWidth: 100 }}>
           <div className={styles.chartContainer}>
             <DonutChart
-  size={100}
-  thickness={12}
+  size={80}
+  thickness={10}
   // strokeWidth={1.5}
   data={chartData}
   withTooltip={false}
@@ -94,14 +96,14 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
   }
   pieProps={{
     activeIndex: hoveredIndex !== null ? hoveredIndex : undefined,
-    outerRadius: 40,
-    innerRadius: 28,
+    outerRadius: 32,
+    innerRadius: 22,
     activeShape: {
-      outerRadius: 45,
-      innerRadius: 31,
+      outerRadius: 36,
+      innerRadius: 26,
       strokeWidth: 2,
     },
-    onMouseEnter: (_: any, index: number) => {
+    onMouseEnter: (_: unknown, index: number) => {
       setHoveredIndex(index);
       const item = project.unit_status_summary?.statuses?.[index];
       if (item) {
@@ -116,7 +118,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
       setHoveredIndex(null);
       setHoveredStatus(null);
     },
-  } as any}
+  } as React.ComponentPropsWithoutRef<typeof DonutChart>['pieProps']}
 />
           </div>
           {hoveredStatus && (
@@ -154,7 +156,7 @@ export default function DetailInteractive() {
   const [requestModal, setRequestModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const router = useRouter();
+
 
   useEffect(() => {
     const token = localStorage.getItem("access_token") ?? "";
