@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Card, Image, Stack, Text, Button, Loader, Modal } from "@mantine/core";
+import { Card, Image, Stack, Text, Button, Loader, Modal, Group } from "@mantine/core";
+import { DonutChart } from '@mantine/charts';
 import styles from './NotFoundTitle.module.css';
 import { getListProject } from "../../api/apigetlistProject";
 import { GetJoinProject } from "../../api/apiGetJoinProject";
 import RequestModal from "./RequestModal";
-import { useRouter } from "next/navigation"; // Thêm useRouter
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -20,11 +21,129 @@ interface Project {
   rank_name?: string | null;
   type?: string | null;
   link?: string;
+  unit_status_summary?: {
+    total_units: number;
+    statuses: {
+      id: string;
+      status_name: string;
+      count: number;
+      percent: number;
+    }[];
+  };
 }
 
 interface JoinedProject {
   project_id: string;
-  status: string; // e.g., "pending", "approved"
+  status: string;
+}
+
+function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, joinedProjects: JoinedProject[], onSelect: (p: Project) => void }) {
+  const router = useRouter();
+  const joinedProject = joinedProjects.find(item => item.project_id === project.id);
+  const status = joinedProject?.status;
+
+  const [hoveredStatus, setHoveredStatus] = useState<{ name: string; color: string; percent: number } | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const getStatusColor = (name: string) => {
+    switch (name) {
+      case 'Đang bán': return '#40c057';
+      case 'Đã đặt cọc': return '#fab005';
+      case 'Đã bán': return '#f0441c';
+      default: return '#dee2e6';
+    }
+  };
+
+  const chartData = project.unit_status_summary?.statuses?.map((item) => ({
+    name: item.status_name,
+    value: item.percent,
+    color: getStatusColor(item.status_name)
+  })) || [];
+
+  return (
+    <Card shadow="sm" radius="md" withBorder padding="0" className={styles.card}>
+      <Image
+        src={project.overview_image || "/placeholder.png"}
+        height={160}
+        alt={project.name}
+        style={{
+          borderTopLeftRadius: "var(--mantine-radius-md)",
+          borderTopRightRadius: "var(--mantine-radius-md)",
+        }}
+      />
+      <Group wrap="nowrap" p="md" align="flex-start" style={{ flexGrow: 1 }}>
+        <Stack gap="xs" style={{ flex: 1 }}>
+          <Text fw={700} size="lg" c="#762f0b">{project.name}</Text>
+          <Text size="xs" c="dimmed">Loại dự án: {project.type || "Thông tin chưa có"}</Text>
+          <Text size="xs" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
+          <Text size="xs" c="dimmed">Chủ đầu tư: {project.investor || "Thông tin chưa có"}</Text>
+        </Stack>
+
+        <Stack align="center" gap={0} style={{ minWidth: 120 }}>
+          <div className={styles.chartContainer}>
+            <DonutChart
+  size={100}
+  thickness={12}
+  // strokeWidth={1.5}
+  data={chartData}
+  withTooltip={false}
+  chartLabel={
+    hoveredStatus
+      ? `${hoveredStatus.percent.toFixed(0)}%`
+      : undefined
+  }
+  pieProps={{
+    activeIndex: hoveredIndex !== null ? hoveredIndex : undefined,
+    outerRadius: 40,
+    innerRadius: 28,
+    activeShape: {
+      outerRadius: 45,
+      innerRadius: 31,
+      strokeWidth: 2,
+    },
+    onMouseEnter: (_: any, index: number) => {
+      setHoveredIndex(index);
+      const item = project.unit_status_summary?.statuses?.[index];
+      if (item) {
+        setHoveredStatus({
+          name: item.status_name,
+          color: getStatusColor(item.status_name),
+          percent: item.percent,
+        });
+      }
+    },
+    onMouseLeave: () => {
+      setHoveredIndex(null);
+      setHoveredStatus(null);
+    },
+  } as any}
+/>
+          </div>
+          {hoveredStatus && (
+            <Text size="xs" fw={500}   c="#752E0B" mt={5} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {hoveredStatus.name} <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: hoveredStatus.color, display: 'inline-block' }}></span>
+            </Text>
+          )}
+        </Stack>
+      </Group>
+
+      <Button
+        className={`${styles.baseButton} ${styles.primaryButton}`}
+        onClick={() => {
+          if (status === "approved" || project.rank_name) {
+            router.push(`/quan-ly-ban-hang/tong-mat-bang/${project.id}?name=${encodeURIComponent(project.name)}`);
+          } else if (!project.rank_name) {
+            onSelect(project);
+          }
+        }}
+        disabled={status === "pending"}
+      >
+        {status === "pending" 
+          ? "Đang chờ phê duyệt" 
+          : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
+      </Button>
+    </Card>
+  );
 }
 
 export default function DetailInteractive() {
@@ -35,7 +154,7 @@ export default function DetailInteractive() {
   const [requestModal, setRequestModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const router = useRouter(); // Khởi tạo router
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("access_token") ?? "";
@@ -53,11 +172,8 @@ export default function DetailInteractive() {
           GetJoinProject({ token })
         ]);
 
-        const projectData = listProjectRes.data;
-        const joinedData = joinedProjectRes.data;
-
-        setProjects(projectData);
-        setJoinedProjects(joinedData);
+        setProjects(listProjectRes.data);
+        setJoinedProjects(joinedProjectRes.data);
       } catch (error) {
         console.error("Failed to fetch:", error);
       } finally {
@@ -81,58 +197,17 @@ export default function DetailInteractive() {
       <div className={styles.background}>
         <div className={styles.container}>
           <div className={styles.cardGrid}>
-           
-            {projects.map((project) => {
-              const joinedProject = joinedProjects.find(item => item.project_id === project.id);
-              const status = joinedProject?.status;
-
-              return (
-                <Card
-                  key={project.id}
-                  shadow="sm"
-                  radius="md"
-                  withBorder
-                  padding="0"
-                  className={styles.card}
-                >
-                  <Image
-                    src={project.overview_image || "/placeholder.png"}
-                    height={160}
-                    alt={project.name}
-                    style={{
-                      borderTopLeftRadius: "var(--mantine-radius-md)",
-                      borderTopRightRadius: "var(--mantine-radius-md)",
-                    }}
-                  />
-                  <Stack gap="xs" p="md" style={{ flexGrow: 1 }}>
-                    <Text fw={500}>{project.name}</Text>
-                    <Text size="sm" c="dimmed">Loại dự án: {project.type || "Thông tin chưa có"}</Text>
-                    <Text size="sm" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
-                    <Text size="sm" c="dimmed">Nhà đầu tư: {project.investor || "Thông tin chưa có"}</Text>
-                    <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
-                  </Stack>
-
-                  <Button
-                    className={`${styles.baseButton} ${styles.primaryButton}`}
-                    onClick={() => {
-                      if (status === "approved" || project.rank_name) {
-                        // Khi là "Đi tới dự án", chuyển sang trang khác
-                      router.push(`/quan-ly-ban-hang/tong-mat-bang/${project.id}?name=${encodeURIComponent(project.name)}`);
-
-                      } else if (!project.rank_name) {
-                        setSelectedProject(project);
-                        setRequestModal(true);
-                      }
-                    }}
-                    disabled={status === "pending"}
-                  >
-                    {status === "pending" 
-                      ? "Đang chờ phê duyệt" 
-                      : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
-                  </Button>
-                </Card>
-              );
-            })}
+            {projects.map((project) => (
+              <ProjectCard 
+                key={project.id} 
+                project={project} 
+                joinedProjects={joinedProjects} 
+                onSelect={(p) => {
+                  setSelectedProject(p);
+                  setRequestModal(true);
+                }} 
+              />
+            ))}
           </div>
         </div>
       </div>

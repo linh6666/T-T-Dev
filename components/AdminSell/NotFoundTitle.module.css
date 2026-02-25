@@ -5,12 +5,14 @@
   padding: 2rem 1rem;
   /* margin-top: 100px; */
 }
-.background{
-    max-width: 1200px;
+
+.background {
+  max-width: 1200px;
   width: 100%;
   height: 100%;
   margin: 0 auto;
 }
+
 .searchSection {
   display: flex;
   flex-direction: column;
@@ -100,19 +102,23 @@
   cursor: not-allowed;
   border: none;
 }
+
 .footerwrapper {
   text-align: center;
   padding: 130px;
   /* padding: 24px 0; */
-  color: #808894; /* text-gray-600 */
-  font-size: 14px; /* text-sm */
+  color: #808894;
+  /* text-gray-600 */
+  font-size: 14px;
+  /* text-sm */
 }
-   
+
 .footerline {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px; /* khoảng cách giữa chữ và logo */
+  gap: 8px;
+  /* khoảng cách giữa chữ và logo */
   margin-bottom: 4px;
 }
 
@@ -124,14 +130,16 @@
 } */
 
 .footersubtext {
-  color: #6b7280; /* text-gray-500 */
+  color: #6b7280;
+  /* text-gray-500 */
 }
 
 .footerline {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px; /* khoảng cách giữa chữ và logo */
+  gap: 8px;
+  /* khoảng cách giữa chữ và logo */
   margin-bottom: 4px;
 }
 
@@ -139,9 +147,46 @@
   /* width: 120px; */
   height: 33px;
   display: inline-block;
-  margin-top: 2px; /* tinh chỉnh nhẹ để logo ngang hàng chữ */
+  margin-top: 2px;
+  /* tinh chỉnh nhẹ để logo ngang hàng chữ */
 }
 
 .footersubtext {
-  color: #6b7280; /* text-gray-500 */
+  color: #6b7280;
+  /* text-gray-500 */
+}
+
+/* Donut Chart Transitions - Nổi hẳn lên không biến dạng */
+.chartContainer :global(.recharts-sector) {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Loại bỏ hiệu ứng làm mờ các phần xung quanh khi hover theo yêu cầu người dùng */
+.chartContainer :global(.recharts-pie:hover .recharts-sector:not(.recharts-active-shape)) {
+  opacity: 1;
+  filter: none;
+}
+
+/* Hiệu ứng nổi khối với shadow sâu */
+/* .chartContainer :global(.recharts-active-shape) {
+  filter: drop-shadow(0px 6px 15px rgba(0, 0, 0, 0.4)) !important;
+  opacity: 1 !important;
+} */
+
+.chartContainer :global(.recharts-text.recharts-label) {
+  transition: all 0.3s ease;
+  font-weight: 800;
+  fill: #762f0b !important;
+  font-size: 1.1rem;
+}
+
+.chartContainer :global(.recharts-pie-status-none .recharts-label) {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.mantine-DonutChart-label {
+  fill: #752E0B !important;
+  font-weight: 700;
 }
