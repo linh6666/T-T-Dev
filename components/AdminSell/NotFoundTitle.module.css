@@ -170,9 +170,25 @@
   /* text-gray-500 */
 }
 
+/* Container cố định kích thước để hover chart không đẩy layout bên dưới */
+.chartContainer {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* SVG phải overflow visible để sector phóng to không bị clip */
+.chartContainer :global(svg) {
+  overflow: visible !important;
+}
+
 /* Donut Chart Transitions - Nổi hẳn lên không biến dạng */
 .chartContainer :global(.recharts-sector) {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   outline: none;
   cursor: pointer;
 }

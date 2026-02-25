@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Card, Image, Stack, Text, Button, Loader, Modal, Group } from "@mantine/core";
 import { DonutChart } from '@mantine/charts';
+import { Sector } from 'recharts';
 import styles from './NotFoundTitle.module.css';
 import { getListProject } from "../../api/apigetlistProject";
 import { GetJoinProject } from "../../api/apiGetJoinProject";
@@ -96,13 +97,12 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
   }
   pieProps={{
     activeIndex: hoveredIndex !== null ? hoveredIndex : undefined,
-    outerRadius: 32,
-    innerRadius: 22,
-    activeShape: {
-      outerRadius: 36,
-      innerRadius: 26,
-      strokeWidth: 2,
-    },
+    activeShape: (props: Record<string, number & string>) => (
+      <Sector
+        {...props}
+        outerRadius={(props.outerRadius as number) + 4}
+      />
+    ),
     onMouseEnter: (_: unknown, index: number) => {
       setHoveredIndex(index);
       const item = project.unit_status_summary?.statuses?.[index];
@@ -121,11 +121,32 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
   } as React.ComponentPropsWithoutRef<typeof DonutChart>['pieProps']}
 />
           </div>
-          {hoveredStatus && (
-            <Text size="xs" fw={500}   c="#752E0B" mt={5} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              {hoveredStatus.name} <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: hoveredStatus.color, display: 'inline-block' }}></span>
-            </Text>
-          )}
+          {/* Luôn render để không thay đổi chiều cao layout — chỉ ẩn bằng visibility */}
+          <Text
+            size="xs"
+            fw={500}
+            c="#752E0B"
+            mt={5}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              height: 18,
+              visibility: hoveredStatus ? 'visible' : 'hidden',
+              opacity: hoveredStatus ? 1 : 0,
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            {hoveredStatus?.name ?? '\u00a0'}
+            <span style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              backgroundColor: hoveredStatus?.color ?? 'transparent',
+              display: 'inline-block',
+              flexShrink: 0,
+            }} />
+          </Text>
         </Stack>
       </Group>
 
