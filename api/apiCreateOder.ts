@@ -7,7 +7,7 @@ export interface CreateOrderPayload {
   email: string;
   contract_code: string;
   total_price_at_sale_vi: number;
-  total_price_at_sale_en: number;
+  // total_price_at_sale_en: number;
   id_cccd: string;
   file: File;
 }
@@ -23,7 +23,7 @@ export const createOrder = async (payload: CreateOrderPayload) => {
   formData.append("email", data.email);
   formData.append("contract_code", data.contract_code);
   formData.append("total_price_at_sale_vi", String(data.total_price_at_sale_vi));
-  formData.append("total_price_at_sale_en", String(data.total_price_at_sale_en));
+  // formData.append("total_price_at_sale_en", String(data.total_price_at_sale_en));
   formData.append("id_cccd", data.id_cccd);
 
   // file upload

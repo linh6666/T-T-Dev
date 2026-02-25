@@ -80,6 +80,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
           <Text size="xs" c="dimmed">Loại dự án: {project.type || "Thông tin chưa có"}</Text>
           <Text size="xs" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
           <Text size="xs" c="dimmed">Chủ đầu tư: {project.investor || "Thông tin chưa có"}</Text>
+                              <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
         </Stack>
 
         <Stack align="center" gap={0} style={{ minWidth: 100 }}>

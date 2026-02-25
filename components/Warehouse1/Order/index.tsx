@@ -37,7 +37,7 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
       email: "",
       contract_code: "",
       total_price_at_sale_vi: "",
-      total_price_at_sale_en: "",
+      // total_price_at_sale_en: "",
       id_cccd: "",
       file: null as File | null,
     },
@@ -69,7 +69,7 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
         email: values.email,
         contract_code: values.contract_code,
         total_price_at_sale_vi: Number(values.total_price_at_sale_vi),
-        total_price_at_sale_en: Number(values.total_price_at_sale_en),
+        // total_price_at_sale_en: Number(values.total_price_at_sale_en),
         id_cccd: values.id_cccd,
         file: values.file,
       };
@@ -161,23 +161,33 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
             {...form.getInputProps("contract_code")}
           />
 
-          <TextInput
-            label="Giá trị đơn hàng (VND)"
-            placeholder="Nhập giá trị đơn hàng (VND)"
-            type="number"
-            withAsterisk
-            mt="md"
-            {...form.getInputProps("total_price_at_sale_vi")}
-          />
+        <TextInput
+  label="Giá trị đơn hàng"
+  placeholder="Nhập giá trị đơn hàng"
+  type="text"
+  withAsterisk
+  mt="md"
+  value={
+    form.values.total_price_at_sale_vi
+      ? Number(form.values.total_price_at_sale_vi).toLocaleString("vi-VN")
+      : ""
+  }
+  onChange={(event) => {
+    const rawValue = event.currentTarget.value.replace(/\./g, "");
+    if (!isNaN(Number(rawValue))) {
+      form.setFieldValue("total_price_at_sale_vi", rawValue);
+    }
+  }}
+/>
 
-          <TextInput
+          {/* <TextInput
             label="Giá trị đơn hàng (USD)"
             placeholder="Nhập giá trị đơn hàng (USD)"
             type="number"
             withAsterisk
             mt="md"
             {...form.getInputProps("total_price_at_sale_en")}
-          />
+          /> */}
 
           <TextInput
             label="Số CCCD / CMND"
