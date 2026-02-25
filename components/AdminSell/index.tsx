@@ -86,7 +86,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
           <div className={styles.chartContainer}>
             <DonutChart
   size={80}
-  thickness={10}
+  thickness={16}
   // strokeWidth={1.5}
   data={chartData}
   withTooltip={false}
