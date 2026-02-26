@@ -668,7 +668,7 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
                 backgroundColor: activeStatus === "Quan tâm" ? "#b8893c" : "#c99945",
                 color: "#fff",
                 padding: "8px 16px",
-                border: activeStatus === "Quan tâm" ? "2px solid #000" : "none",
+                // border: activeStatus === "Quan tâm" ? "2px solid #000" : "none",
                 borderRadius: 20,
               }}
               onClick={() => {
@@ -685,7 +685,7 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
                 backgroundColor: activeStatus === "Đang bán" ? "#2f566d" : "#3d6985",
                 color: "#fff",
                 padding: "8px 16px",
-                border: activeStatus === "Đang bán" ? "2px solid #000" : "none",
+                // border: activeStatus === "Đang bán" ? "2px solid #000" : "none",
                 borderRadius: 20,
               }}
               onClick={() => {
@@ -702,7 +702,7 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
                 backgroundColor: activeStatus === "Đã đặt cọc" ? "#cc5c34" : "#e56a3e",
                 color: "#fff",
                 padding: "8px 16px",
-                border: activeStatus === "Đã đặt cọc" ? "2px solid #000" : "none",
+                // border: activeStatus === "Đã đặt cọc" ? "2px solid #000" : "none",
                 borderRadius: 20,
               }}
               onClick={() => {
@@ -719,7 +719,7 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
                 backgroundColor: activeStatus === "Đã bán" ? "#b32f1f" : "#d73a24",
                 color: "#fff",
                 padding: "8px 16px",
-                border: activeStatus === "Đã bán" ? "2px solid #000" : "none",
+                // border: activeStatus === "Đã bán" ? "2px solid #000" : "none",
                 borderRadius: 20,
               }}
               onClick={() => {
