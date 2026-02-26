@@ -354,53 +354,33 @@ const uniqueBuildingTypes = Array.from(
   new Set(
     items
       .map((item) => item.building_type)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueDirections = Array.from(
   new Set(
     items
       .map((item) => item.direction)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueMainDoorDirections = Array.from(
   new Set(
     items
       .map((item) => item.main_door_direction)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueBalconyDirections = Array.from(
   new Set(
     items
       .map((item) => item.balcony_direction)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature1 = Array.from(
   new Set(
@@ -408,7 +388,7 @@ const uniqueFeature1 = Array.from(
       .map((item) => item.feature_1)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature2 = Array.from(
   new Set(
@@ -416,7 +396,7 @@ const uniqueFeature2 = Array.from(
       .map((item) => item.feature_2)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature3 = Array.from(
   new Set(
@@ -424,7 +404,7 @@ const uniqueFeature3 = Array.from(
       .map((item) => item.feature_3)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature4 = Array.from(
   new Set(
@@ -432,7 +412,7 @@ const uniqueFeature4 = Array.from(
       .map((item) => item.feature_4)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueApartmentType = Array.from(
   new Set(
@@ -440,7 +420,7 @@ const uniqueApartmentType = Array.from(
       .map((item) => item.apartment_type)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueApartmentModelCode = Array.from(
   new Set(
@@ -448,7 +428,7 @@ const uniqueApartmentModelCode = Array.from(
       .map((item) => item.apartment_model_code)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueApartmentNum = Array.from(
   new Set(
@@ -456,7 +436,7 @@ const uniqueApartmentNum = Array.from(
       .map((item) => item.apartment_num)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFloorName = Array.from(
   new Set(
@@ -464,7 +444,7 @@ const uniqueFloorName = Array.from(
       .map((item) => item.floor_name)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFloorGroupCode = Array.from(
   new Set(
@@ -472,7 +452,7 @@ const uniqueFloorGroupCode = Array.from(
       .map((item) => item.floor_group_code)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFloorApartmentGroupCode = Array.from(
   new Set(
@@ -480,7 +460,7 @@ const uniqueFloorApartmentGroupCode = Array.from(
       .map((item) => item.floor_apartment_group_code)
       .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 
 // Lấy danh sách phòng ngủ duy nhất, ép về string và bỏ "Skip"
