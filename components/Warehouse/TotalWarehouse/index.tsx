@@ -9,7 +9,7 @@ import {
   Loader,
   ActionIcon,
   Autocomplete,
-  MultiSelect,
+  
 } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehousebasic";
 import styles from "./TotalWarehouse.module.css";

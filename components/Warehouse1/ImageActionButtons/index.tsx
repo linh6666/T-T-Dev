@@ -23,13 +23,24 @@ export default function ImageActionButtons({
   projectId,
 }: ImageActionButtonsProps) {
   const [loading, setLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(true); // Thêm trạng thái kiểm tra ban đầu
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
 
   // Kiểm tra trạng thái yêu thích khi load trang
   useEffect(() => {
+    // Thử lấy kết quả từ cache local (nếu có) để hiển thị tức thì
+    const cacheKey = `fav_${projectId}_${unitCode}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached === "true") {
+      setIsFavorite(true);
+    }
+
     const checkFavoriteStatus = async () => {
-      if (!projectId || !unitCode) return;
+      if (!projectId || !unitCode) {
+        setIsChecking(false);
+        return;
+      }
 
       try {
         const response = await getListFavorites(projectId);
@@ -46,12 +57,16 @@ export default function ImageActionButtons({
           setFavoriteId(
             favoriteItem.id || favoriteItem.favorite_id || null
           );
+          localStorage.setItem(cacheKey, "true"); // Update cache
         } else {
           setIsFavorite(false);
           setFavoriteId(null);
+          localStorage.removeItem(cacheKey); // Clear cache if not found
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra trạng thái yêu thích:", error);
+      } finally {
+        setIsChecking(false); // Hoàn tất kiểm tra
       }
     };
 
@@ -84,8 +99,10 @@ export default function ImageActionButtons({
           await deleteFavorites(idToDelete);
           setIsFavorite(false);
           setFavoriteId(null);
+          localStorage.removeItem(`fav_${projectId}_${unitCode}`); // Xóa cache
         } else {
           setIsFavorite(false);
+          localStorage.removeItem(`fav_${projectId}_${unitCode}`); // Xóa cache
         }
       } else {
         // --- CHƯA YÊU THÍCH -> THÊM ---
@@ -116,6 +133,8 @@ export default function ImageActionButtons({
 
           setFavoriteId(item?.id || item?.favorite_id || null);
         }
+        // Cập nhật cache
+        localStorage.setItem(`fav_${projectId}_${unitCode}`, "true");
       }
     } catch (error: unknown) {
       if (
@@ -123,6 +142,7 @@ export default function ImageActionButtons({
         error.response?.status === 409
       ) {
         setIsFavorite(true);
+        localStorage.setItem(`fav_${projectId}_${unitCode}`, "true");
 
         const reloadResponse = await getListFavorites(projectId);
         const list: FavoriteItem[] = reloadResponse.data || [];
@@ -157,14 +177,13 @@ export default function ImageActionButtons({
           border: isFavorite
             ? "1px solid #ff4d4f"
             : "1px solid #e5e7eb",
-          backgroundColor: isFavorite
-            ? "#fff5f5"
-            : "#ffffff",
+          backgroundColor: isFavorite ? "#fff5f5" : "#ffffff",
           color: isFavorite ? "#ff4d4f" : "#752E0B",
           boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
           cursor: loading ? "not-allowed" : "pointer",
-          opacity: loading ? 0.7 : 1,
+          opacity: loading || (isChecking && !isFavorite) ? 0.8 : 1,
           transition: "all 0.2s ease",
+         
         }}
         onMouseEnter={(e) => {
           if (!isFavorite) {
@@ -185,12 +204,15 @@ export default function ImageActionButtons({
           size={18}
           color={isFavorite ? "#ff4d4f" : "#752E0B"}
           fill={isFavorite ? "#ff4d4f" : "none"}
+          style={{ transition: "fill 0.2s ease, color 0.2s ease" }}
         />
-        {loading
-          ? "Đang xử lý..."
-          : isFavorite
-          ? "Đã yêu thích"
-          : "Yêu thích"}
+        {/* <span style={{ minWidth: "85px", textAlign: "center" }}> */}
+          {loading
+            ? "Đang xử lý..."
+            : isFavorite
+            ? "Đã yêu thích"
+            : "Yêu thích"}
+        {/* </span> */}
       </button>
     </div>
   );
