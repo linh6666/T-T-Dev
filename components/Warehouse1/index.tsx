@@ -4,7 +4,7 @@ import React, { useState } from "react";
 // import { Tabs } from "@mantine/core";
 import styles from "./App.module.css";
 import TotalWarehouse from "./TotalWarehouse";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { Group } from "@mantine/core";
 
 interface AppProps {
@@ -14,12 +14,12 @@ interface AppProps {
 }
 
 // 💡 Nhận props projectId
-export default function Managent({ projectId,target,projectName }: AppProps) {
+export default function Managent({ projectId,target }: AppProps) {
 //   const [activeTab, setActiveTab] = useState<string | null>("all"); 
   const [activeView, setActiveView] = useState<string>("warehouse"); // main view
 
   // giả lập zoneNames để render tab (không gọi API)
- const router = useRouter();
+//  const router = useRouter();
 
   return (
     <div className={styles.containerr}>
@@ -53,16 +53,7 @@ export default function Managent({ projectId,target,projectName }: AppProps) {
     </h1>
   </Group>
 
-<h1
-  style={{ marginLeft: "auto", cursor: "pointer", color: "#1c7ed6" }}
-onClick={() =>
-  router.push(
-    `/quan-ly-ban-hang/tong-mat-bang/${projectId}?name=${encodeURIComponent(projectName || "")}`
-  )
-}
->
-  ← Quay lại
-</h1>
+
 
 </div>
 
