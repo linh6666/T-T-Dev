@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Group,
   Card,
@@ -9,7 +10,6 @@ import {
   Loader,
   ActionIcon,
   Autocomplete,
-  
 } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehousebasic";
 import styles from "./TotalWarehouse.module.css";
@@ -55,6 +55,10 @@ export interface WarehouseItem {
 }
 
 export default function TotalWarehouse({ projectId, target }: TotalWarehouseProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const projectName = searchParams.get("name") || "";
+
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<WarehouseItem | null>(null);
@@ -567,6 +571,8 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
         {/* Header */}
         <div>
           <Group gap="md">
+           
+
             <ActionIcon
               variant="outline"
               radius="md"
@@ -630,6 +636,27 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               }}
               style={{ width: 300 }}
             />
+             <h1
+              style={{
+                cursor: "pointer",
+                color: "#1c7ed6",
+                fontSize: "16px",
+                margin: 0,
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                marginLeft: "auto", // Đẩy về bên phải
+              }}
+              onClick={() =>
+                router.push(
+                  `/Thong-tin-san-pham/tong-mat-bang/${projectId}?name=${encodeURIComponent(
+                    projectName || ""
+                  )}`
+                )
+              }
+            >
+              ← Quay lại
+            </h1>
           </Group>
 
           {/* Status buttons */}
