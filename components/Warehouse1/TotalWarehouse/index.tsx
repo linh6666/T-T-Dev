@@ -41,6 +41,16 @@ export interface WarehouseItem {
   bathroom: string | number;
   direction: string;
   price: number;
+  feature_1: string;
+  feature_2: string;
+  feature_3: string;
+  feature_4: string;
+  apartment_type: string;
+  apartment_model_code: string;
+  apartment_num: string;
+  floor_name: string;
+  floor_group_code: string;
+  floor_apartment_group_code: string;
 }
 
 export default function TotalWarehouse({ projectId, target }: TotalWarehouseProps) {
@@ -59,6 +69,16 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [selectedMainDoorDirections, setSelectedMainDoorDirections] = useState<string[]>([]);
   const [selectedBalconyDirections, setSelectedBalconyDirections] = useState<string[]>([]);
   const [selectedDirections, setSelectedDirections] = useState<string[]>([]);
+  const [selectedFeature1, setSelectedFeature1] = useState<string[]>([]);
+  const [selectedFeature2, setSelectedFeature2] = useState<string[]>([]);
+  const [selectedFeature3, setSelectedFeature3] = useState<string[]>([]);
+  const [selectedFeature4, setSelectedFeature4] = useState<string[]>([]);
+  const [selectedApartmentType, setSelectedApartmentType] = useState<string[]>([]);
+  const [selectedApartmentModelCode, setSelectedApartmentModelCode] = useState<string[]>([]);
+  const [selectedApartmentNum, setSelectedApartmentNum] = useState<string[]>([]);
+  const [selectedFloorName, setSelectedFloorName] = useState<string[]>([]);
+  const [selectedFloorGroupCode, setSelectedFloorGroupCode] = useState<string[]>([]);
+  const [selectedFloorApartmentGroupCode, setSelectedFloorApartmentGroupCode] = useState<string[]>([]);
   const [activeStatus, setActiveStatus] = useState<string | null>(null);
   const [activeBedroom, setActiveBedroom] = useState<string | null>(null);
 
@@ -171,6 +191,40 @@ useEffect(() => {
     );
   }
 
+  // Filter theo các feature
+  if (selectedFeature1.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature1.includes(item.feature_1));
+  }
+  if (selectedFeature2.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature2.includes(item.feature_2));
+  }
+  if (selectedFeature3.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature3.includes(item.feature_3));
+  }
+  if (selectedFeature4.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature4.includes(item.feature_4));
+  }
+
+  // Filter theo các trường mới
+  if (selectedApartmentType.length > 0) {
+    filtered = filtered.filter((item) => item && selectedApartmentType.includes(item.apartment_type));
+  }
+  if (selectedApartmentModelCode.length > 0) {
+    filtered = filtered.filter((item) => item && selectedApartmentModelCode.includes(item.apartment_model_code));
+  }
+  if (selectedApartmentNum.length > 0) {
+    filtered = filtered.filter((item) => item && selectedApartmentNum.includes(item.apartment_num));
+  }
+  if (selectedFloorName.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFloorName.includes(item.floor_name));
+  }
+  if (selectedFloorGroupCode.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFloorGroupCode.includes(item.floor_group_code));
+  }
+  if (selectedFloorApartmentGroupCode.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFloorApartmentGroupCode.includes(item.floor_apartment_group_code));
+  }
+
   setFilteredItems(filtered);
   setCurrentPage(1);
 }, [
@@ -178,6 +232,17 @@ useEffect(() => {
   selectedBuildingTypes,
   selectedMainDoorDirections,
   selectedBalconyDirections,
+  selectedDirections,
+  selectedFeature1,
+  selectedFeature2,
+  selectedFeature3,
+  selectedFeature4,
+  selectedApartmentType,
+  selectedApartmentModelCode,
+  selectedApartmentNum,
+  selectedFloorName,
+  selectedFloorGroupCode,
+  selectedFloorApartmentGroupCode,
 ]);
 
 
@@ -337,6 +402,87 @@ const uniqueBalconyDirections = Array.from(
   )
 );
 
+const uniqueFeature1 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_1)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueFeature2 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_2)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueFeature3 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_3)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueFeature4 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_4)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueApartmentType = Array.from(
+  new Set(
+    items
+      .map((item) => item.apartment_type)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueApartmentModelCode = Array.from(
+  new Set(
+    items
+      .map((item) => item.apartment_model_code)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueApartmentNum = Array.from(
+  new Set(
+    items
+      .map((item) => item.apartment_num)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueFloorName = Array.from(
+  new Set(
+    items
+      .map((item) => item.floor_name)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueFloorGroupCode = Array.from(
+  new Set(
+    items
+      .map((item) => item.floor_group_code)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+const uniqueFloorApartmentGroupCode = Array.from(
+  new Set(
+    items
+      .map((item) => item.floor_apartment_group_code)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+);
+
+
 // Lấy danh sách phòng ngủ duy nhất, ép về string và bỏ "Skip"
 const uniqueBedrooms: string[] = Array.from(
   new Set(
@@ -400,6 +546,36 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
           uniqueBalconyDirections={uniqueBalconyDirections}
           selectedBalconyDirections={selectedBalconyDirections}
           setSelectedBalconyDirections={setSelectedBalconyDirections}
+          uniqueFeature1={uniqueFeature1}
+          selectedFeature1={selectedFeature1}
+          setSelectedFeature1={setSelectedFeature1}
+          uniqueFeature2={uniqueFeature2}
+          selectedFeature2={selectedFeature2}
+          setSelectedFeature2={setSelectedFeature2}
+          uniqueFeature3={uniqueFeature3}
+          selectedFeature3={selectedFeature3}
+          setSelectedFeature3={setSelectedFeature3}
+          uniqueFeature4={uniqueFeature4}
+          selectedFeature4={selectedFeature4}
+          setSelectedFeature4={setSelectedFeature4}
+          uniqueApartmentType={uniqueApartmentType}
+          selectedApartmentType={selectedApartmentType}
+          setSelectedApartmentType={setSelectedApartmentType}
+          uniqueApartmentModelCode={uniqueApartmentModelCode}
+          selectedApartmentModelCode={selectedApartmentModelCode}
+          setSelectedApartmentModelCode={setSelectedApartmentModelCode}
+          uniqueApartmentNum={uniqueApartmentNum}
+          selectedApartmentNum={selectedApartmentNum}
+          setSelectedApartmentNum={setSelectedApartmentNum}
+          uniqueFloorName={uniqueFloorName}
+          selectedFloorName={selectedFloorName}
+          setSelectedFloorName={setSelectedFloorName}
+          uniqueFloorGroupCode={uniqueFloorGroupCode}
+          selectedFloorGroupCode={selectedFloorGroupCode}
+          setSelectedFloorGroupCode={setSelectedFloorGroupCode}
+          uniqueFloorApartmentGroupCode={uniqueFloorApartmentGroupCode}
+          selectedFloorApartmentGroupCode={selectedFloorApartmentGroupCode}
+          setSelectedFloorApartmentGroupCode={setSelectedFloorApartmentGroupCode}
           sortedBedrooms={sortedBedrooms}
           activeBedroom={activeBedroom}
           setActiveBedroom={setActiveBedroom}

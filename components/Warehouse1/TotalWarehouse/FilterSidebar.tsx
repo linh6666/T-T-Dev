@@ -1,5 +1,3 @@
-"use client";
-
 import { MultiSelect } from "@mantine/core";
 import { WarehouseItem } from "./index";
 
@@ -19,6 +17,36 @@ interface FilterSidebarProps {
   sortedBedrooms: string[];
   activeBedroom: string | null;
   setActiveBedroom: (val: string | null) => void;
+  uniqueFeature1: string[];
+  selectedFeature1: string[];
+  setSelectedFeature1: (val: string[]) => void;
+  uniqueFeature2: string[];
+  selectedFeature2: string[];
+  setSelectedFeature2: (val: string[]) => void;
+  uniqueFeature3: string[];
+  selectedFeature3: string[];
+  setSelectedFeature3: (val: string[]) => void;
+  uniqueFeature4: string[];
+  selectedFeature4: string[];
+  setSelectedFeature4: (val: string[]) => void;
+  uniqueApartmentType: string[];
+  selectedApartmentType: string[];
+  setSelectedApartmentType: (val: string[]) => void;
+  uniqueApartmentModelCode: string[];
+  selectedApartmentModelCode: string[];
+  setSelectedApartmentModelCode: (val: string[]) => void;
+  uniqueApartmentNum: string[];
+  selectedApartmentNum: string[];
+  setSelectedApartmentNum: (val: string[]) => void;
+  uniqueFloorName: string[];
+  selectedFloorName: string[];
+  setSelectedFloorName: (val: string[]) => void;
+  uniqueFloorGroupCode: string[];
+  selectedFloorGroupCode: string[];
+  setSelectedFloorGroupCode: (val: string[]) => void;
+  uniqueFloorApartmentGroupCode: string[];
+  selectedFloorApartmentGroupCode: string[];
+  setSelectedFloorApartmentGroupCode: (val: string[]) => void;
   handleFilterBedroom: (num: string | number) => void;
   items: WarehouseItem[];
   setFilteredItems: (items: WarehouseItem[]) => void;
@@ -41,6 +69,36 @@ export default function FilterSidebar({
   sortedBedrooms,
   activeBedroom,
   setActiveBedroom,
+  uniqueFeature1,
+  selectedFeature1,
+  setSelectedFeature1,
+  uniqueFeature2,
+  selectedFeature2,
+  setSelectedFeature2,
+  uniqueFeature3,
+  selectedFeature3,
+  setSelectedFeature3,
+  uniqueFeature4,
+  selectedFeature4,
+  setSelectedFeature4,
+  uniqueApartmentType,
+  selectedApartmentType,
+  setSelectedApartmentType,
+  uniqueApartmentModelCode,
+  selectedApartmentModelCode,
+  setSelectedApartmentModelCode,
+  uniqueApartmentNum,
+  selectedApartmentNum,
+  setSelectedApartmentNum,
+  uniqueFloorName,
+  selectedFloorName,
+  setSelectedFloorName,
+  uniqueFloorGroupCode,
+  selectedFloorGroupCode,
+  setSelectedFloorGroupCode,
+  uniqueFloorApartmentGroupCode,
+  selectedFloorApartmentGroupCode,
+  setSelectedFloorApartmentGroupCode,
   handleFilterBedroom,
   items,
   setFilteredItems,
@@ -51,7 +109,7 @@ export default function FilterSidebar({
       style={{
         backgroundColor: "#f7f7f7",
         padding: 20,
-        boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)",
+        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.05)",
         borderRadius: "10px",
         width: 300,
       }}
@@ -71,14 +129,7 @@ export default function FilterSidebar({
       )}
 
       {uniqueDirections.length > 0 && (
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "15px",
-          }}
-        >
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
           <MultiSelect
             label="Hướng"
             placeholder="Chọn hướng"
@@ -90,14 +141,7 @@ export default function FilterSidebar({
       )}
 
       {uniqueMainDoorDirections.length > 0 && (
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "15px",
-          }}
-        >
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
           <MultiSelect
             label="Hướng cửa chính"
             placeholder="Chọn hướng cửa chính"
@@ -109,14 +153,7 @@ export default function FilterSidebar({
       )}
 
       {uniqueBalconyDirections.length > 0 && (
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "15px",
-          }}
-        >
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
           <MultiSelect
             label="Hướng ban công"
             placeholder="Chọn hướng ban công"
@@ -127,22 +164,129 @@ export default function FilterSidebar({
         </div>
       )}
 
+      {uniqueFeature1.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Đặc điểm nổi bật 1"
+            placeholder="Chọn đặc điểm nổi bật 1"
+            data={uniqueFeature1}
+            value={selectedFeature1}
+            onChange={setSelectedFeature1}
+          />
+        </div>
+      )}
+
+      {uniqueFeature2.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Đặc điểm nổi bật 2"
+            placeholder="Chọn đặc điểm nổi bật 2"
+            data={uniqueFeature2}
+            value={selectedFeature2}
+            onChange={setSelectedFeature2}
+          />
+        </div>
+      )}
+
+      {uniqueFeature3.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Đặc điểm nổi bật 3"
+            placeholder="Chọn đặc điểm nổi bật 3"
+            data={uniqueFeature3}
+            value={selectedFeature3}
+            onChange={setSelectedFeature3}
+          />
+        </div>
+      )}
+
+      {uniqueFeature4.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Đặc điểm nổi bật 4"
+            placeholder="Chọn đặc điểm nổi bật 4"
+            data={uniqueFeature4}
+            value={selectedFeature4}
+            onChange={setSelectedFeature4}
+          />
+        </div>
+      )}
+
+      {uniqueApartmentType.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Loại sản phẩm"
+            placeholder="Chọn loại sản phẩm"
+            data={uniqueApartmentType}
+            value={selectedApartmentType}
+            onChange={setSelectedApartmentType}
+          />
+        </div>
+      )}
+
+      {uniqueApartmentModelCode.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Mã mẫu sản phẩm"
+            placeholder="Chọn mã mẫu"
+            data={uniqueApartmentModelCode}
+            value={selectedApartmentModelCode}
+            onChange={setSelectedApartmentModelCode}
+          />
+        </div>
+      )}
+
+      {uniqueApartmentNum.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Số hiệu sản phẩm"
+            placeholder="Chọn số hiệu"
+            data={uniqueApartmentNum}
+            value={selectedApartmentNum}
+            onChange={setSelectedApartmentNum}
+          />
+        </div>
+      )}
+
+      {uniqueFloorName.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Tầng"
+            placeholder="Chọn tầng"
+            data={uniqueFloorName}
+            value={selectedFloorName}
+            onChange={setSelectedFloorName}
+          />
+        </div>
+      )}
+
+      {uniqueFloorGroupCode.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Nhóm tầng"
+            placeholder="Chọn nhóm tầng"
+            data={uniqueFloorGroupCode}
+            value={selectedFloorGroupCode}
+            onChange={setSelectedFloorGroupCode}
+          />
+        </div>
+      )}
+
+      {uniqueFloorApartmentGroupCode.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <MultiSelect
+            label="Nhóm sản phẩm của tầng"
+            placeholder="Chọn nhóm sản phẩm"
+            data={uniqueFloorApartmentGroupCode}
+            value={selectedFloorApartmentGroupCode}
+            onChange={setSelectedFloorApartmentGroupCode}
+          />
+        </div>
+      )}
+
       {sortedBedrooms.length > 0 && (
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "15px",
-          }}
-        >
-          <label
-            style={{
-              fontWeight: "bold",
-              display: "block",
-              marginBottom: "5px",
-            }}
-          >
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
+          <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
             Phòng ngủ
           </label>
 
@@ -155,12 +299,10 @@ export default function FilterSidebar({
                   key={num}
                   onClick={() => {
                     if (isActive) {
-                      // 👉 CLICK LẦN 2: BỎ ACTIVE + RESET LIST
                       setActiveBedroom(null);
                       setFilteredItems(items);
                       setCurrentPage(1);
                     } else {
-                      // 👉 CLICK LẦN 1: SET ACTIVE + FILTER
                       setActiveBedroom(String(num));
                       handleFilterBedroom(num);
                     }
@@ -175,18 +317,6 @@ export default function FilterSidebar({
                     fontSize: "14px",
                     cursor: "pointer",
                     transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = "#762f0b";
-                      e.currentTarget.style.color = "#fff";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = "#fff";
-                      e.currentTarget.style.color = "#762f0b";
-                    }
                   }}
                 >
                   {num}
