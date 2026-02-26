@@ -16,6 +16,7 @@ import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail";
 import { IconFilter2, IconSearch } from "@tabler/icons-react";
 import { Pagination } from "antd";
+import FilterSidebar from "./FilterSidebar";
 
 interface TotalWarehouseProps {
   projectId: string;
@@ -41,6 +42,16 @@ export interface WarehouseItem {
   bathroom: string | number;
   direction: string;
   price: number;
+  feature_1: string;
+  feature_2: string;
+  feature_3: string;
+  feature_4: string;
+  apartment_type: string;
+  apartment_model_code: string;
+  apartment_num: string;
+  floor_name: string;
+  floor_group_code: string;
+  floor_apartment_group_code: string;
 }
 
 export default function TotalWarehouse({ projectId, target }: TotalWarehouseProps) {
@@ -61,6 +72,16 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [selectedDirections, setSelectedDirections] = useState<string[]>([]);
   const [activeStatus, setActiveStatus] = useState<string | null>(null);
   const [activeBedroom, setActiveBedroom] = useState<string | null>(null);
+  const [selectedFeature1, setSelectedFeature1] = useState<string[]>([]);
+  const [selectedFeature2, setSelectedFeature2] = useState<string[]>([]);
+  const [selectedFeature3, setSelectedFeature3] = useState<string[]>([]);
+  const [selectedFeature4, setSelectedFeature4] = useState<string[]>([]);
+  const [selectedApartmentType, setSelectedApartmentType] = useState<string[]>([]);
+  const [selectedApartmentModelCode, setSelectedApartmentModelCode] = useState<string[]>([]);
+  const [selectedApartmentNum, setSelectedApartmentNum] = useState<string[]>([]);
+  const [selectedFloorName, setSelectedFloorName] = useState<string[]>([]);
+  const [selectedFloorGroupCode, setSelectedFloorGroupCode] = useState<string[]>([]);
+  const [selectedFloorApartmentGroupCode, setSelectedFloorApartmentGroupCode] = useState<string[]>([]);
 
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
@@ -168,13 +189,58 @@ useEffect(() => {
     );
   }
 
+  // Filter theo các trường đặc điểm nổi bật
+  if (selectedFeature1.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature1.includes(item.feature_1));
+  }
+  if (selectedFeature2.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature2.includes(item.feature_2));
+  }
+  if (selectedFeature3.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature3.includes(item.feature_3));
+  }
+  if (selectedFeature4.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFeature4.includes(item.feature_4));
+  }
+
+  // Filter theo các trường mới khác
+  if (selectedApartmentType.length > 0) {
+    filtered = filtered.filter((item) => item && selectedApartmentType.includes(item.apartment_type));
+  }
+  if (selectedApartmentModelCode.length > 0) {
+    filtered = filtered.filter((item) => item && selectedApartmentModelCode.includes(item.apartment_model_code));
+  }
+  if (selectedApartmentNum.length > 0) {
+    filtered = filtered.filter((item) => item && selectedApartmentNum.includes(item.apartment_num));
+  }
+  if (selectedFloorName.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFloorName.includes(item.floor_name));
+  }
+  if (selectedFloorGroupCode.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFloorGroupCode.includes(item.floor_group_code));
+  }
+  if (selectedFloorApartmentGroupCode.length > 0) {
+    filtered = filtered.filter((item) => item && selectedFloorApartmentGroupCode.includes(item.floor_apartment_group_code));
+  }
+
   setFilteredItems(filtered);
   setCurrentPage(1);
 }, [
   items,
   selectedBuildingTypes,
+  selectedDirections,
   selectedMainDoorDirections,
   selectedBalconyDirections,
+  selectedFeature1,
+  selectedFeature2,
+  selectedFeature3,
+  selectedFeature4,
+  selectedApartmentType,
+  selectedApartmentModelCode,
+  selectedApartmentNum,
+  selectedFloorName,
+  selectedFloorGroupCode,
+  selectedFloorApartmentGroupCode,
 ]);
 
 
@@ -286,53 +352,113 @@ const uniqueBuildingTypes = Array.from(
   new Set(
     items
       .map((item) => item.building_type)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueDirections = Array.from(
   new Set(
     items
       .map((item) => item.direction)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueMainDoorDirections = Array.from(
   new Set(
     items
       .map((item) => item.main_door_direction)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueBalconyDirections = Array.from(
   new Set(
     items
       .map((item) => item.balcony_direction)
-      .filter(
-        (type) =>
-          type !== undefined &&
-          type !== null &&
-          type !== "skip"
-      )
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
   )
-);
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFeature1 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_1)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFeature2 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_2)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFeature3 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_3)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFeature4 = Array.from(
+  new Set(
+    items
+      .map((item) => item.feature_4)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueApartmentType = Array.from(
+  new Set(
+    items
+      .map((item) => item.apartment_type)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueApartmentModelCode = Array.from(
+  new Set(
+    items
+      .map((item) => item.apartment_model_code)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueApartmentNum = Array.from(
+  new Set(
+    items
+      .map((item) => item.apartment_num)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFloorName = Array.from(
+  new Set(
+    items
+      .map((item) => item.floor_name)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFloorGroupCode = Array.from(
+  new Set(
+    items
+      .map((item) => item.floor_group_code)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+const uniqueFloorApartmentGroupCode = Array.from(
+  new Set(
+    items
+      .map((item) => item.floor_apartment_group_code)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 // Lấy danh sách phòng ngủ duy nhất, ép về string và bỏ "Skip"
 const uniqueBedrooms: string[] = Array.from(
@@ -384,165 +510,57 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
   return (
     <div style={{ display: "flex" }}>
       {showFilterSidebar && (
-        <div
-          style={{
-            backgroundColor: "#f7f7f7",
-            padding: 20,
-            boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)",
-            borderRadius: "10px",
-            width: 300,
-          }}
-        >
-          <h1 style={{ fontWeight: "bold", fontSize: "20px", marginBottom: "20px" }}>
-            Bộ lọc sản phẩm
-          </h1>
-
-                    {uniqueBuildingTypes.length > 0 && (
-            <MultiSelect
-              label="Loại công trình"
-              placeholder="Chọn loại công trình"
-              data={uniqueBuildingTypes}
-              value={selectedBuildingTypes}
-              onChange={setSelectedBuildingTypes}
-            />
-          )}
-
-          {uniqueDirections.length > 0 && (
-  <div
-    style={{
-      marginTop: "20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "15px",
-    }}
-  >
-    <MultiSelect
-      label="Hướng"
-      placeholder="Chọn hướng"
-      data={uniqueDirections}
-      value={selectedDirections}
-      onChange={setSelectedDirections}
-    />
-  </div>
-)}
-
-
-
-
-         {uniqueMainDoorDirections.length > 0 && (
-  <div
-    style={{
-      marginTop: "20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "15px",
-    }}
-  >
-    <MultiSelect
-      label="Hướng cửa chính"
-      placeholder="Chọn hướng cửa chính"
-      data={uniqueMainDoorDirections}
-      value={selectedMainDoorDirections}
-      onChange={setSelectedMainDoorDirections}
-    />
-  </div>
-)}
-
-
-
-
-          {uniqueBalconyDirections.length > 0 && (
-  <div
-    style={{
-      marginTop: "20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "15px",
-    }}
-  >
-    <MultiSelect
-      label="Hướng ban công"
-      placeholder="Chọn hướng ban công"
-      data={uniqueBalconyDirections}
-      value={selectedBalconyDirections}
-      onChange={setSelectedBalconyDirections}
-    />
-  </div>
-)}
-
-
-{sortedBedrooms.length > 0 && (
-  <div
-    style={{
-      marginTop: "20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "15px",
-    }}
-  >
-    <label
-      style={{
-        fontWeight: "bold",
-        display: "block",
-        marginBottom: "5px",
-      }}
-    >
-      Phòng ngủ
-    </label>
-
-    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-      {sortedBedrooms.map((num) => {
-        const isActive = activeBedroom === String(num);
-
-        return (
-          <button
-            key={num}
-            onClick={() => {
-              if (isActive) {
-                // 👉 CLICK LẦN 2: BỎ ACTIVE + RESET LIST
-                setActiveBedroom(null);
-                setFilteredItems(items);
-                setCurrentPage(1);
-              } else {
-                // 👉 CLICK LẦN 1: SET ACTIVE + FILTER
-                setActiveBedroom(String(num));
-                handleFilterBedroom(num);
-              }
-            }}
-            style={{
-              padding: "8px 16px",
-              border: "1px solid #762f0b",
-              borderRadius: "20px",
-              backgroundColor: isActive ? "#762f0b" : "#fff",
-              color: isActive ? "#fff" : "#762f0b",
-              fontWeight: "bold",
-              fontSize: "14px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.backgroundColor = "#762f0b";
-                e.currentTarget.style.color = "#fff";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.backgroundColor = "#fff";
-                e.currentTarget.style.color = "#762f0b";
-              }
-            }}
-          >
-            {num}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-)}
-
-       
-        </div>
+        <FilterSidebar
+          uniqueBuildingTypes={uniqueBuildingTypes}
+          selectedBuildingTypes={selectedBuildingTypes}
+          setSelectedBuildingTypes={setSelectedBuildingTypes}
+          uniqueDirections={uniqueDirections}
+          selectedDirections={selectedDirections}
+          setSelectedDirections={setSelectedDirections}
+          uniqueMainDoorDirections={uniqueMainDoorDirections}
+          selectedMainDoorDirections={selectedMainDoorDirections}
+          setSelectedMainDoorDirections={setSelectedMainDoorDirections}
+          uniqueBalconyDirections={uniqueBalconyDirections}
+          selectedBalconyDirections={selectedBalconyDirections}
+          setSelectedBalconyDirections={setSelectedBalconyDirections}
+          uniqueFeature1={uniqueFeature1}
+          selectedFeature1={selectedFeature1}
+          setSelectedFeature1={setSelectedFeature1}
+          uniqueFeature2={uniqueFeature2}
+          selectedFeature2={selectedFeature2}
+          setSelectedFeature2={setSelectedFeature2}
+          uniqueFeature3={uniqueFeature3}
+          selectedFeature3={selectedFeature3}
+          setSelectedFeature3={setSelectedFeature3}
+          uniqueFeature4={uniqueFeature4}
+          selectedFeature4={selectedFeature4}
+          setSelectedFeature4={setSelectedFeature4}
+          uniqueApartmentType={uniqueApartmentType}
+          selectedApartmentType={selectedApartmentType}
+          setSelectedApartmentType={setSelectedApartmentType}
+          uniqueApartmentModelCode={uniqueApartmentModelCode}
+          selectedApartmentModelCode={selectedApartmentModelCode}
+          setSelectedApartmentModelCode={setSelectedApartmentModelCode}
+          uniqueApartmentNum={uniqueApartmentNum}
+          selectedApartmentNum={selectedApartmentNum}
+          setSelectedApartmentNum={setSelectedApartmentNum}
+          uniqueFloorName={uniqueFloorName}
+          selectedFloorName={selectedFloorName}
+          setSelectedFloorName={setSelectedFloorName}
+          uniqueFloorGroupCode={uniqueFloorGroupCode}
+          selectedFloorGroupCode={selectedFloorGroupCode}
+          setSelectedFloorGroupCode={setSelectedFloorGroupCode}
+          uniqueFloorApartmentGroupCode={uniqueFloorApartmentGroupCode}
+          selectedFloorApartmentGroupCode={selectedFloorApartmentGroupCode}
+          setSelectedFloorApartmentGroupCode={setSelectedFloorApartmentGroupCode}
+          sortedBedrooms={sortedBedrooms}
+          activeBedroom={activeBedroom}
+          setActiveBedroom={setActiveBedroom}
+          handleFilterBedroom={handleFilterBedroom}
+          items={items}
+          setFilteredItems={setFilteredItems}
+          setCurrentPage={setCurrentPage}
+        />
       )}
 
       <div style={{ flex: 1, padding: 20 }}>
