@@ -35,27 +35,28 @@ const mockdata = [
   },
 
  {
-    label: 'Quản lý dự án',
+    label: 'Quản trị dự án',
     icon: IconNotes,
     initiallyOpened: true,
     links: [
       { label: 'Danh sách dự án', link: 'project' },
-         { label: 'Cập nhật dự án', link: 'projectdetails' },
+         { label: 'Cập nhật thông tin sản phẩm', link: 'projectdetails' },
       
       { label: 'Định danh vai trò người trong dự án', link: 'Roles' },
        { label: 'Phân quyền người dùng trong dự án', link: 'UserProjectRole' },
+        { label: 'Duyệt yêu cầu tham gia dự án', link: 'JionProject' },
      
     ],
   },
   {
-    label: 'Phân quyền người dùng trong dự án',
+    label: 'Quản lý đơn hàng',
     icon: IconUser,
     initiallyOpened: true,
     links: [
-      { label: 'Quản lý người dùng vào dự án', link: 'JionProject' },
-      { label: 'Quản lý đơn hàng', link: 'Order' },
+     
+      { label: 'Đơn hàng', link: 'Order' },
       { label: 'Duyệt đơn thanh toán kế tiếp', link: 'PaymentRequest' },
-         { label: 'Duyệt yêu cầu', link: 'LockRequest' }
+         { label: 'Duyệt đơn thanh toán', link: 'LockRequest' }
       
     ],
   },
