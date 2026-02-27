@@ -231,16 +231,27 @@ export default function OrderDetailPage({
 
                 {/* NÚT DÍNH ĐÁY */}
                 <Group mt="auto" pt="md" justify="center" gap="sm">
-                  <Button
-                    variant="outline"
+                  {/* <Button
+                     variant="filled"
                     color="dark"
                     radius="md"
                     leftSection={<span style={{ fontSize: 18 }}>+</span>}
                     onClick={open}
                   >
                     Tạo đơn thanh toán mới
-                  </Button>
-
+                  </Button> */}
+<Button
+  variant="filled"
+  radius="md"
+  leftSection={<span style={{ fontSize: 18 }}>+</span>}
+  onClick={open}
+  style={{
+    backgroundColor: "#ffffff",
+    color: "#000000",
+  }}
+>
+  Tạo đơn thanh toán mới
+</Button>
                
                 </Group>
               </Card>
