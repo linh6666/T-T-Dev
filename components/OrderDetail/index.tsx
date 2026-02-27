@@ -16,9 +16,9 @@ import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 // import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { Loader, Center, TextInput, NumberInput, SimpleGrid, FileInput, Textarea, Badge } from "@mantine/core";
+import { Badge, Loader, Center } from "@mantine/core";
 import { getOrderPaymentByOrderId } from "../../api/apiGetlistdetailOder";
-import { createOrderPayment } from "../../api/apicreateOderpayment";
+import CreatePaymentModal from "./CreatePaymentModal";
 
 
 
@@ -60,11 +60,6 @@ interface OrderPaymentItem {
   remaining_amount?: number;
 }
 
-interface PaymentFileItem {
-  file: File | null;
-  name_vi: string;
-  description_vi: string;
-}
 
 interface OrderPaymentResponse {
   items: OrderPaymentItem[];
@@ -82,13 +77,7 @@ export default function OrderDetailPage({
 
   // Form states for inline creation
   const [isCreating, setIsCreating] = useState(false);
-  const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
-  const [paymentStage, setPaymentStage] = useState("");
-  const [saleNote, setSaleNote] = useState("");
-  const [files, setFiles] = useState<PaymentFileItem[]>([
-    { file: null, name_vi: "", description_vi: "" },
-  ]);
-  const [formLoading, setFormLoading] = useState(false);
+  // const [formLoading, setFormLoading] = useState(false);
 
   const fetchOrderDetails = async () => {
     try {
@@ -108,60 +97,6 @@ export default function OrderDetailPage({
     }
   }, [orderId, projectId]);
 
-  const addFile = () => {
-    setFiles((prev: PaymentFileItem[]) => [...prev, { file: null, name_vi: "", description_vi: "" }]);
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((prev: PaymentFileItem[]) => prev.filter((_, i) => i !== index));
-  };
-
-  const updateFile = (index: number, data: Partial<PaymentFileItem>) => {
-    setFiles((prev: PaymentFileItem[]) => {
-      const newFiles = [...prev];
-      newFiles[index] = { ...newFiles[index], ...data };
-      return newFiles;
-    });
-  };
-
-  const hasInvalidFile = files.some((f: PaymentFileItem) => f.file && !f.name_vi.trim());
-
-  const canSubmit =
-    !!projectId &&
-    !!orderId &&
-    totalAmount !== undefined &&
-    !!paymentStage.trim() &&
-    !hasInvalidFile;
-
-  const handleSubmit = async () => {
-    if (!canSubmit) return;
-    try {
-      setFormLoading(true);
-      await createOrderPayment(projectId!, {
-        order_id: orderId,
-        total_amount_vn: totalAmount,
-        payment_stage: paymentStage,
-        sale_note: saleNote || undefined,
-        files: files
-          .filter((f: PaymentFileItem) => f.file)
-          .map((f: PaymentFileItem) => ({
-            file: f.file as File,
-            name_vi: f.name_vi.trim(),
-            description_vi: f.description_vi,
-          })),
-      });
-      setIsCreating(false);
-      setTotalAmount(undefined);
-      setPaymentStage("");
-      setSaleNote("");
-      setFiles([{ file: null, name_vi: "", description_vi: "" }]);
-      fetchOrderDetails(); // Refresh list
-    } catch (error) {
-      console.error("Create order payment error:", error);
-    } finally {
-      setFormLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -232,106 +167,15 @@ export default function OrderDetailPage({
                 </Group>
 
                 {isCreating ? (
-                  <Card withBorder shadow="sm" radius="md" p="md" bg="white">
-                    <Stack gap="sm">
-                      <Title order={5}>Thông tin thanh toán mới</Title>
-                      <SimpleGrid cols={2} spacing="xs">
-                        <NumberInput
-                          label="Số Tiền (VNĐ)"
-                          placeholder="Nhập số tiền"
-                          thousandSeparator=","
-                          hideControls
-                          value={totalAmount}
-                          onChange={(value) =>
-                            setTotalAmount(typeof value === "number" ? value : undefined)
-                          }
-                          radius="md"
-                          required
-                          size="sm"
-                        />
-                        <TextInput
-                          label="Giai Đoạn"
-                          placeholder="VD: Đợt 1"
-                          value={paymentStage}
-                          onChange={(e) => setPaymentStage(e.currentTarget.value)}
-                          radius="md"
-                          required
-                          size="sm"
-                        />
-                      </SimpleGrid>
-
-                      <Textarea
-                        label="Ghi chú Sale"
-                        placeholder="Nhập ghi chú"
-                        autosize
-                        minRows={2}
-                        value={saleNote}
-                        onChange={(e) => setSaleNote(e.currentTarget.value)}
-                        radius="md"
-                        size="sm"
-                      />
-
-                      <Divider label="Files" labelPosition="center" />
-
-                      <Stack gap="xs">
-                        {files.map((item: PaymentFileItem, index: number) => (
-                          <Box key={index}>
-                            <SimpleGrid cols={2} spacing="xs">
-                              <FileInput
-                                placeholder="Chọn file"
-                                accept="image/*,.pdf"
-                                value={item.file}
-                                onChange={(file) => {
-                                  updateFile(index, {
-                                    file,
-                                    name_vi: file && !item.name_vi ? file.name : item.name_vi,
-                                  });
-                                }}
-                                radius="md"
-                                size="xs"
-                              />
-                              <TextInput
-                                placeholder="Tên file"
-                                value={item.name_vi}
-                                onChange={(e) => updateFile(index, { name_vi: e.currentTarget.value })}
-                                radius="md"
-                                size="xs"
-                                required={!!item.file}
-                              />
-                            </SimpleGrid>
-                            {files.length > 1 && (
-                              <Text
-                                size="xs"
-                                c="red"
-                                style={{ cursor: "pointer", textAlign: "right" }}
-                                onClick={() => removeFile(index)}
-                              >
-                                Xóa file
-                              </Text>
-                            )}
-                          </Box>
-                        ))}
-                        <Button variant="subtle" size="xs" onClick={addFile}>
-                          + Thêm file
-                        </Button>
-                      </Stack>
-
-                      <Group justify="flex-end" mt="md" gap="xs">
-                        <Button variant="default" size="sm" onClick={() => setIsCreating(false)}>
-                          Hủy
-                        </Button>
-                        <Button
-                          color="blue"
-                          size="sm"
-                          onClick={handleSubmit}
-                          loading={formLoading}
-                          disabled={!canSubmit}
-                        >
-                          Xác nhận
-                        </Button>
-                      </Group>
-                    </Stack>
-                  </Card>
+                  <CreatePaymentModal
+                    projectId={projectId}
+                    orderId={orderId}
+                    onSuccess={() => {
+                      setIsCreating(false);
+                      fetchOrderDetails();
+                    }}
+                    onCancel={() => setIsCreating(false)}
+                  />
                 ) : (
                   <>
                     <Card shadow="xs" radius="lg" p={0}>

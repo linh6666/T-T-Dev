@@ -31,7 +31,7 @@ interface CreatePaymentFormProps {
   onCancel: () => void;
 }
 
-export default function CreatePaymentForm({
+export default function CreatePaymentModal({
   projectId,
   orderId,
   onSuccess,
@@ -162,6 +162,7 @@ export default function CreatePaymentForm({
                   size="xs"
                   required={!!item.file}
                 />
+                
               </SimpleGrid>
               {files.length > 1 && (
                 <Text
@@ -189,9 +190,8 @@ export default function CreatePaymentForm({
             size="sm"
             onClick={handleSubmit}
             loading={loading}
-            disabled={!canSubmit}
           >
-            Tạo đơn
+            Xác nhận
           </Button>
         </Group>
       </Stack>
