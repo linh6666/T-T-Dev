@@ -9,12 +9,15 @@ import {
   NumberInput,
   SimpleGrid,
   Title,
-  FileInput,
+
   Divider,
   Textarea,
   Card,
-  Text,
-  Box,
+ 
+  MantineProvider,
+  createTheme,
+  Input,
+  Select,
 } from "@mantine/core";
 import { createOrderPayment } from "../../../api/apicreateOderpayment";
 
@@ -40,26 +43,26 @@ export default function CreatePaymentModal({
   const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
   const [paymentStage, setPaymentStage] = useState("");
   const [saleNote, setSaleNote] = useState("");
-  const [files, setFiles] = useState<PaymentFileItem[]>([
+  const [files] = useState<PaymentFileItem[]>([
     { file: null, name_vi: "", description_vi: "" },
   ]);
   const [loading, setLoading] = useState(false);
 
-  const addFile = () => {
-    setFiles((prev) => [...prev, { file: null, name_vi: "", description_vi: "" }]);
-  };
+  // const addFile = () => {
+  //   setFiles((prev) => [...prev, { file: null, name_vi: "", description_vi: "" }]);
+  // };
 
-  const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const removeFile = (index: number) => {
+  //   setFiles((prev) => prev.filter((_, i) => i !== index));
+  // };
 
-  const updateFile = (index: number, data: Partial<PaymentFileItem>) => {
-    setFiles((prev) => {
-      const newFiles = [...prev];
-      newFiles[index] = { ...newFiles[index], ...data };
-      return newFiles;
-    });
-  };
+  // const updateFile = (index: number, data: Partial<PaymentFileItem>) => {
+  //   setFiles((prev) => {
+  //     const newFiles = [...prev];
+  //     newFiles[index] = { ...newFiles[index], ...data };
+  //     return newFiles;
+  //   });
+  // };
 
   const hasInvalidFile = files.some((f) => f.file && !f.name_vi.trim());
 
@@ -94,13 +97,65 @@ export default function CreatePaymentModal({
       setLoading(false);
     }
   };
+  const theme = createTheme({
+  components: {
+    Input: Input.extend({
+      defaultProps: {
+        variant: 'filled',
+      },
+    }),
+
+    InputWrapper: Input.Wrapper.extend({
+      defaultProps: {
+        inputWrapperOrder: ['label', 'input', 'description', 'error'],
+      },
+    }),
+  },
+});
 
   return (
     <Card withBorder shadow="sm" radius="md" p="md" bg="white">
       <Stack gap="sm">
         <Title order={5}>Thông tin thanh toán mới</Title>
+            <MantineProvider theme={theme}>
         <SimpleGrid cols={2} spacing="xs">
-          <NumberInput
+           <TextInput
+            label="Tên khách hàng"
+            placeholder="Nhập tên khách hàng"
+            value={paymentStage}
+            onChange={(e) => setPaymentStage(e.currentTarget.value)}
+            radius="md"
+            required
+            size="sm"
+          />
+             <TextInput
+            label="SĐT liên hệ"
+            placeholder="Nhập số điện thoại"
+            value={paymentStage}
+            onChange={(e) => setPaymentStage(e.currentTarget.value)}
+            radius="md"
+            required
+            size="sm"
+          />
+             <TextInput
+            label="Số CCCD/CMND"
+            placeholder="Nhập số CCCD/CMND"
+            value={paymentStage}
+            onChange={(e) => setPaymentStage(e.currentTarget.value)}
+            radius="md"
+            required
+            size="sm"
+          />
+             <TextInput
+            label="Email khách hàng"
+            placeholder="Nhập email khách hàng"
+            value={paymentStage}
+            onChange={(e) => setPaymentStage(e.currentTarget.value)}
+            radius="md"
+            required
+            size="sm"
+          />
+          {/* <NumberInput
             label="Số Tiền (VNĐ)"
             placeholder="Nhập số tiền"
             thousandSeparator=","
@@ -121,10 +176,56 @@ export default function CreatePaymentModal({
             radius="md"
             required
             size="sm"
-          />
+          /> */}
         </SimpleGrid>
+             <Divider  labelPosition="center" />
 
-        <Textarea
+</MantineProvider>
+<TextInput
+            label="Mã hóa đơn"
+            placeholder="Nhập mã hóa đơn"
+            value={paymentStage}
+            onChange={(e) => setPaymentStage(e.currentTarget.value)}
+            radius="md"
+            required
+            size="sm"
+          />
+<SimpleGrid cols={2} spacing="xs">
+
+          <NumberInput
+            label="Số Tiền khách thanh toán"
+            placeholder="Nhập số tiền"
+            thousandSeparator=","
+            hideControls
+            value={totalAmount}
+            onChange={(value) =>
+              setTotalAmount(typeof value === "number" ? value : undefined)
+            }
+            radius="md"
+            required
+            size="sm"
+          />
+          <TextInput
+            label="Giai Đoạn"
+            placeholder="VD: Đợt 1"
+            value={paymentStage}
+            onChange={(e) => setPaymentStage(e.currentTarget.value)}
+            radius="md"
+            required
+            size="sm"
+          />
+            <Select
+      label="Trạng thái"
+      placeholder="Chọn trạng thái"
+      autoSelectOnBlur
+      searchable
+      data={['Đã thanh toán', 'Chưa thanh toán', 'Đang xử lý']}
+    />
+
+       
+
+     </SimpleGrid>
+      <Textarea
           label="Ghi chú Sale"
           placeholder="Nhập ghi chú"
           autosize
@@ -135,9 +236,7 @@ export default function CreatePaymentModal({
           size="sm"
         />
 
-        <Divider label="Files" labelPosition="center" />
-
-        <Stack gap="xs">
+        {/* <Stack gap="xs">
           {files.map((item, index) => (
             <Box key={index}>
               <SimpleGrid cols={2} spacing="xs">
@@ -179,7 +278,7 @@ export default function CreatePaymentModal({
           <Button variant="subtle" size="xs" onClick={addFile}>
             + Thêm file
           </Button>
-        </Stack>
+        </Stack> */}
 
         <Group justify="flex-end" mt="md" gap="xs">
           <Button variant="default" size="sm" onClick={onCancel}>

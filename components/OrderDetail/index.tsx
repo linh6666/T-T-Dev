@@ -122,7 +122,7 @@ export default function OrderDetailPage({
 
   return (
     <>
-      <Box py={10}>
+      <Box >
         <Container size="xl">
           {/* BACK */}
           <Group mb="md">
