@@ -61,6 +61,49 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
     color: getStatusColor(item.status_name)
   })) || [];
 
+  // ✅ MẶC ĐỊNH HIỂN THỊ "Đang bán" KHI LOAD
+  useEffect(() => {
+    if (!project.unit_status_summary?.statuses?.length) return;
+
+    const statuses = project.unit_status_summary.statuses;
+
+    let defaultIndex = statuses.findIndex(
+      (item) => item.status_name === "Đang bán"
+    );
+
+    if (defaultIndex === -1) defaultIndex = 0;
+
+    const item = statuses[defaultIndex];
+
+    setHoveredIndex(defaultIndex);
+    setHoveredStatus({
+      name: item.status_name,
+      color: getStatusColor(item.status_name),
+      percent: item.percent,
+    });
+  }, [project.unit_status_summary]);
+
+  const resetToDefault = () => {
+    if (!project.unit_status_summary?.statuses?.length) return;
+
+    const statuses = project.unit_status_summary.statuses;
+
+    let defaultIndex = statuses.findIndex(
+      (item) => item.status_name === "Đang bán"
+    );
+
+    if (defaultIndex === -1) defaultIndex = 0;
+
+    const item = statuses[defaultIndex];
+
+    setHoveredIndex(defaultIndex);
+    setHoveredStatus({
+      name: item.status_name,
+      color: getStatusColor(item.status_name),
+      percent: item.percent,
+    });
+  };
+
   return (
     <Card shadow="sm" radius="md" withBorder padding="0" className={styles.card}>
       <Image
@@ -72,57 +115,57 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
           borderTopRightRadius: "var(--mantine-radius-md)",
         }}
       />
-        <Text className={styles.projectName}>{project.name}</Text>
+
+      <Text className={styles.projectName}>{project.name}</Text>
+
       <Group wrap="nowrap" p="md" align="flex-start" style={{ flexGrow: 1 }}>
-        
         <Stack gap="xs" style={{ flex: 1 }}>
-        
           <Text size="xs" c="dimmed">Loại dự án: {project.type || "Thông tin chưa có"}</Text>
           <Text size="xs" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
           <Text size="xs" c="dimmed">Chủ đầu tư: {project.investor || "Thông tin chưa có"}</Text>
-                              <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
+          <Text size="sm" c="dimmed">Vai trò: {project.rank_name || "Chưa gán rank"}</Text>
         </Stack>
 
         <Stack align="center" gap={0} style={{ minWidth: 100 }}>
           <div className={styles.chartContainer}>
             <DonutChart
-  size={80}
-  thickness={16}
-  // strokeWidth={1.5}
-  data={chartData}
-  withTooltip={false}
-  chartLabel={
-    hoveredStatus
-      ? `${hoveredStatus.percent.toFixed(0)}%`
-      : undefined
-  }
-  pieProps={{
-    activeIndex: hoveredIndex !== null ? hoveredIndex : undefined,
-    activeShape: (props: Record<string, number & string>) => (
-      <Sector
-        {...props}
-        outerRadius={(props.outerRadius as number) + 4}
-      />
-    ),
-    onMouseEnter: (_: unknown, index: number) => {
-      setHoveredIndex(index);
-      const item = project.unit_status_summary?.statuses?.[index];
-      if (item) {
-        setHoveredStatus({
-          name: item.status_name,
-          color: getStatusColor(item.status_name),
-          percent: item.percent,
-        });
-      }
-    },
-    onMouseLeave: () => {
-      setHoveredIndex(null);
-      setHoveredStatus(null);
-    },
-  } as React.ComponentPropsWithoutRef<typeof DonutChart>['pieProps']}
-/>
+              size={80}
+              thickness={16}
+              data={chartData}
+              withTooltip={false}
+              chartLabel={
+                hoveredStatus
+                  ? `${hoveredStatus.percent.toFixed(1)}%`
+                  : undefined
+              }
+              pieProps={{
+                startAngle: 90,
+                endAngle: 450,
+                activeIndex: hoveredIndex !== null ? hoveredIndex : undefined,
+                activeShape: (props: Record<string, number & string>) => (
+                  <Sector
+                    {...props}
+                    outerRadius={(props.outerRadius as number) + 4}
+                  />
+                ),
+                onMouseEnter: (_: unknown, index: number) => {
+                  setHoveredIndex(index);
+                  const item = project.unit_status_summary?.statuses?.[index];
+                  if (item) {
+                    setHoveredStatus({
+                      name: item.status_name,
+                      color: getStatusColor(item.status_name),
+                      percent: item.percent,
+                    });
+                  }
+                },
+                onMouseLeave: () => {
+                  resetToDefault(); // 🔥 quay lại "Đang bán"
+                },
+              } as React.ComponentPropsWithoutRef<typeof DonutChart>['pieProps']}
+            />
           </div>
-          {/* Luôn render để không thay đổi chiều cao layout — chỉ ẩn bằng visibility */}
+
           <Text
             size="xs"
             fw={500}
@@ -162,8 +205,8 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
         }}
         disabled={status === "pending"}
       >
-        {status === "pending" 
-          ? "Đang chờ phê duyệt" 
+        {status === "pending"
+          ? "Đang chờ phê duyệt"
           : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
       </Button>
     </Card>
@@ -177,8 +220,6 @@ export default function DetailInteractive() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [requestModal, setRequestModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-
-
 
   useEffect(() => {
     const token = localStorage.getItem("access_token") ?? "";
@@ -222,14 +263,14 @@ export default function DetailInteractive() {
         <div className={styles.container}>
           <div className={styles.cardGrid}>
             {projects.map((project) => (
-              <ProjectCard 
-                key={project.id} 
-                project={project} 
-                joinedProjects={joinedProjects} 
+              <ProjectCard
+                key={project.id}
+                project={project}
+                joinedProjects={joinedProjects}
                 onSelect={(p) => {
                   setSelectedProject(p);
                   setRequestModal(true);
-                }} 
+                }}
               />
             ))}
           </div>
