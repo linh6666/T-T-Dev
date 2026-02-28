@@ -10,6 +10,7 @@ import {
   Loader,
   ActionIcon,
   Autocomplete,
+  Divider,
 } from "@mantine/core";
 import { createWarehouse } from "../../../api/apiFilterWarehousebasic";
 import styles from "./TotalWarehouse.module.css";
@@ -927,6 +928,8 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
             </button>
           </Group>
 
+          {/* <Divider size="xs" style={{ marginTop: 16 }} /> */}
+
           {/* Tags row */}
           {allActiveFilters.length > 0 && (
             <Group gap="xs" style={{ marginTop: 12, flexWrap: "wrap" }}>
@@ -955,6 +958,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
               ))}
             </Group>
           )}
+          <Divider size="xs" style={{ marginTop: 16, marginBottom: 16 }} />
         </div>
 
         {/* List cards */}
