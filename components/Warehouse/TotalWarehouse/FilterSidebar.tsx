@@ -1,11 +1,13 @@
 "use client";
 
 import { MultiSelect } from "@mantine/core";
-import { WarehouseItem } from "./index";
+// import { WarehouseItem } from "./index";
 import styles from "./FilterSidebar.module.css";
 
 interface FilterSidebarProps {
-// ... existing props ...
+  uniqueZones: string[];
+  selectedZones: string[];
+  setSelectedZones: (val: string[]) => void;
   uniqueBuildingTypes: string[];
   selectedBuildingTypes: string[];
   setSelectedBuildingTypes: (val: string[]) => void;
@@ -21,6 +23,9 @@ interface FilterSidebarProps {
   sortedBedrooms: string[];
   activeBedroom: string | null;
   setActiveBedroom: (val: string | null) => void;
+  sortedBathrooms: string[];
+  activeBathroom: string | null;
+  setActiveBathroom: (val: string | null) => void;
   uniqueFeature1: string[];
   selectedFeature1: string[];
   setSelectedFeature1: (val: string[]) => void;
@@ -51,14 +56,13 @@ interface FilterSidebarProps {
   uniqueFloorApartmentGroupCode: string[];
   selectedFloorApartmentGroupCode: string[];
   setSelectedFloorApartmentGroupCode: (val: string[]) => void;
-  handleFilterBedroom: (num: string | number) => void;
-  items: WarehouseItem[];
-  setFilteredItems: (items: WarehouseItem[]) => void;
-  setCurrentPage: (page: number) => void;
 }
 
 
 export default function FilterSidebar({
+  uniqueZones,
+  selectedZones,
+  setSelectedZones,
   uniqueBuildingTypes,
   selectedBuildingTypes,
   setSelectedBuildingTypes,
@@ -74,6 +78,9 @@ export default function FilterSidebar({
   sortedBedrooms,
   activeBedroom,
   setActiveBedroom,
+  sortedBathrooms,
+  activeBathroom,
+  setActiveBathroom,
   uniqueFeature1,
   selectedFeature1,
   setSelectedFeature1,
@@ -104,10 +111,6 @@ export default function FilterSidebar({
   uniqueFloorApartmentGroupCode,
   selectedFloorApartmentGroupCode,
   setSelectedFloorApartmentGroupCode,
-  handleFilterBedroom,
-  items,
-  setFilteredItems,
-  setCurrentPage,
 }: FilterSidebarProps) {
   return (
     <div
@@ -124,13 +127,13 @@ export default function FilterSidebar({
       </h1>
 
       <div className={styles.filterListContainer}>
-        {uniqueBuildingTypes.length > 0 && (
+        {uniqueZones.length > 0 && (
           <MultiSelect
-            label="Loại công trình"
-            placeholder="Chọn loại công trình"
-            data={uniqueBuildingTypes}
-            value={selectedBuildingTypes}
-            onChange={setSelectedBuildingTypes}
+            label="Phân khu"
+            placeholder="Chọn phân khu"
+            data={uniqueZones}
+            value={selectedZones}
+            onChange={setSelectedZones}
             maxDropdownHeight={200}
             styles={{
               input: {
@@ -139,6 +142,25 @@ export default function FilterSidebar({
               },
             }}
           />
+        )}
+
+        {uniqueBuildingTypes.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <MultiSelect
+              label="Loại công trình"
+              placeholder="Chọn loại công trình"
+              data={uniqueBuildingTypes}
+              value={selectedBuildingTypes}
+              onChange={setSelectedBuildingTypes}
+              maxDropdownHeight={200}
+              styles={{
+                input: {
+                  maxHeight: "100px",
+                  overflowY: "auto",
+                },
+              }}
+            />
+          </div>
         )}
 
         {uniqueDirections.length > 0 && (
@@ -390,8 +412,8 @@ export default function FilterSidebar({
       </div>
 
       {sortedBedrooms.length > 0 && (
-        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "15px" }}>
-          <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <label style={{ fontWeight: "bold", display: "block" }}>
             Phòng ngủ
           </label>
 
@@ -402,16 +424,41 @@ export default function FilterSidebar({
               return (
                 <button
                   key={num}
-                  onClick={() => {
-                    if (isActive) {
-                      setActiveBedroom(null);
-                      setFilteredItems(items);
-                      setCurrentPage(1);
-                    } else {
-                      setActiveBedroom(String(num));
-                      handleFilterBedroom(num);
-                    }
+                  onClick={() => setActiveBedroom(isActive ? null : String(num))}
+                  style={{
+                    padding: "8px 16px",
+                    border: "1px solid #762f0b",
+                    borderRadius: "20px",
+                    backgroundColor: isActive ? "#762f0b" : "#fff",
+                    color: isActive ? "#fff" : "#762f0b",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
                   }}
+                >
+                  {num}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {sortedBathrooms.length > 0 && (
+        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <label style={{ fontWeight: "bold", display: "block" }}>
+            Phòng tắm
+          </label>
+
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            {sortedBathrooms.map((num) => {
+              const isActive = activeBathroom === String(num);
+
+              return (
+                <button
+                  key={num}
+                  onClick={() => setActiveBathroom(isActive ? null : String(num))}
                   style={{
                     padding: "8px 16px",
                     border: "1px solid #762f0b",

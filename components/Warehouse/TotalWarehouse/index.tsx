@@ -14,7 +14,7 @@ import {
 import { createWarehouse } from "../../../api/apiFilterWarehousebasic";
 import styles from "./TotalWarehouse.module.css";
 import WarehouseDetail from "../WarehouseDetail";
-import { IconFilter2, IconSearch } from "@tabler/icons-react";
+import { IconFilter2, IconSearch, IconX } from "@tabler/icons-react";
 import { Pagination } from "antd";
 import FilterSidebar from "./FilterSidebar";
 
@@ -76,6 +76,8 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [selectedDirections, setSelectedDirections] = useState<string[]>([]);
   const [activeStatus, setActiveStatus] = useState<string | null>(null);
   const [activeBedroom, setActiveBedroom] = useState<string | null>(null);
+  const [activeBathroom, setActiveBathroom] = useState<string | null>(null);
+  const [selectedZones, setSelectedZones] = useState<string[]>([]);
   const [selectedFeature1, setSelectedFeature1] = useState<string[]>([]);
   const [selectedFeature2, setSelectedFeature2] = useState<string[]>([]);
   const [selectedFeature3, setSelectedFeature3] = useState<string[]>([]);
@@ -162,6 +164,26 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
 useEffect(() => {
   let filtered = items;
 
+  // Filter theo trạng thái
+  if (activeStatus) {
+    filtered = filtered.filter((item) => item && item.status_unit === activeStatus);
+  }
+
+  // Filter theo phòng ngủ
+  if (activeBedroom) {
+    filtered = filtered.filter((item) => item && String(item.bedroom) === activeBedroom);
+  }
+
+  // Filter theo phòng tắm
+  if (activeBathroom) {
+    filtered = filtered.filter((item) => item && String(item.bathroom) === activeBathroom);
+  }
+
+  // Filter theo phân khu
+  if (selectedZones.length > 0) {
+    filtered = filtered.filter((item) => item && selectedZones.includes(item.zone));
+  }
+
   // Filter theo loại building
   if (selectedBuildingTypes.length > 0) {
     filtered = filtered.filter(
@@ -231,6 +253,10 @@ useEffect(() => {
   setCurrentPage(1);
 }, [
   items,
+  activeStatus,
+  activeBedroom,
+  activeBathroom,
+  selectedZones,
   selectedBuildingTypes,
   selectedDirections,
   selectedMainDoorDirections,
@@ -246,6 +272,114 @@ useEffect(() => {
   selectedFloorGroupCode,
   selectedFloorApartmentGroupCode,
 ]);
+
+  const allActiveFilters = useMemo(() => {
+    const filters: { label: string; type: string; value: string }[] = [];
+
+    selectedZones.forEach((v) => filters.push({ label: v, type: "zone", value: v }));
+    selectedBuildingTypes.forEach((v) => filters.push({ label: v, type: "buildingType", value: v }));
+    selectedDirections.forEach((v) => filters.push({ label: `Hướng ${v}`, type: "direction", value: v }));
+    selectedMainDoorDirections.forEach((v) => filters.push({ label: `Hướng cửa ${v}`, type: "mainDoor", value: v }));
+    selectedBalconyDirections.forEach((v) => filters.push({ label: `Hướng ban công ${v}`, type: "balcony", value: v }));
+    selectedFeature1.forEach((v) => filters.push({ label: v, type: "feature1", value: v }));
+    selectedFeature2.forEach((v) => filters.push({ label: v, type: "feature2", value: v }));
+    selectedFeature3.forEach((v) => filters.push({ label: v, type: "feature3", value: v }));
+    selectedFeature4.forEach((v) => filters.push({ label: v, type: "feature4", value: v }));
+    selectedApartmentType.forEach((v) => filters.push({ label: v, type: "apartmentType", value: v }));
+    selectedApartmentModelCode.forEach((v) =>
+      filters.push({ label: v, type: "apartmentModelCode", value: v })
+    );
+    selectedApartmentNum.forEach((v) => filters.push({ label: v, type: "apartmentNum", value: v }));
+    selectedFloorName.forEach((v) => filters.push({ label: `Tầng ${v}`, type: "floorName", value: v }));
+    selectedFloorGroupCode.forEach((v) => filters.push({ label: `Nhóm tầng ${v}`, type: "floorGroupCode", value: v }));
+    selectedFloorApartmentGroupCode.forEach((v) =>
+      filters.push({ label: v, type: "floorApartmentGroupCode", value: v })
+    );
+
+    if (activeBedroom) {
+      filters.push({ label: `${activeBedroom} phòng ngủ`, type: "bedroom", value: activeBedroom });
+    }
+
+    if (activeBathroom) {
+      filters.push({ label: `${activeBathroom} phòng tắm`, type: "bathroom", value: activeBathroom });
+    }
+
+    return filters;
+  }, [
+    selectedZones,
+    selectedBuildingTypes,
+    selectedDirections,
+    selectedMainDoorDirections,
+    selectedBalconyDirections,
+    selectedFeature1,
+    selectedFeature2,
+    selectedFeature3,
+    selectedFeature4,
+    selectedApartmentType,
+    selectedApartmentModelCode,
+    selectedApartmentNum,
+    selectedFloorName,
+    selectedFloorGroupCode,
+    selectedFloorApartmentGroupCode,
+    activeBedroom,
+    activeBathroom,
+  ]);
+
+  const removeFilter = (type: string, value: string) => {
+    switch (type) {
+      case "zone":
+        setSelectedZones(selectedZones.filter((v) => v !== value));
+        break;
+      case "buildingType":
+        setSelectedBuildingTypes(selectedBuildingTypes.filter((v) => v !== value));
+        break;
+      case "direction":
+        setSelectedDirections(selectedDirections.filter((v) => v !== value));
+        break;
+      case "mainDoor":
+        setSelectedMainDoorDirections(selectedMainDoorDirections.filter((v) => v !== value));
+        break;
+      case "balcony":
+        setSelectedBalconyDirections(selectedBalconyDirections.filter((v) => v !== value));
+        break;
+      case "feature1":
+        setSelectedFeature1(selectedFeature1.filter((v) => v !== value));
+        break;
+      case "feature2":
+        setSelectedFeature2(selectedFeature2.filter((v) => v !== value));
+        break;
+      case "feature3":
+        setSelectedFeature3(selectedFeature3.filter((v) => v !== value));
+        break;
+      case "feature4":
+        setSelectedFeature4(selectedFeature4.filter((v) => v !== value));
+        break;
+      case "apartmentType":
+        setSelectedApartmentType(selectedApartmentType.filter((v) => v !== value));
+        break;
+      case "apartmentModelCode":
+        setSelectedApartmentModelCode(selectedApartmentModelCode.filter((v) => v !== value));
+        break;
+      case "apartmentNum":
+        setSelectedApartmentNum(selectedApartmentNum.filter((v) => v !== value));
+        break;
+      case "floorName":
+        setSelectedFloorName(selectedFloorName.filter((v) => v !== value));
+        break;
+      case "floorGroupCode":
+        setSelectedFloorGroupCode(selectedFloorGroupCode.filter((v) => v !== value));
+        break;
+      case "floorApartmentGroupCode":
+        setSelectedFloorApartmentGroupCode(selectedFloorApartmentGroupCode.filter((v) => v !== value));
+        break;
+      case "bedroom":
+        setActiveBedroom(null);
+        break;
+      case "bathroom":
+        setActiveBathroom(null);
+        break;
+    }
+  };
 
 
 
@@ -325,22 +459,7 @@ useEffect(() => {
     setCurrentPage(1);
   };
 
-  const handleFilterStatus = (status?: string) => {
-    if (!status) {
-      setFilteredItems(items);
-    } else {
-      const filtered = items.filter((item) => item && item.status_unit === status);
-      setFilteredItems(filtered);
-    }
-    setCurrentPage(1);
-  };
 
-  // Lọc theo phòng ngủ
-  const handleFilterBedroom = (num: string | number) => {
-    const filtered = items.filter((item) => item.bedroom === num);
-    setFilteredItems(filtered);
-    setCurrentPage(1);
-  };
 
   // Lọc theo phòng tắm
   // const handleFilterBathroom = (num: string | number) => {
@@ -456,6 +575,14 @@ const uniqueFloorGroupCode = Array.from(
   )
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
+const uniqueZones = Array.from(
+  new Set(
+    items
+      .map((item) => item.zone)
+      .filter((type) => type !== undefined && type !== null && type !== "skip")
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
 const uniqueFloorApartmentGroupCode = Array.from(
   new Set(
     items
@@ -479,7 +606,33 @@ const uniqueBedrooms: string[] = Array.from(
   )
 );
 
+const uniqueBathrooms: string[] = Array.from(
+  new Set(
+    items
+      .map((item) => item.bathroom)
+      .filter(
+        (num): num is string | number =>
+          num !== undefined &&
+          num !== null &&
+          String(num).toLowerCase() !== "skip"
+      )
+      .map((num) => String(num))
+  )
+);
+
 const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
+  const isNumA = !isNaN(Number(a));
+  const isNumB = !isNaN(Number(b));
+
+  if (isNumA && isNumB) {
+    return Number(a) - Number(b);
+  }
+  if (isNumA) return -1;
+  if (isNumB) return 1;
+  return a.localeCompare(b);
+});
+
+const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
   const isNumA = !isNaN(Number(a));
   const isNumB = !isNaN(Number(b));
 
@@ -493,9 +646,7 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
 
 
 
-  // const uniqueBathrooms = Array.from(
-  //   new Set(items.map((item) => item.bathroom).filter((num) => num !== undefined && num !== null))
-  // );
+
 
   if (loading) {
     return <Loader style={{ marginTop: 50, display: "block" }} />;
@@ -515,6 +666,9 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
     <div style={{ display: "flex" }}>
       {showFilterSidebar && (
         <FilterSidebar
+          uniqueZones={uniqueZones}
+          selectedZones={selectedZones}
+          setSelectedZones={setSelectedZones}
           uniqueBuildingTypes={uniqueBuildingTypes}
           selectedBuildingTypes={selectedBuildingTypes}
           setSelectedBuildingTypes={setSelectedBuildingTypes}
@@ -560,10 +714,9 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
           sortedBedrooms={sortedBedrooms}
           activeBedroom={activeBedroom}
           setActiveBedroom={setActiveBedroom}
-          handleFilterBedroom={handleFilterBedroom}
-          items={items}
-          setFilteredItems={setFilteredItems}
-          setCurrentPage={setCurrentPage}
+          sortedBathrooms={sortedBathrooms}
+          activeBathroom={activeBathroom}
+          setActiveBathroom={setActiveBathroom}
         />
       )}
 
@@ -672,7 +825,6 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               onClick={() => {
                 const status = "Quan tâm";
                 setActiveStatus(activeStatus === status ? null : status);
-                handleFilterStatus(status);
               }}
             >
               Quan tâm
@@ -689,7 +841,6 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               onClick={() => {
                 const status = "Đang bán";
                 setActiveStatus(activeStatus === status ? null : status);
-                handleFilterStatus(status);
               }}
             >
               Đang bán
@@ -706,7 +857,6 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               onClick={() => {
                 const status = "Đã đặt cọc";
                 setActiveStatus(activeStatus === status ? null : status);
-                handleFilterStatus(status);
               }}
             >
               Đã đặt cọc
@@ -723,12 +873,40 @@ const sortedBedrooms = [...uniqueBedrooms].sort((a, b) => {
               onClick={() => {
                 const status = "Đã bán";
                 setActiveStatus(activeStatus === status ? null : status);
-                handleFilterStatus(status);
               }}
             >
               Đã bán
             </button>
           </Group>
+
+          {/* Tags row */}
+          {allActiveFilters.length > 0 && (
+            <Group gap="xs" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              {allActiveFilters.map((filter, index) => (
+                <div
+                  key={`${filter.type}-${filter.value}-${index}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "3px 10px",
+                    border: "1px solid #762f0b",
+                    borderRadius: "20px",
+                    fontSize: "14px",
+                    color: "#762f0b",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <span>{filter.label}</span>
+                  <IconX
+                    size={14}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => removeFilter(filter.type, filter.value)}
+                  />
+                </div>
+              ))}
+            </Group>
+          )}
         </div>
 
         {/* List cards */}
