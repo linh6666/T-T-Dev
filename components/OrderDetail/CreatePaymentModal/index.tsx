@@ -233,7 +233,7 @@ export default function CreatePaymentModal({
             required
             size="sm"
           />
-            <Stack gap={5}>
+            <Stack gap={5} align="flex-start">
               <Group gap={4} align="center">
                 <Text size="sm" fw={500}>
                   Tải tệp lên
@@ -248,19 +248,18 @@ export default function CreatePaymentModal({
               </Group>
 
               <Button
-                variant="filled"
-                bg="#f1f3f5"
-                c="#495057"
+                variant="default"
                 radius="xl"
-                fw={400}
                 size="sm"
-                leftSection={<IconUpload size={16} />}
+                leftSection={<IconUpload size={16} color="#adb5bd" />}
                 onClick={() => setFileModalOpened(true)}
-                styles={{
-                  root: {
-                    border: "1px solid #dee2e6",
-                    "&:hover": { backgroundColor: "#e9ecef" },
-                  },
+                fw={500}
+                style={{
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  border: "1px solid #dee2e6",
+                  color: "#495057",
+                  backgroundColor: "white",
+                  height: "36px",
                 }}
               >
                 {files.length > 0
