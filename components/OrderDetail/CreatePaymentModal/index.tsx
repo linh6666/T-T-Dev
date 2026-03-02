@@ -9,11 +9,9 @@ import {
   NumberInput,
   SimpleGrid,
   Title,
-
   Divider,
   Textarea,
   Card,
- 
   MantineProvider,
   createTheme,
   Input,
@@ -22,11 +20,16 @@ import {
   Tooltip,
   Text,
   Modal,
-
   rem,
   Box,
 } from "@mantine/core";
-import { IconHelpCircle, IconUpload, IconTrash, IconFileText, IconFolder } from "@tabler/icons-react";
+import {
+  IconHelpCircle,
+  IconUpload,
+  IconTrash,
+  IconFileText,
+  IconFolder,
+} from "@tabler/icons-react";
 import { createOrderPayment } from "../../../api/apicreateOderpayment";
 
 interface PaymentFileItem {
@@ -49,7 +52,11 @@ export default function CreatePaymentModal({
   onCancel,
 }: CreatePaymentFormProps) {
   const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
+
+  // ✅ TÁCH RIÊNG
+  const [invoiceCode, setInvoiceCode] = useState("");
   const [paymentStage, setPaymentStage] = useState("");
+
   const [saleNote, setSaleNote] = useState("");
   const [files, setFiles] = useState<PaymentFileItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -67,37 +74,25 @@ export default function CreatePaymentModal({
     });
   };
 
-  // const addFile = () => {
-  //   setFiles((prev) => [...prev, { file: null, name_vi: "", description_vi: "" }]);
-  // };
-
-  // const removeFile = (index: number) => {
-  //   setFiles((prev) => prev.filter((_, i) => i !== index));
-  // };
-
-  // const updateFile = (index: number, data: Partial<PaymentFileItem>) => {
-  //   setFiles((prev) => {
-  //     const newFiles = [...prev];
-  //     newFiles[index] = { ...newFiles[index], ...data };
-  //     return newFiles;
-  //   });
-  // };
-
   const hasInvalidFile = files.some((f) => f.file && !f.name_vi.trim());
 
   const canSubmit =
     !!projectId &&
     !!orderId &&
     totalAmount !== undefined &&
+    !!invoiceCode.trim() &&
     !!paymentStage.trim() &&
     !hasInvalidFile;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+
     try {
       setLoading(true);
+
       await createOrderPayment(projectId!, {
         order_id: orderId,
+      // nếu backend có field này
         total_amount_vn: totalAmount,
         payment_stage: paymentStage,
         sale_note: saleNote || undefined,
@@ -109,6 +104,7 @@ export default function CreatePaymentModal({
             description_vi: f.description_vi,
           })),
       });
+
       onSuccess();
     } catch (error) {
       console.error("Create order payment error:", error);
@@ -116,101 +112,74 @@ export default function CreatePaymentModal({
       setLoading(false);
     }
   };
-  const theme = createTheme({
-  components: {
-    Input: Input.extend({
-      defaultProps: {
-        variant: 'filled',
-      },
-    }),
 
-    InputWrapper: Input.Wrapper.extend({
-      defaultProps: {
-        inputWrapperOrder: ['label', 'input', 'description', 'error'],
-      },
-    }),
-  },
-});
+  const theme = createTheme({
+    components: {
+      Input: Input.extend({
+        defaultProps: {
+          variant: "filled",
+        },
+      }),
+      InputWrapper: Input.Wrapper.extend({
+        defaultProps: {
+          inputWrapperOrder: ["label", "input", "description", "error"],
+        },
+      }),
+    },
+  });
 
   return (
     <Card withBorder shadow="sm" radius="md" p="md" bg="white">
       <Stack gap="sm">
         <Title order={5}>Thông tin thanh toán mới</Title>
-            <MantineProvider theme={theme}>
+
+        <MantineProvider theme={theme}>
+          <SimpleGrid cols={2} spacing="xs">
+            <TextInput
+              label="Tên khách hàng"
+              placeholder="Nhập tên khách hàng"
+              radius="md"
+              required
+              size="sm"
+            />
+            <TextInput
+              label="SĐT liên hệ"
+              placeholder="Nhập số điện thoại"
+              radius="md"
+              required
+              size="sm"
+            />
+            <TextInput
+              label="Số CCCD/CMND"
+              placeholder="Nhập số CCCD/CMND"
+              radius="md"
+              required
+              size="sm"
+            />
+            <TextInput
+              label="Email khách hàng"
+              placeholder="Nhập email khách hàng"
+              radius="md"
+              required
+              size="sm"
+            />
+          </SimpleGrid>
+
+          <Divider labelPosition="center" />
+        </MantineProvider>
+
+        {/* ✅ Mã hóa đơn riêng */}
+        <TextInput
+          label="Mã hóa đơn"
+          placeholder="Nhập mã hóa đơn"
+          value={invoiceCode}
+          onChange={(e) => setInvoiceCode(e.currentTarget.value)}
+          radius="md"
+          required
+          size="sm"
+        />
+
         <SimpleGrid cols={2} spacing="xs">
-           <TextInput
-            label="Tên khách hàng"
-            placeholder="Nhập tên khách hàng"
-            value={paymentStage}
-            onChange={(e) => setPaymentStage(e.currentTarget.value)}
-            radius="md"
-            required
-            size="sm"
-          />
-             <TextInput
-            label="SĐT liên hệ"
-            placeholder="Nhập số điện thoại"
-            value={paymentStage}
-            onChange={(e) => setPaymentStage(e.currentTarget.value)}
-            radius="md"
-            required
-            size="sm"
-          />
-             <TextInput
-            label="Số CCCD/CMND"
-            placeholder="Nhập số CCCD/CMND"
-            value={paymentStage}
-            onChange={(e) => setPaymentStage(e.currentTarget.value)}
-            radius="md"
-            required
-            size="sm"
-          />
-             <TextInput
-            label="Email khách hàng"
-            placeholder="Nhập email khách hàng"
-            value={paymentStage}
-            onChange={(e) => setPaymentStage(e.currentTarget.value)}
-            radius="md"
-            required
-            size="sm"
-          />
-          {/* <NumberInput
-            label="Số Tiền (VNĐ)"
-            placeholder="Nhập số tiền"
-            thousandSeparator=","
-            hideControls
-            value={totalAmount}
-            onChange={(value) =>
-              setTotalAmount(typeof value === "number" ? value : undefined)
-            }
-            radius="md"
-            required
-            size="sm"
-          />
-          <TextInput
-            label="Giai Đoạn"
-            placeholder="VD: Đợt 1"
-            value={paymentStage}
-            onChange={(e) => setPaymentStage(e.currentTarget.value)}
-            radius="md"
-            required
-            size="sm"
-          /> */}
-        </SimpleGrid>
-             <Divider  labelPosition="center" />
-
-</MantineProvider>
-<TextInput
-            label="Mã hóa đơn"
-            placeholder="Nhập mã hóa đơn"
-            value={paymentStage}
-            onChange={(e) => setPaymentStage(e.currentTarget.value)}
-            radius="md"
-            required
-            size="sm"
-          />
-<SimpleGrid cols={2} spacing="xs">
-
           <NumberInput
             label="Số Tiền khách thanh toán"
             placeholder="Nhập số tiền"
@@ -224,6 +193,8 @@ export default function CreatePaymentModal({
             required
             size="sm"
           />
+
+          {/* ✅ Giai đoạn riêng */}
           <TextInput
             label="Giai Đoạn"
             placeholder="VD: Đợt 1"
@@ -233,53 +204,50 @@ export default function CreatePaymentModal({
             required
             size="sm"
           />
-            <Stack gap={5} align="flex-start">
-              <Group gap={4} align="center">
-                <Text size="sm" fw={500}>
-                  Tải tệp lên
-                </Text>
-                <Tooltip label="Nhấn để quản lý danh sách file đính kèm">
-                  <IconHelpCircle
-                    size={14}
-                    // color="#adb5bd"
-                    style={{ cursor: "help" }}
-                  />
-                </Tooltip>
-              </Group>
 
-              <Button
-                variant="default"
-                radius="xl"
-                size="sm"
-                leftSection={<IconUpload size={16} color="#adb5bd" />}
-                onClick={() => setFileModalOpened(true)}
-                fw={500}
-                style={{
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                  border: "1px solid #dee2e6",
-                  color: "#495057",
-                  backgroundColor: "white",
-                  height: "36px",
-                }}
-              >
-                {files.length > 0
-                  ? `${files.length} tệp đã chọn`
-                  : "Ấn để tải file lên"}
-              </Button>
-            </Stack>
-            <Select
-              label="Trạng thái"
-              placeholder="Chọn trạng thái"
-              autoSelectOnBlur
-              searchable
-              data={["Đã thanh toán", "Chưa thanh toán", "Đang xử lý"]}
-              radius="md"
+          <Stack gap={5} align="flex-start">
+            <Group gap={4} align="center">
+              <Text size="sm" fw={500}>
+                Tải tệp lên
+              </Text>
+              <Tooltip label="Nhấn để quản lý danh sách file đính kèm">
+                <IconHelpCircle size={14} style={{ cursor: "help" }} />
+              </Tooltip>
+            </Group>
+
+            <Button
+              variant="default"
+              radius="xl"
               size="sm"
-            />
+              leftSection={<IconUpload size={16} color="#adb5bd" />}
+              onClick={() => setFileModalOpened(true)}
+              fw={500}
+              style={{
+                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                border: "1px solid #dee2e6",
+                color: "#495057",
+                backgroundColor: "white",
+                height: "36px",
+              }}
+            >
+              {files.length > 0
+                ? `${files.length} tệp đã chọn`
+                : "Ấn để tải file lên"}
+            </Button>
+          </Stack>
 
-           
-          </SimpleGrid>
-      <Textarea
+          <Select
+            label="Trạng thái"
+            placeholder="Chọn trạng thái"
+            autoSelectOnBlur
+            searchable
+            data={["Đã thanh toán", "Chưa thanh toán", "Đang xử lý"]}
+            radius="md"
+            size="sm"
+          />
+        </SimpleGrid>
+
+        <Textarea
           label="Ghi chú Sale"
           placeholder="Nhập ghi chú"
           autosize
@@ -289,50 +257,6 @@ export default function CreatePaymentModal({
           radius="md"
           size="sm"
         />
-
-        {/* <Stack gap="xs">
-          {files.map((item, index) => (
-            <Box key={index}>
-              <SimpleGrid cols={2} spacing="xs">
-                <FileInput
-                  placeholder="Chọn file"
-                  accept="image/*,.pdf"
-                  value={item.file}
-                  onChange={(file) => {
-                    updateFile(index, {
-                      file,
-                      name_vi: file && !item.name_vi ? file.name : item.name_vi,
-                    });
-                  }}
-                  radius="md"
-                  size="xs"
-                />
-                <TextInput
-                  placeholder="Tên file"
-                  value={item.name_vi}
-                  onChange={(e) => updateFile(index, { name_vi: e.currentTarget.value })}
-                  radius="md"
-                  size="xs"
-                  required={!!item.file}
-                />
-                
-              </SimpleGrid>
-              {files.length > 1 && (
-                <Text
-                  size="xs"
-                  c="red"
-                  style={{ cursor: "pointer", textAlign: "right" }}
-                  onClick={() => removeFile(index)}
-                >
-                  Xóa file
-                </Text>
-              )}
-            </Box>
-          ))}
-          <Button variant="subtle" size="xs" onClick={addFile}>
-            + Thêm file
-          </Button>
-        </Stack> */}
 
         <Group justify="flex-end" mt="xl" gap="md">
           <Button
@@ -352,12 +276,14 @@ export default function CreatePaymentModal({
             bg="#3b5d7d"
             onClick={handleSubmit}
             loading={loading}
+            disabled={!canSubmit}
           >
             Xác nhận
           </Button>
         </Group>
       </Stack>
 
+      {/* ================= FILE MODAL ================= */}
       <Modal
         opened={fileModalOpened}
         onClose={() => setFileModalOpened(false)}
@@ -391,24 +317,31 @@ export default function CreatePaymentModal({
                   borderRadius: rem(8),
                   cursor: "pointer",
                   backgroundColor: "white",
-                  "&:hover": {
-                    backgroundColor: "#fcfcfc",
-                  },
                 }}
                 py={60}
               >
                 <Stack align="center" gap="lg">
-                  <IconFolder size={100} color="#e9ecef" fill="#e9ecef" stroke={1} />
-                  
+                  <IconFolder
+                    size={100}
+                    color="#e9ecef"
+                    fill="#e9ecef"
+                    stroke={1}
+                  />
+
                   <Stack gap={8} align="center">
                     <Text size="md" fw={700} c="#212529">
-                      <Text span style={{ textDecoration: "underline" }} inherit>
+                      <Text
+                        span
+                        style={{ textDecoration: "underline" }}
+                        inherit
+                      >
                         Ấn để tải file lên
                       </Text>{" "}
                       hoặc kéo thả vào đây
                     </Text>
                     <Text size="xs" c="#868e96">
-                      Lưu ý chỉ hỗ trợ các định dạng file .jpg, .png, .docx, .pdf
+                      Lưu ý chỉ hỗ trợ các định dạng file .jpg, .png, .docx,
+                      .pdf
                     </Text>
                   </Stack>
                 </Stack>
@@ -421,7 +354,10 @@ export default function CreatePaymentModal({
               <Divider my="sm" />
               <SimpleGrid cols={2} spacing="md">
                 {files.map((item, index) => {
-                  const isPdf = item.file?.type === "application/pdf" || item.name_vi.toLowerCase().endsWith(".pdf");
+                  const isPdf =
+                    item.file?.type === "application/pdf" ||
+                    item.name_vi.toLowerCase().endsWith(".pdf");
+
                   return (
                     <Card
                       key={index}
@@ -472,7 +408,9 @@ export default function CreatePaymentModal({
                           <TextInput
                             value={item.name_vi}
                             onChange={(e) =>
-                              updateFile(index, { name_vi: e.currentTarget.value })
+                              updateFile(index, {
+                                name_vi: e.currentTarget.value,
+                              })
                             }
                             variant="default"
                             size="xs"
@@ -483,8 +421,10 @@ export default function CreatePaymentModal({
                             placeholder="Nhập mô tả file"
                             value={item.description_vi}
                             onChange={(e) =>
-                                updateFile(index, { description_vi: e.currentTarget.value })
-                              }
+                              updateFile(index, {
+                                description_vi: e.currentTarget.value,
+                              })
+                            }
                             variant="default"
                             size="xs"
                             radius="xs"

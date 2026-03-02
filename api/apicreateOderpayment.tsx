@@ -29,39 +29,41 @@ export const createOrderPayment = async (
 ) => {
   const formData = new FormData();
 
-  // 🔴 Trường bắt buộc
+  // Trường bắt buộc
   formData.append("order_id", payload.order_id);
   formData.append("total_amount_vn", String(payload.total_amount_vn));
   formData.append("payment_stage", payload.payment_stage);
 
-  // 🟢 File upload (tùy chọn)
+  if (payload.sale_note) {
+    formData.append("sale_note", payload.sale_note);
+  }
+
+  // File upload
   payload.files?.forEach((item, index) => {
     const i = index + 1;
 
     formData.append(`file_${i}`, item.file);
 
     if (item.name_vi) {
-      formData.append(`name_vi_${i}`, item.name_vi);
+      formData.append(`file_${i}_name_vi`, item.name_vi);
     }
 
     if (item.description_vi) {
-      formData.append(`description_vi_${i}`, item.description_vi);
+      formData.append(`file_${i}_description_vi`, item.description_vi);
     }
   });
 
-  const response = await api.post(
-    API_ROUTE.CREATE_ODER_PAYMENT,
-    formData,
-    {
-      params: {
-        project_id: projectId,
-      },
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+  // 🔥 REPLACE {project_id}
+  const url = API_ROUTE.CREATE_ODER_PAYMENT.replace(
+    "{project_id}",
+    projectId
   );
+
+  const response = await api.post(url, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return response.data;
 };
-
