@@ -136,7 +136,7 @@ CREATE_FAVORITES:"/api/v1/favorites/",
 DELETE_FAVORITES:"/api/v1/favorites/{favorite_id}",
 
 ////Order
-CREATE_ORDER:"/api/v1/order/",
+CREATE_ORDER:"/api/v1/order/{project_id}",
 GET_LIST_ORDER:"/api/v1/order/{project_id}",
 
 //Home
