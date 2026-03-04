@@ -50,6 +50,10 @@ interface CreatePaymentFormProps {
     customer_email?: string;
     invoice_code?: string;
   };
+  totalAmount: number | undefined;
+  setTotalAmount: (value: number | undefined) => void;
+  paymentStage: string;
+  setPaymentStage: (value: string) => void;
 }
 
 export default function CreatePaymentModal({
@@ -58,8 +62,11 @@ export default function CreatePaymentModal({
   onSuccess,
   onCancel,
   initialData,
+  totalAmount,
+  setTotalAmount,
+  paymentStage,
+  setPaymentStage,
 }: CreatePaymentFormProps) {
-  const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
 
   // Pre-filled customer info
   const [customerName] = useState(initialData?.customer_name || "");
@@ -69,7 +76,6 @@ export default function CreatePaymentModal({
 
   // ✅ TÁCH RIÊNG
   const [invoiceCode] = useState(initialData?.invoice_code || "");
-  const [paymentStage, setPaymentStage] = useState("");
 
   const [saleNote, setSaleNote] = useState("");
   const [files, setFiles] = useState<PaymentFileItem[]>([]);
@@ -193,19 +199,19 @@ export default function CreatePaymentModal({
 
 
         <SimpleGrid cols={2} spacing="xs">
-          <NumberInput
-            label="Số Tiền khách thanh toán"
-            placeholder="Nhập số tiền"
-            thousandSeparator=","
-            hideControls
-            value={totalAmount}
-            onChange={(value) =>
-              setTotalAmount(typeof value === "number" ? value : undefined)
-            }
-            radius="md"
-            required
-            size="sm"
-          />
+            <NumberInput
+              label="Số Tiền khách thanh toán"
+              placeholder="Nhập số tiền"
+              thousandSeparator=","
+              hideControls
+              value={totalAmount}
+              onChange={(value) =>
+                setTotalAmount(value === "" ? undefined : (typeof value === "string" ? parseFloat(value) : value))
+              }
+              radius="md"
+              required
+              size="sm"
+            />
 
           {/* ✅ Giai đoạn riêng */}
           <TextInput

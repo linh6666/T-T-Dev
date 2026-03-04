@@ -89,6 +89,8 @@ export default function OrderDetailPage({
 
   // Form states for inline creation
   const [isCreating, setIsCreating] = useState(false);
+  const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
+  const [paymentStage, setPaymentStage] = useState("");
   // const [formLoading, setFormLoading] = useState(false);
 
   const downloadContract = async (url: string) => {
@@ -237,11 +239,21 @@ export default function OrderDetailPage({
                       customer_email: orderInfo?.customer_email,
                       invoice_code: orderId,
                     }}
+                    totalAmount={totalAmount}
+                    setTotalAmount={setTotalAmount}
+                    paymentStage={paymentStage}
+                    setPaymentStage={setPaymentStage}
                     onSuccess={() => {
                       setIsCreating(false);
+                      setTotalAmount(undefined);
+                      setPaymentStage("");
                       fetchOrderDetails();
                     }}
-                    onCancel={() => setIsCreating(false)}
+                    onCancel={() => {
+                      setIsCreating(false);
+                      setTotalAmount(undefined);
+                      setPaymentStage("");
+                    }}
                   />
                 ) : (
                   <>
@@ -416,7 +428,35 @@ customer_name
 </Grid>
 <Divider mt="sm" />
                     <Stack gap="md">
-                     
+                      {payments.map((p) => (
+                        <Group justify="space-between" key={p.id}>
+                          <Text fw={600} size="sm">
+                            {p.payment_stage || "N/A"}
+                          </Text>
+                          <Text size="sm">
+                            {p.pay_date
+                              ? new Date(p.pay_date).toLocaleDateString("vi-VN")
+                              : new Date().toLocaleDateString("vi-VN")}
+                          </Text>
+                          <Text fw={600} size="sm">
+                            {(p.total_amount_vn || p.amount || 0).toLocaleString("vi-VN")}
+                          </Text>
+                        </Group>
+                      ))}
+
+                      {isCreating && (paymentStage || totalAmount) && (
+                        <Group justify="space-between" style={{ opacity: 0.6 }}>
+                          <Text fw={600} size="sm">
+                            {paymentStage || "Giai đoạn..."}
+                          </Text>
+                          <Text size="sm">
+                            {new Date().toLocaleDateString("vi-VN")}
+                          </Text>
+                          <Text fw={600} size="sm">
+                            {(totalAmount || 0).toLocaleString("vi-VN")}
+                          </Text>
+                        </Group>
+                      )}
                     </Stack>
                     <Divider mt="sm" />
 
