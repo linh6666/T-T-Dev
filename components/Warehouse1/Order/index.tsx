@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import {
-  IconCheck,
+  // IconCheck,
+  IconFolder,
   IconPlus,
-  IconUpload,
-  IconX,
+  // IconQuestionMark,
+  // IconX,
 } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import {
@@ -15,12 +16,15 @@ import {
   TextInput,
   LoadingOverlay,
   Box,
-  FileInput,
   MantineProvider,
   createTheme,
   Input,
   Grid,
   Divider,
+  FileButton,
+  Text,
+  Stack,
+  // Center,
 } from "@mantine/core";
 import { createOrder } from "../../../api/apiCreateOder";
 import { useDisclosure } from "@mantine/hooks";
@@ -212,34 +216,101 @@ export default function OrderButton({ unitCode, projectId }: OrderButtonProps) {
               {...form.getInputProps("id_cccd")}
             />
 
-            <FileInput
-              label="Tải tệp lên"
-              placeholder="Chọn file PDF"
-              withAsterisk
+            <Input.Wrapper
+              label={
+                <Group gap={4} align="center">
+                  <Text size="sm">Tải tệp lên</Text>
+                  {/* <IconQuestionMark size={14} color="#adb5bd" stroke={2.5} cursor="pointer" /> */}
+                </Group>
+              }
+              // withAsterisk
               mt="md"
-              leftSection={<IconUpload size={16} />}
-              accept="application/pdf"
-              value={form.values.file}
-              onChange={(file) => form.setFieldValue("file", file)}
-            />
-
-            <Group justify="flex-end" mt="lg">
-              <Button
-                type="submit"
-                loading={visible}
-                leftSection={<IconCheck size={18} />}
+            >
+              <FileButton
+                onChange={(file) => form.setFieldValue("file", file)}
+                accept="application/pdf,image/png,image/jpeg,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               >
-                Lưu
-              </Button>
+                {(props) => (
+                  <Box
+                    {...props}
+                    style={{
+                      border: "1px dashed #ced4da",
+                      borderRadius: "8px",
+                      padding: "40px 20px",
+                      cursor: "pointer",
+                      backgroundColor: "#f8f9fa",
+                      marginTop: "8px",
+                      transition: "background-color 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f1f3f5")}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#f8f9fa")}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.style.backgroundColor = "#e9ecef";
+                      e.currentTarget.style.borderColor = "#228be6";
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.style.backgroundColor = "#f8f9fa";
+                      e.currentTarget.style.borderColor = "#ced4da";
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.currentTarget.style.backgroundColor = "#f8f9fa";
+                      e.currentTarget.style.borderColor = "#ced4da";
+                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        const droppedFile = e.dataTransfer.files[0];
+                        // Optional: check file type here if needed
+                        form.setFieldValue("file", droppedFile);
+                      }
+                    }}
+                  >
+                    <Stack align="center" gap={4}>
+                      <IconFolder size={64} color="#e9ecef" stroke={1} />
+                      <Text fw={700} size="sm" mt="xs" style={{ color: "#212529" }}>
+                        Ấn để tải file lên hoặc kéo thả vào đây
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        Lưu ý chỉ hỗ trợ các định dạng file{" "}
+                        <Text span c="blue" fw={500} inherit>jpg</Text>,{" "}
+                        <Text span c="blue" fw={500} inherit>.png</Text>,{" "}
+                        <Text span c="blue" fw={500} inherit>.docx</Text>,{" "}
+                        <Text span c="blue" fw={500} inherit>.pdf</Text>
+                      </Text>
+                      {form.values.file && (
+                        <Text size="xs" c="teal" mt={8} fw={600}>
+                          ✓ Đã chọn: {form.values.file.name}
+                        </Text>
+                      )}
+                    </Stack>
+                  </Box>
+                )}
+              </FileButton>
+            </Input.Wrapper>
 
-              <Button
-                variant="outline"
-                type="button"
-                onClick={handleCloseModal}
-                leftSection={<IconX size={18} />}
-              >
-                Đóng
-              </Button>
+       <Group justify="flex-end" mt="lg">
+  <Button
+    variant="default"
+    radius="xl"
+    size="md"
+    onClick={handleCloseModal}
+  >
+    Hủy
+  </Button>
+
+  <Button
+  radius="xl"
+  size="md"
+  loading={visible}
+  type="submit"
+  style={{ backgroundColor: "#3d6985" }}
+>
+  Xác nhận
+</Button>
+
             </Group>
           </Box>
         </Modal>
