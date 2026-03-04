@@ -68,6 +68,7 @@ interface OrderPaymentItem {
   customer_phone?: string;
   customer_email?: string;
   contract_url?: string;
+  id_cccd?: string;
 }
 
 
@@ -229,6 +230,13 @@ export default function OrderDetailPage({
                   <CreatePaymentModal
                     projectId={projectId}
                     orderId={orderId}
+                    initialData={{
+                      customer_name: orderInfo?.customer_name,
+                      customer_phone: orderInfo?.customer_phone,
+                      id_cccd: orderInfo?.id_cccd,
+                      customer_email: orderInfo?.customer_email,
+                      invoice_code: orderId,
+                    }}
                     onSuccess={() => {
                       setIsCreating(false);
                       fetchOrderDetails();

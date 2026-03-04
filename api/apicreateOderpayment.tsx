@@ -15,6 +15,7 @@ export interface CreateOrderPaymentPayload {
   order_id: string;
   total_amount_vn: number;
   payment_stage: string;
+  invoice_code?: string;
   sale_note?: string;
   files?: OrderPaymentFile[];
 }
@@ -36,6 +37,10 @@ export const createOrderPayment = async (
 
   if (payload.sale_note) {
     formData.append("sale_note", payload.sale_note);
+  }
+
+  if (payload.invoice_code) {
+    formData.append("invoice_code", payload.invoice_code);
   }
 
   // File upload

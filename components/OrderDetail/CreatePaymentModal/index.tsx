@@ -43,6 +43,13 @@ interface CreatePaymentFormProps {
   orderId: string;
   onSuccess: () => void;
   onCancel: () => void;
+  initialData?: {
+    customer_name?: string;
+    customer_phone?: string;
+    id_cccd?: string;
+    customer_email?: string;
+    invoice_code?: string;
+  };
 }
 
 export default function CreatePaymentModal({
@@ -50,11 +57,18 @@ export default function CreatePaymentModal({
   orderId,
   onSuccess,
   onCancel,
+  initialData,
 }: CreatePaymentFormProps) {
   const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
 
+  // Pre-filled customer info
+  const [customerName] = useState(initialData?.customer_name || "");
+  const [customerPhone] = useState(initialData?.customer_phone || "");
+  const [idCccd] = useState(initialData?.id_cccd || "");
+  const [customerEmail] = useState(initialData?.customer_email || "");
+
   // ✅ TÁCH RIÊNG
-  const [invoiceCode, setInvoiceCode] = useState("");
+  const [invoiceCode] = useState(initialData?.invoice_code || "");
   const [paymentStage, setPaymentStage] = useState("");
 
   const [saleNote, setSaleNote] = useState("");
@@ -95,6 +109,7 @@ export default function CreatePaymentModal({
       // nếu backend có field này
         total_amount_vn: totalAmount,
         payment_stage: paymentStage,
+        invoice_code: invoiceCode,
         sale_note: saleNote || undefined,
         files: files
           .filter((f) => f.file)
@@ -135,19 +150,23 @@ export default function CreatePaymentModal({
 
         <MantineProvider theme={theme}>
           <SimpleGrid cols={2} spacing="xs">
-            <TextInput
-              label="Tên khách hàng"
-              placeholder="Nhập tên khách hàng"
-              radius="md"
-              required
-              size="sm"
-            />
+           <TextInput
+  label="Tên khách hàng"
+  placeholder="Nhập tên khách hàng"
+  radius="md"
+  required
+  size="sm"
+  value={customerName}
+  readOnly
+/>
             <TextInput
               label="SĐT liên hệ"
               placeholder="Nhập số điện thoại"
               radius="md"
               required
               size="sm"
+              value={customerPhone}
+              readOnly
             />
             <TextInput
               label="Số CCCD/CMND"
@@ -155,6 +174,8 @@ export default function CreatePaymentModal({
               radius="md"
               required
               size="sm"
+              value={idCccd}
+              readOnly
             />
             <TextInput
               label="Email khách hàng"
@@ -162,22 +183,14 @@ export default function CreatePaymentModal({
               radius="md"
               required
               size="sm"
+              value={customerEmail}
+              readOnly
             />
           </SimpleGrid>
 
           <Divider labelPosition="center" />
         </MantineProvider>
 
-        {/* ✅ Mã hóa đơn riêng */}
-        <TextInput
-          label="Mã hóa đơn"
-          placeholder="Nhập mã hóa đơn"
-          value={invoiceCode}
-          onChange={(e) => setInvoiceCode(e.currentTarget.value)}
-          radius="md"
-          required
-          size="sm"
-        />
 
         <SimpleGrid cols={2} spacing="xs">
           <NumberInput
