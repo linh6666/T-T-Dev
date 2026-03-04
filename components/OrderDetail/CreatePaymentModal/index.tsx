@@ -31,6 +31,7 @@ import {
   IconFolder,
 } from "@tabler/icons-react";
 import { createOrderPayment } from "../../../api/apicreateOderpayment";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface PaymentFileItem {
   file: File | null;
@@ -104,35 +105,43 @@ export default function CreatePaymentModal({
     !!paymentStage.trim() &&
     !hasInvalidFile;
 
-  const handleSubmit = async () => {
-    if (!canSubmit) return;
+ const handleSubmit = async () => {
+  if (!canSubmit) return;
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      await createOrderPayment(projectId!, {
-        order_id: orderId,
-      // nếu backend có field này
-        total_amount_vn: totalAmount,
-        payment_stage: paymentStage,
-        invoice_code: invoiceCode,
-        sale_note: saleNote || undefined,
-        files: files
-          .filter((f) => f.file)
-          .map((f) => ({
-            file: f.file as File,
-            name_vi: f.name_vi.trim(),
-            description_vi: f.description_vi,
-          })),
-      });
+    await createOrderPayment(projectId!, {
+      order_id: orderId,
+      total_amount_vn: totalAmount,
+      payment_stage: paymentStage,
+      invoice_code: invoiceCode,
+      sale_note: saleNote || undefined,
+      files: files
+        .filter((f) => f.file)
+        .map((f) => ({
+          file: f.file as File,
+          name_vi: f.name_vi.trim(),
+          description_vi: f.description_vi,
+        })),
+    });
 
-      onSuccess();
-    } catch (error) {
-      console.error("Create order payment error:", error);
-    } finally {
-      setLoading(false);
+    NotificationExtension.Success("Tạo thanh toán thành công");
+    onSuccess();
+  } catch (error: unknown) {
+    console.error("Create order payment error:", error);
+
+    let errorMessage = "Có lỗi xảy ra khi tạo thanh toán";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
     }
-  };
+
+    NotificationExtension.Fails(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const theme = createTheme({
     components: {
