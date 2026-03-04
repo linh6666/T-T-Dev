@@ -12,13 +12,16 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
+import { IconArrowLeft, IconFolder } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-// import { useDisclosure } from "@mantine/hooks";
+
 import { useEffect, useState } from "react";
 import { Badge, Loader, Center } from "@mantine/core";
 import { getOrderPaymentByOrderId } from "../../api/apiGetlistdetailOder";
 import CreatePaymentModal from "./CreatePaymentModal";
+import { getListOrder } from "../../api/apiGetlistOrder";
+// import { api } from "../../libray/axios";
+// import axios from "axios";
 
 
 
@@ -58,6 +61,13 @@ interface OrderPaymentItem {
   paid_amount?: number;
   discount_amount?: number;
   remaining_amount?: number;
+  accountant_status?: string;
+  pay_date?: string;
+  seller_name?: string;
+  customer_name?: string;
+  customer_phone?: string;
+  customer_email?: string;
+  contract_url?: string;
 }
 
 
@@ -73,17 +83,66 @@ export default function OrderDetailPage({
   const router = useRouter();
   // const [opened, { open, close }] = useDisclosure(false);
   const [paymentData, setPaymentData] = useState<OrderPaymentResponse | null>(null);
+  const [orderDetail, setOrderDetail] = useState<OrderPaymentItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Form states for inline creation
   const [isCreating, setIsCreating] = useState(false);
   // const [formLoading, setFormLoading] = useState(false);
 
+  const downloadContract = async (url: string) => {
+    if (!url) {
+      console.warn("No contract URL provided");
+      return;
+    }
+    
+    // Check if URL is absolute or needs prefixing
+    const finalUrl = url.startsWith("http") ? url : `https://www.vietmodel.com.vn${url}`;
+
+    try {
+      const response = await fetch(finalUrl);
+      if (!response.ok) throw new Error("Failed to fetch file");
+      
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = downloadUrl;
+      a.download = `hop-dong-${orderId || "file"}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Blob download failed, falling back to direct link:", error);
+      // Fallback: If CORS or other error occurs, try direct download via link
+      const link = document.createElement("a");
+      link.href = finalUrl;
+      link.target = "_blank";
+      link.download = `hop-dong-${orderId || "file"}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const fetchOrderDetails = async () => {
     try {
       setLoading(true);
       const data = await getOrderPaymentByOrderId(orderId, projectId);
       setPaymentData(data);
+
+      if (projectId) {
+        const orderList = await getListOrder(projectId);
+        if (orderList && orderList.items) {
+          const matchingOrder = orderList.items.find(
+            (item: OrderPaymentItem) => item.id.toString() === orderId
+          );
+          setOrderDetail(matchingOrder);
+        }
+      }
     } catch (error) {
       console.error("Error fetching order details:", error);
     } finally {
@@ -107,7 +166,7 @@ export default function OrderDetailPage({
   }
 
   const payments = paymentData?.items || [];
-  const orderInfo = payments[0] || {}; // Fallback: Take info from the first payment item if metadata is missing
+  const orderInfo = { ...orderDetail, ...(payments[0] || {}) }; // Combine data, prioritize payment item info for names/details
 
   const status = orderInfo?.manager_status || orderInfo?.order_status || orderInfo?.status;
   const statusConfig: Record<string, { label: string; color: string }> = {
@@ -180,7 +239,44 @@ export default function OrderDetailPage({
                   <>
                     <Card shadow="xs" radius="lg" p={0}>
                       <Box p="xl" bg="white">
+                        
                         <Grid gutter="xs">
+                     <Grid.Col span={9}>
+                        <Text size="xl" fw={700}>
+                          {(
+                            {
+                              pending: "Đang chờ manager khóa căn hộ",
+                              pending_deposit: "Đang chờ đơn thanh toán đầu tiên được duyệt",
+                              paying: "Đang thanh toán",
+                              completed: "Đã thanh toán hoàn tất",
+                              cancelled: "Đã hủy đơn hàng",
+                              expired: "Đơn thanh toán chưa được tạo hoặc không được duyệt - hết hạn",
+                            } as Record<string, string>
+                          )[orderInfo?.manager_status || orderInfo?.accountant_status || ""] || "N/A"}
+                        </Text>
+ 
+</Grid.Col>
+
+<Grid.Col span={3}>
+ 
+</Grid.Col> 
+                            
+                          
+                         <Grid.Col span={3}>
+  <Text size="sm" c="dimmed">
+    Thanh Toán:
+  </Text>
+</Grid.Col>
+
+<Grid.Col span={9}>
+  <Text size="sm">
+    {orderInfo?.total_price_at_sale_vi
+      ? new Intl.NumberFormat("vi-VN").format(
+          Number(orderInfo.total_price_at_sale_vi)
+        ) + " đ"
+      : orderInfo?.order_code || "N/A"}
+  </Text>
+</Grid.Col>
                           <Grid.Col span={3}>
                             <Text size="sm" c="dimmed">
                               Mã đơn hàng:
@@ -196,7 +292,9 @@ export default function OrderDetailPage({
                             </Text>
                           </Grid.Col>
                           <Grid.Col span={9}>
-                            <Text size="sm">{ (orderInfo?.order_date || orderInfo?.created_at) ? new Date((orderInfo.order_date || orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
+                            <Text size="sm">{ (orderInfo?.pay_date || orderInfo?.created_at) ? new Date((orderInfo.
+pay_date
+ || orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
                           </Grid.Col>
 
                           <Grid.Col span={3}>
@@ -205,13 +303,13 @@ export default function OrderDetailPage({
                             </Text>
                           </Grid.Col>
                           <Grid.Col span={9}>
-                            <Text size="sm">{orderInfo?.created_by_name || orderInfo?.seller_id || "N/A"}</Text>
+                            <Text size="sm">{orderInfo?.seller_name || orderInfo?.seller_id || "N/A"}</Text>
                           </Grid.Col>
                         </Grid>
 
                         <Group mt="xl" align="flex-start" wrap="nowrap">
                           <Text size="sm" c="dimmed">
-                            Lời nhắn từ Sale:
+                            Lời nhắn từ hệ thống:
                           </Text>
                           <Text size="sm">
                             {orderInfo?.sale_note || "Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp theo theo hợp đồng."}
@@ -256,74 +354,87 @@ export default function OrderDetailPage({
                 <Card shadow="md" radius="sm" bg="white">
                   <Stack gap={30}>
                     <Box>
-                      <Text fw={600} size="md">
-                        {orderInfo?.full_name || orderInfo?.customer_id || "N/A"}
+                    <Group justify="space-between" align="center" mb="md">
+  <Text fw={600} size="md">
+    ĐƠN THANH TOÁN
+  </Text>
+
+  <Text size="sm">
+  
+    <Text component="span" >
+      #{orderInfo?.contract_code || orderInfo?.order_code || "N/A"}
+    </Text>
+  </Text>
+</Group>
+  <Text size="xs" c="dimmed">
+                     Tên: {orderInfo?.
+customer_name
+ || "N/A"}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        SĐT: {orderInfo?.phone_number || "N/A"}
+                        SĐT: {orderInfo?.customer_phone
+ || "N/A"}
                       </Text>
-                      <Text size="xs" c="dimmed">
-                        {orderInfo?.email || "N/A"}
+                      <Text size="sm" c="dimmed">
+                        {orderInfo?.customer_email || "N/A"}
                       </Text>
                     </Box>
 
-                    <Grid gutter={5}>
-                      <Grid.Col span={6}>
-                        <Text size="xs" c="dimmed">
-                          Mã đơn hàng:
-                        </Text>
-                      </Grid.Col>
-                      <Grid.Col span={6} ta="right">
-                        <Text size="xs">#{orderInfo?.contract_code || orderInfo?.order_code || "N/A"}</Text>
-                      </Grid.Col>
+                   <Grid gutter={5}>
+  <Grid.Col span={12}>
+    <Text size="xs" c="dimmed">
+      Mã đơn hàng: #
+      {orderInfo?.contract_code || orderInfo?.order_code || "N/A"}
+    </Text>
+  </Grid.Col>
 
-                      <Grid.Col span={6}>
-                        <Text size="xs" c="dimmed">
-                          Ngày tạo đơn:
-                        </Text>
-                      </Grid.Col>
-                      <Grid.Col span={6} ta="right">
-                        <Text size="xs">{(orderInfo?.order_date || orderInfo?.created_at) ? new Date((orderInfo.order_date || orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
-                      </Grid.Col>
+  <Grid.Col span={12}>
+    <Text size="xs" c="dimmed">
+      Ngày tạo đơn:{" "}
+      {(orderInfo?.pay_date || orderInfo?.created_at)
+        ? new Date(
+            (orderInfo?.pay_date || orderInfo?.created_at) as string
+          ).toLocaleDateString("vi-VN")
+        : "N/A"}
+    </Text>
+  </Grid.Col>
 
-                      <Grid.Col span={6}>
-                        <Text size="xs" c="dimmed">
-                          Người tạo đơn:
-                        </Text>
-                      </Grid.Col>
-                      <Grid.Col span={6} ta="right">
-                        <Text size="xs">{orderInfo?.created_by_name || orderInfo?.seller_id || "N/A"}</Text>
-                      </Grid.Col>
-                    </Grid>
-
+  <Grid.Col span={12}>
+    <Text size="xs" c="dimmed">
+      Người tạo đơn:{" "}
+      {orderInfo?.seller_name || orderInfo?.seller_id || "N/A"}
+    </Text>
+  </Grid.Col>
+</Grid>
+<Divider mt="sm" />
                     <Stack gap="md">
-                      {payments.map((item: OrderPaymentItem, idx: number) => (
-                        <Box key={idx}>
-                          <Group justify="space-between">
-                            <Text size="sm" fw={600}>
-                              {item.payment_stage || item.title || "Thanh toán"}
-                            </Text>
-                            <Text size="sm" c="dimmed">
-                              {(item.created_at || item.payment_date) ? new Date((item.created_at || item.payment_date) as string).toLocaleDateString("vi-VN") : "N/A"}
-                            </Text>
-                            <Text size="sm" fw={600}>
-                              {(item.total_amount_vn || item.amount)?.toLocaleString("vi-VN")}
-                            </Text>
-                          </Group>
-                          <Divider mt="sm" />
-                        </Box>
-                      ))}
+                     
                     </Stack>
+                    <Divider mt="sm" />
 
                     <Group align="flex-start" wrap="nowrap" gap="lg">
-                      <Stack align="center" gap={5}>
-                        <Box bg="gray.1" p="sm">
-                          <IconCheck size={36} color="#adb5bd" />
-                        </Box>
-                        <Text size="10px" c="dimmed" ta="center">
-                          Ấn để tải file đính kèm
-                        </Text>
-                      </Stack>
+                  <Stack align="center" gap={5}>
+  <Box p="sm">
+    <IconFolder
+      size={80}
+      color="#adb5bd"
+      style={{
+        cursor: orderInfo?.contract_url ? "pointer" : "not-allowed",
+      }}
+      onClick={() => {
+        if (orderInfo?.contract_url) {
+          downloadContract(orderInfo.contract_url);
+        }
+      }}
+    />
+  </Box>
+
+  <Text size="10px" c="dimmed" ta="center">
+    {orderInfo?.contract_url
+      ? "Ấn để tải file đính kèm"
+      : "Không có file đính kèm"}
+  </Text>
+</Stack>
 
                       <Box bg="#f1f3f5" p="md" style={{ flex: 1 }}>
                         <Stack gap={5}>
@@ -371,6 +482,30 @@ export default function OrderDetailPage({
                         </Stack>
                       </Box>
                     </Group>
+
+                    {/* IN-CARD FOOTER */}
+                    <Box mt="xl">
+                      <Divider mb="lg" />
+                      <Group justify="space-between" align="flex-start">
+                        <Stack gap={2}>
+                          <Text fw={700} size="xs" c="gray.7">T&T GROUP</Text>
+                          <Box>
+                            <Text size="10px" c="dimmed">Hotline: 0666888868</Text>
+                            <Text size="10px" c="dimmed">Phone: 012345678</Text>
+                            <Text size="10px" c="dimmed">Email: ttgroup@example.com</Text>
+                          </Box>
+                        </Stack>
+                        
+                        <Stack gap={0} align="flex-end" ta="right">
+                          <Text size="10px" c="dimmed">Website</Text>
+                          <Text size="10px" c="dimmed">ttgroup.example.com</Text>
+                        </Stack>
+                      </Group>
+                      
+                      <Text mt="md" size="10px" c="dimmed">
+                        For any question please contact us at ttgroup@example.com
+                      </Text>
+                    </Box>
                   </Stack>
                 </Card>
               </Card>
