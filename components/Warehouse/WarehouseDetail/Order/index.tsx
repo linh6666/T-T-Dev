@@ -13,13 +13,36 @@ import {
   Textarea,
   Text,
   Grid,
+  MantineProvider,
+  createTheme,
+  Input,
 } from "@mantine/core";
-import { createOrder } from "../../../../api/apiCreateOder";
+import { createContact } from "../../../../api/apiCreateContact";
 import { useDisclosure } from "@mantine/hooks";
 import useAuth from "../../../../hook/useAuth";
 import { modals } from "@mantine/modals";
 import { NotificationExtension } from "../../../../extension/NotificationExtension";
 import { AxiosError } from "axios";
+
+/* ================= THEME ================= */
+
+const theme = createTheme({
+  components: {
+    Input: Input.extend({
+      defaultProps: {
+        variant: "filled",
+      },
+    }),
+
+    InputWrapper: Input.Wrapper.extend({
+      defaultProps: {
+        inputWrapperOrder: ["label", "input", "description", "error"],
+      },
+    }),
+  },
+});
+
+/* ================= TYPE ================= */
 
 interface HouseData {
   unit_code: string;
@@ -27,10 +50,6 @@ interface HouseData {
   layer3?: string;
   layer2?: string;
   building_type?: string;
-  bedroom?: string | number;
-  bathroom?: string | number;
-  direction?: string;
-  price?: number;
 }
 
 interface OrderButtonProps {
@@ -45,6 +64,7 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
   const { user, isLoggedIn } = useAuth();
 
   /* ================= FORM ================= */
+
   const form = useForm({
     initialValues: {
       full_name: "",
@@ -52,24 +72,19 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
       phone: "",
       subject: "",
       content: "",
+    },
 
-      contract_code: "",
-      total_price_at_sale_vi: house.price ? String(house.price) : "",
-      total_price_at_sale_en: "",
-      id_cccd: "",
-      file: null as File | null,
+    validate: {
+      subject: (value) =>
+        value.trim().length === 0 ? "Vui lòng nhập chủ đề" : null,
+
+      content: (value) =>
+        value.trim().length === 0 ? "Vui lòng nhập nội dung" : null,
     },
   });
 
-  /* ================= UPDATE PRICE ================= */
-  useEffect(() => {
-    form.setFieldValue(
-      "total_price_at_sale_vi",
-      house.price ? String(house.price) : ""
-    );
-  }, [house]);
-
   /* ================= AUTO FILL USER ================= */
+
   useEffect(() => {
     if (!opened || !user) return;
 
@@ -81,12 +96,14 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
   }, [opened, user]);
 
   /* ================= CLOSE MODAL ================= */
+
   const handleCloseModal = () => {
     setOpened(false);
     form.reset();
   };
 
   /* ================= SUBMIT ================= */
+
   const handleSubmit = async (values: typeof form.values) => {
     if (!isLoggedIn) {
       NotificationExtension.Warn("Vui lòng đăng nhập trước");
@@ -97,25 +114,16 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
 
     try {
       const payload = {
-        unit_code: house.unit_code,
         project_id: projectId,
-        email: values.email,
-        contract_code: values.contract_code,
-        total_price_at_sale_vi: Number(values.total_price_at_sale_vi),
-        total_price_at_sale_en: Number(values.total_price_at_sale_en),
-        id_cccd: values.id_cccd,
-        file: values.file as File,
-
-        bedroom: house.bedroom,
-        bathroom: house.bathroom,
-        direction: house.direction,
-        building_type: house.building_type,
+        unit_code: house.unit_code,
+        topic: values.subject,
+        message: values.content,
       };
 
-      const res = await createOrder(payload);
+      const res = await createContact(payload);
 
       NotificationExtension.Success(
-        res?.data?.message || "Tạo đơn hàng thành công"
+        res?.message || "Gửi liên hệ thành công"
       );
 
       handleCloseModal();
@@ -134,134 +142,148 @@ export default function OrderButton({ house, projectId }: OrderButtonProps) {
   };
 
   return (
-    <div style={{ display: "flex", gap: "12px", zIndex: 10 }}>
-      {/* ================= BUTTON ================= */}
-      <button
-        onClick={() => setOpened(true)}
-        style={{
-          height: "40px",
-          padding: "0 14px",
-          borderRadius: "20px",
-          border: "none",
-          backgroundColor: "#fff",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          whiteSpace: "nowrap",
-        }}
-      >
-        <IconMail size={20} color="#752E0B" />
-        <span
+    <MantineProvider theme={theme}>
+      <div style={{ display: "flex", gap: "12px", zIndex: 10 }}>
+        {/* ================= BUTTON ================= */}
+
+        <button
+          onClick={() => setOpened(true)}
           style={{
-            fontSize: "14px",
-            fontWeight: 500,
-            color: "#752E0B",
+            height: "40px",
+            padding: "0 14px",
+            borderRadius: "20px",
+            border: "none",
+            backgroundColor: "#fff",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.25)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          Liên hệ
-        </span>
-      </button>
+          <IconMail size={20} color="#752E0B" />
 
-      {/* ================= MODAL ================= */}
-      <Modal
-        opened={opened}
-        onClose={handleCloseModal}
-        title={<div style={{ fontWeight: 600, fontSize: 18 }}>Liên hệ</div>}
-        size="lg"
-      >
-        <Box
-          component="form"
-          miw={320}
-          mx="auto"
-          onSubmit={form.onSubmit(handleSubmit)}
+          <span
+            style={{
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "#752E0B",
+            }}
+          >
+            Liên hệ
+          </span>
+        </button>
+
+        {/* ================= MODAL ================= */}
+
+        <Modal
+          opened={opened}
+          onClose={handleCloseModal}
+          title={<div style={{ fontWeight: 600, fontSize: 18 }}>Liên hệ</div>}
+          size="lg"
+          radius="md"
         >
-          <LoadingOverlay visible={visible} />
+          <Box component="form" mx="auto" onSubmit={form.onSubmit(handleSubmit)}>
+            <LoadingOverlay visible={visible} />
 
-          <Grid gutter="xl">
-            {/* ===== LEFT - HOUSE INFO ===== */}
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <Text fw={700} size="md"  mb="xs">
-                Thông tin căn hộ
-              </Text>
+            <Grid gutter="md">
+              {/* ===== THÔNG TIN LIÊN HỆ ===== */}
 
-              <TextInput
-                label="Phân khu / Tòa"
-                value={house.zone || house.layer3 || "Không có"}
-                readOnly
-              />
+              <Grid.Col span={12}>
+                <Text fw={700} size="md">
+                  Thông tin liên hệ
+                </Text>
+              </Grid.Col>
 
-              <TextInput
-                label="Loại công trình/Vị trí"
-                value={house.building_type || house.layer2 || "Không có"}
-                readOnly
-                mt="md"
-              />
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Phân khu"
+                  value={house.zone || house.layer3 || "Không có"}
+                  readOnly
+                />
+              </Grid.Col>
 
-              <TextInput
-                label="Mã căn"
-                value={house.unit_code}
-                readOnly
-                mt="md"
-              />
-            </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Loại công trình"
+                  value={house.building_type || house.layer2 || "Không có"}
+                  readOnly
+                />
+              </Grid.Col>
 
-            {/* ===== RIGHT - USER INFO ===== */}
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <Text fw={700} size="md" mb="xs">
-                Thông tin người dùng
-              </Text>
+              <Grid.Col span={12}>
+                <TextInput label="Mã căn" value={house.unit_code} readOnly />
+              </Grid.Col>
 
-              <TextInput
-                label="Họ và tên"
-                 readOnly
-                {...form.getInputProps("full_name")}
-              />
+              {/* ===== THÔNG TIN NGƯỜI DÙNG ===== */}
 
-              <TextInput
-                label="Email"
-                mt="md"
-                readOnly
-                {...form.getInputProps("email")}
-              />
+              <Grid.Col span={12} mt="md">
+                <Text fw={700} size="md">
+                  Thông tin người dùng
+                </Text>
+              </Grid.Col>
 
-              <TextInput
-                label="Số điện thoại"
-                 readOnly
-                mt="md"
-                {...form.getInputProps("phone")}
-              />
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Họ và tên"
+                  readOnly
+                  {...form.getInputProps("full_name")}
+                />
+              </Grid.Col>
 
-              <TextInput
-                label="Chủ đề"
-                withAsterisk
-                mt="md"
-                {...form.getInputProps("subject")}
-              />
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Email"
+                  readOnly
+                  {...form.getInputProps("email")}
+                />
+              </Grid.Col>
 
-              <Textarea
-                withAsterisk
-                resize="vertical"
-                label="Nội dung"
-                placeholder="Nhập nội dung liên hệ"
-                mt="md"
-                {...form.getInputProps("content")}
-              />
-            </Grid.Col>
-          </Grid>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Số điện thoại"
+                  readOnly
+                  {...form.getInputProps("phone")}
+                />
+              </Grid.Col>
 
-          <Group justify="flex-end" mt="lg">
-            <Button
-              type="submit"
-              loading={visible}
-              leftSection={<IconCheck size={18} />}
-            >
-              Gửi
-            </Button>
-          </Group>
-        </Box>
-      </Modal>
-    </div>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Chủ đề"
+                   placeholder="Nhập chủ đề"
+                  withAsterisk
+                  variant="default"
+                  {...form.getInputProps("subject")}
+                />
+              </Grid.Col>
+
+              <Grid.Col span={12}>
+                <Textarea
+                  withAsterisk
+                  label="Nội dung"
+                  placeholder="Nhập nội dung liên hệ"
+                  autosize
+                  minRows={3}
+                  variant="default"
+                  {...form.getInputProps("content")}
+                />
+              </Grid.Col>
+            </Grid>
+
+            <Group justify="flex-end" mt="lg">
+        <Button
+  type="submit"
+  loading={visible}
+  disabled={!form.values.subject.trim() || !form.values.content.trim()}
+  leftSection={<IconCheck size={18} />}
+  style={{ backgroundColor: "#3d6985" }}
+>
+  Gửi
+</Button>
+            </Group>
+          </Box>
+        </Modal>
+      </div>
+    </MantineProvider>
   );
 }
