@@ -13,9 +13,11 @@ import type { ColumnsType } from "antd/es/table";
 import { useEffect, useCallback, useState } from "react";
 import { getListOrder } from "../../../api/apiGetlistOrder";
 import { getOrderPaymentByOrderId } from "../../../api/apiGetlistdetailOder";
-
+import { updateRequest } from "../../../api/apiLockRequest";
 import { getCurrentUser } from "../../../api/apiProfile";
-
+import { ActionIcon, Tooltip } from "@mantine/core";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface EditViewProps {
   id: string; // project_id
@@ -38,7 +40,7 @@ interface OrderDataType {
 const EditView = ({ id }: EditViewProps) => {
   const [data, setData] = useState<OrderDataType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
 
   const token = localStorage.getItem("access_token") || "";
 
@@ -91,7 +93,28 @@ const EditView = ({ id }: EditViewProps) => {
     fetchOrders();
   }, [fetchOrders]);
 
- 
+  const handleStatusUpdate = async (request_id: string, status: "granted" | "rejected", message: string = "") => {
+    try {
+      setLoading(true);
+      const res = await updateRequest(request_id, id, { 
+        status,
+        approver_id: currentUser?.id,
+        approver_at: new Date().toISOString(),
+        response_message_vi: message,
+        response_message_en: message
+      });
+      
+      NotificationExtension.Success(res?.message || `Đã ${status === "granted" ? "duyệt" : "từ chối"} yêu cầu thành công.`);
+      fetchOrders(); // Refresh table
+    } catch (error: unknown) {
+      console.error("Lỗi khi cập nhật trạng thái:", error);
+      const err = error as { response?: { data?: { detail?: string } } };
+      NotificationExtension.Fails(err?.response?.data?.detail || "Không thể cập nhật trạng thái yêu cầu.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns: ColumnsType<OrderDataType> = [
     {
       title: "Căn hộ",
@@ -150,7 +173,38 @@ const EditView = ({ id }: EditViewProps) => {
         return <Badge color={config.color} variant="filled">{config.label}</Badge>;
       },
     },
- 
+    {
+      title: "Hành động",
+      key: "action",
+      width: 150,
+      render: (record: OrderDataType) => (
+        <Group gap="xs">
+          
+          {record.manager_status === "pending" && (
+            <>
+              <Tooltip label="Duyệt yêu cầu">
+                <ActionIcon 
+                  color="green" 
+                  variant="light" 
+                  onClick={() => handleStatusUpdate(record.id, "granted")}
+                >
+                  <IconCheck size={18} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Từ chối yêu cầu">
+                <ActionIcon 
+                  color="red" 
+                  variant="light"
+                  onClick={() => handleStatusUpdate(record.id, "rejected")}
+                >
+                  <IconX size={18} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
+        </Group>
+      ),
+    },
   ];
 
   return (

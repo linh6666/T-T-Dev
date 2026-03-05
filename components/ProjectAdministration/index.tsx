@@ -18,7 +18,8 @@ import Order from './Order';
 import  ProjectDetails from './ProjectDetails';
 import  PaymentRequest from './PaymentRequest';
 import  LockRequest from './LockRequest';
-import HomeAdmin from '../HomeAdmin/index';  
+import HomeAdmin from '../HomeAdmin/index';
+  import  LockProductRequest from './LockProductRequest';
 // import ProjectManagere from './ProjectManagere'; 
 
 const mockdata = [
@@ -55,8 +56,11 @@ const mockdata = [
     links: [
      
       { label: 'Đơn hàng', link: 'Order' },
+            { label: 'Duyệt khóa sản phẩm', link: 'LockProductRequest' },
+
       { label: 'Duyệt đơn thanh toán kế tiếp', link: 'PaymentRequest' },
-         { label: 'Duyệt đơn thanh toán', link: 'LockRequest' }
+         { label: 'Duyệt đơn thanh toán', link: 'LockRequest' },
+         
       
     ],
   },
@@ -97,6 +101,8 @@ export function ProjectManagement() {
         return <PaymentRequest/>;
             case 'LockRequest':
         return <LockRequest/>;
+                case 'LockProductRequest':
+        return <LockProductRequest/>;
       default:
          return <HomeAdmin/>;
     }
