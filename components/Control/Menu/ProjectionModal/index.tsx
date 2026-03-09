@@ -1,6 +1,7 @@
 "use client";
 
 import { Modal, Text, Stack, Button, Group } from "@mantine/core";
+import { IconPlayerPlay, IconPlayerStop } from "@tabler/icons-react";
 
 interface ProjectionModalProps {
   opened: boolean;
@@ -27,17 +28,25 @@ export default function ProjectionModal({
       onClose={onClose}
       centered
       size="lg"
-      title="Một trải nghiệm trình chiếu đặc biệt sắp bắt đầu."
+      title={
+        <Text fw={700} ta="center">
+          PROJECTION MAPPING MÔ HÌNH DỰ ÁN T&T MILLENNIA CITY
+        </Text>
+      }
     >
-      <Stack>
-        <Text>
-          Xin mời quý khách hướng sự chú ý lên mô hình để theo dõi các hình ảnh,
-          hiệu ứng ánh sáng và âm thanh được đồng bộ và trình chiếu trực tiếp
-          trên bề mặt mô hình.
+      <Stack align="center">
+        <Text >
+          Một trải nghiệm trình chiếu đặc biệt sắp bắt đầu.
+          <br />
+          Xin mời quý khách hướng sự chú ý lên mô hình để theo dõi các hình
+          ảnh, hiệu ứng ánh sáng và âm thanh được đồng bộ và trình chiếu trực
+          tiếp trên bề mặt mô hình.
         </Text>
 
-        <Group mt="md">
+        <Group mt="md" justify="center">
           <Button
+            radius="xl"
+            leftSection={<IconPlayerPlay size={18} />}
             onClick={handleStart}
             style={{
               backgroundColor: "#fffaee",
@@ -49,6 +58,8 @@ export default function ProjectionModal({
           </Button>
 
           <Button
+            radius="xl"
+            leftSection={<IconPlayerStop size={18} />}
             onClick={handleEnd}
             style={{
               backgroundColor: "#fffaee",
