@@ -49,7 +49,7 @@ export default function Managent({ projectId,target }: AppProps) {
       className={`${styles.titleTab} ${activeView === "note" ? styles.titleTabActive : ""}`}
       onClick={() => setActiveView("note")}
     >
-      Ghi chú
+      Đơn hàng
     </h1>
   </Group>
 
