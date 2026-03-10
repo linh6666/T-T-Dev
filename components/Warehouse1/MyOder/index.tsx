@@ -40,6 +40,18 @@ export interface OrderItem {
   id_cccd?: string;
 }
 
+const getOrderStatusText = (status?: string) => {
+  switch (status) {
+    case 'pending': return 'Đang chờ manager khóa căn hộ';
+    case 'pending_deposit': return 'Đang chờ đơn thanh toán';
+    case 'paying': return 'Đang thanh toán';
+    case 'completed': return 'Đã thanh toán hoàn tất';
+    case 'cancelled': return 'Đã hủy đơn hàng';
+    case 'expired': return 'Đơn thanh toán chưa được tạo hoặc hết hạn';
+    default: return status || 'Chờ khóa căn hộ';
+  }
+};
+
 const PropertyImageComponent = ({ projectId, unitCode }: { projectId: string; unitCode: string }) => {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
@@ -90,29 +102,31 @@ export default function MyOder({ projectId }: MyOderProps) {
 
   return (
     <Box className={styles.container} style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* 1. Search Bar */}
-      <Box className={styles.searchBox}>
-        <TextInput
-          placeholder="Tìm kiếm..."
-          leftSection={<IconSearch size={20} stroke={1.5} color="#8c5b3f" />}
-          radius="xl"
-          classNames={{ input: styles.searchInput }}
-        />
-      </Box>
+      {/* 1. Search Bar and Header wrapper for sticky effect */}
+      <Box className={styles.stickyTop}>
+        <Box className={styles.searchBox}>
+          <TextInput
+            placeholder="Tìm kiếm..."
+            leftSection={<IconSearch size={20} stroke={1.5} color="#8c5b3f" />}
+            radius="xl"
+            classNames={{ input: styles.searchInput }}
+          />
+        </Box>
 
-      {/* 2. Header */}
-      <Flex className={styles.header}>
-        <Text className={styles.title}>
-          Danh sách đơn hàng phê duyệt
-        </Text>
-        <Badge
-          className={styles.headerBadge}
-          variant="filled"
-          radius="lg"
-        >
-          {`Có ${orders.length < 10 ? '0' + orders.length : orders.length} đơn hàng chờ phê duyệt`}
-        </Badge>
-      </Flex>
+        {/* 2. Header */}
+        <Flex className={styles.header}>
+          <Text className={styles.title}>
+            Danh sách đơn hàng phê duyệt
+          </Text>
+          <Badge
+            className={styles.headerBadge}
+            variant="filled"
+            radius="lg"
+          >
+            {`Có ${orders.length < 10 ? '0' + orders.length : orders.length} đơn hàng chờ phê duyệt`}
+          </Badge>
+        </Flex>
+      </Box>
 
       {/* 3. Main Content Row */}
       {orders.map((order, index) => (
@@ -168,7 +182,7 @@ export default function MyOder({ projectId }: MyOderProps) {
                   className={styles.propertyBadge}
                   radius="xl"
                 >
-                  {order.order_status === 'expired' ? 'Đã hết hạn' : (order.order_status || 'Chờ khóa căn hộ')}
+                  {getOrderStatusText(order.order_status)}
                 </Badge>
               </Flex>
 

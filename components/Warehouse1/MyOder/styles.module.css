@@ -16,6 +16,15 @@
     font-size: 13px !important;
 }
 
+/* .stickyTop {
+    position: sticky;
+    top: 110px;
+    background-color: white;
+    z-index: 10;
+    padding-top: 0px;
+    padding-bottom: 10px;
+} */
+
 .header {
     margin-bottom: var(--mantine-spacing-xl);
     align-items: center;
