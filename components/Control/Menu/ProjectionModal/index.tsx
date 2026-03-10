@@ -20,14 +20,18 @@ export default function ProjectionModal({
 
   const handleEnd = () => {
     console.log("Kết thúc trình chiếu", project_id);
+    onClose(); // chỉ khi bấm nút này mới đóng modal
   };
 
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={() => {}}
       centered
       size="lg"
+      withCloseButton={false}
+      closeOnClickOutside={false}
+      closeOnEscape={false}
       title={
         <Text fw={700} ta="center">
           PROJECTION MAPPING MÔ HÌNH DỰ ÁN T&T MILLENNIA CITY
@@ -35,7 +39,7 @@ export default function ProjectionModal({
       }
     >
       <Stack align="center">
-        <Text >
+        <Text ta="center">
           Một trải nghiệm trình chiếu đặc biệt sắp bắt đầu.
           <br />
           Xin mời quý khách hướng sự chú ý lên mô hình để theo dõi các hình
@@ -46,7 +50,7 @@ export default function ProjectionModal({
         <Group mt="md" justify="center">
           <Button
             radius="xl"
-            leftSection={<IconPlayerPlay size={18} />}
+            rightSection={<IconPlayerPlay size={18} fill="#762f0b" />}
             onClick={handleStart}
             style={{
               backgroundColor: "#fffaee",
@@ -59,7 +63,7 @@ export default function ProjectionModal({
 
           <Button
             radius="xl"
-            leftSection={<IconPlayerStop size={18} />}
+            rightSection={<IconPlayerStop size={18} fill="#762f0b" />}
             onClick={handleEnd}
             style={{
               backgroundColor: "#fffaee",
