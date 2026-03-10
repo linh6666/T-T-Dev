@@ -4,6 +4,7 @@ import React, { useState } from "react";
 // import { Tabs } from "@mantine/core";
 import styles from "./App.module.css";
 import TotalWarehouse from "./TotalWarehouse";
+import MyOder from "./MyOder";
 // import { useRouter } from "next/navigation";
 import { Group } from "@mantine/core";
 
@@ -59,12 +60,7 @@ export default function Managent({ projectId,target }: AppProps) {
 
       {/* Nội dung view */}
       {activeView === "warehouse" &&  <TotalWarehouse projectId={projectId} target={target} />}
-
-      {/* 
-      {activeView === "amenities" && <AmenityContent projectId={projectId} />}
-      {activeView === "houseType" && <HouseTypeContent projectId={projectId} />}
-      {activeView === "note" && <Note projectId={projectId} />} 
-      */}
+  {activeView === "note" &&  <MyOder projectId={projectId}/>}
     </div>
   );
 }
