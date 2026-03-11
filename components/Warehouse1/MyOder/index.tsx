@@ -15,6 +15,7 @@ import {
   IconSearch,
   IconChevronDown,
   IconChevronUp,
+  // IconFolder,
 } from "@tabler/icons-react";
 import styles from "./styles.module.css";
 import { getListOrder } from "../../../api/apiGetlistRequest";
@@ -50,7 +51,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   expired: { label: "Đã hết hạn", color: "gray" },
 };
 
-const PropertyImageComponent = ({ projectId, unitCode }: { projectId: string; unitCode: string }) => {
+const PropertyImageComponent = ({ projectId, unitCode, className }: { projectId: string; unitCode: string; className?: string }) => {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const PropertyImageComponent = ({ projectId, unitCode }: { projectId: string; un
 
   return (
     <Box 
-      className={styles.propertyImage} 
+      className={className || styles.propertyImage} 
       style={imgUrl ? { backgroundImage: `url(${imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}} 
     />
   );
@@ -140,9 +141,9 @@ export default function MyOder({ projectId }: MyOderProps) {
         </Flex>
       </Box>
 
-      {/* 3. Main Content Row */}
+      {/* 3. Main Content Row - Pending/Rejected orders */}
       <Box className={`${styles.ordersListWrapper} ${visibleCount > 1 ? styles.expanded : ''}`}>
-        {orders.map((order, index) => {
+        {orders.filter(o => o.status !== 'approved').map((order, index) => {
           const handleUpdatePayment = async (status: "approved" | "rejected") => {
             if (!order.id || !projectId) return;
             try {
@@ -195,15 +196,11 @@ export default function MyOder({ projectId }: MyOderProps) {
                   <Text className={styles.salesInfo}>
                     {order.requester_email|| "nguyenvana@gmail.com"}
                   </Text>
-                  {/* <Text className={styles.salesInfo}>
-                    {order.requester_phone || "0987654321"}
-                  </Text> */}
                 </Stack>
               </Box>
 
               {/* Column 2: Order Details Card */}
               <Box className={styles.propertyCard}>
-                {/* Property Image Placeholder or Data */}
                 <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} />
                 
                 <Stack className={styles.propertyContent} gap={4}>
@@ -223,12 +220,6 @@ export default function MyOder({ projectId }: MyOderProps) {
                         {statusConfig[order.status || ""]?.label || order.status || "Chờ khóa căn hộ"}
                       </Badge>
                     </Flex>
-
-                    {/* <Box mt="sm">
-                      <Text className={styles.price}>
-                        {order.total_price_at_sale_vi ? order.total_price_at_sale_vi.toLocaleString() : "10.500.000.000"}
-                      </Text>
-                    </Box> */}
                   </Box>
 
                   {/* Bottom Row inside middle card */}
@@ -248,23 +239,10 @@ export default function MyOder({ projectId }: MyOderProps) {
                     </Text>
                   </Flex>
                 </Stack>
-
-                {/* Folder Icon Shadow Overlay Rendering */}
-                {/* <Box 
-                  component="a" 
-                  href={order.contract_url || "#"} 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.folderIconContainer}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <IconFolder size={100} stroke={1} color="#474645c9" className={styles.folderIcon} />
-                </Box> */}
               </Box>
 
               {/* Column 3: Customer Info & Buttons Container */}
               <Stack className={styles.customerStack}>
-                {/* Customer Info Box */}
                 <Box className={styles.customerCard}>
                   <Text className={styles.customerTitle}>
                     Thông tin khách hàng
@@ -279,14 +257,6 @@ export default function MyOder({ projectId }: MyOderProps) {
                       <Text className={styles.infoLabel}>Email khách hàng:</Text>
                       <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.customer_email || "nguyenthib@gmail.com"}</Text>
                     </Flex>
-                    {/* <Flex>
-                      <Text className={styles.infoLabel}>SĐT liên hệ:</Text>
-                      <Text className={styles.infoValue}>{order.customer_phone || "0987654321"}</Text>
-                    </Flex>
-                    <Flex>
-                      <Text className={styles.infoLabel}>Số CCCD/CMND:</Text>
-                      <Text className={styles.infoValue}>{order.id_cccd || "112233445566"}</Text>
-                    </Flex> */}
                   </Stack>
                 </Box>
 
@@ -294,10 +264,6 @@ export default function MyOder({ projectId }: MyOderProps) {
                 {order.status === "rejected" ? (
                   <Box className={styles.rejectedMessage}>
                     Đơn hàng đã bị từ chối
-                  </Box>
-                ) : order.status === "approved" ? (
-                  <Box className={styles.approvedMessage}>
-                    Đơn hàng đã được duyệt
                   </Box>
                 ) : (
                   <Flex gap="sm">
@@ -324,14 +290,13 @@ export default function MyOder({ projectId }: MyOderProps) {
                   </Flex>
                 )}
               </Stack>
-
             </Flex>
           );
         })}
       </Box>
 
-      {/* 4. Load More Button - Logic updated to expand the scrollable view */}
-      {orders.length > 1 && (
+      {/* 4. Load More Button */}
+      {orders.filter(o => o.status !== 'approved').length > 1 && (
         <Flex justify="center" gap="md" mt={-18} mb={24} style={{ position: 'relative', zIndex: 2 }}>
           {visibleCount > 1 && (
             <Box
@@ -346,7 +311,7 @@ export default function MyOder({ projectId }: MyOderProps) {
           {visibleCount <= 1 && (
             <Box
               className={styles.loadMoreButtonCustom}
-              onClick={() => setVisibleCount(orders.length)}
+              onClick={() => setVisibleCount(orders.filter(o => o.status !== 'approved').length)}
             >
               <Text className={styles.loadMoreText} style={{ marginBottom: -2 }}>Xem thêm</Text>
               <IconChevronDown size={18} stroke={1.5} color="#495057" />
@@ -355,18 +320,95 @@ export default function MyOder({ projectId }: MyOderProps) {
         </Flex>
       )}
 
-        <Flex className={styles.header}>
-          <Text className={styles.title}>
-            Quản lí đơn hàng 
-          </Text>
-          <Badge
-            className={styles.headerBadge}
-            variant="filled"
-            radius="lg"
-          >
-            {`Có ${orders.length < 10 ? '0' + orders.length : orders.length} đơn hàng chờ phê duyệt`}
-          </Badge>
+      {/* 5. New Order Management Section - Only Approved Orders */}
+      <Box className={styles.newOrdersSection}>
+        <Flex justify="space-between" align="center" mb="lg">
+          <Flex align="center" gap="md">
+            <Text className={styles.title}>Quản lý đơn hàng</Text>
+            <Badge
+              className={styles.headerBadge}
+              variant="filled"
+              radius="lg"
+            >
+              {`Có ${orders.filter(o => o.status === 'approved').length < 10 ? '0' + orders.filter(o => o.status === 'approved').length : orders.filter(o => o.status === 'approved').length} đơn đã phê duyệt`}
+            </Badge>
+          </Flex>
+          <Button variant="outline" className={styles.editButton} radius="xl">
+            Chỉnh sửa
+          </Button>
         </Flex>
+
+        <Box className={styles.orderGrid}>
+          {orders.filter(o => o.status === 'approved').map((order, index) => (
+            <Box key={order.id || index} className={styles.newOrderCard}>
+              {/* Notification Dot */}
+              {/* {index === 0 && (
+                <Box className={styles.notificationDot}>
+                  <Box className={styles.dot} />
+                </Box>
+              )} */}
+
+              {/* Left Column: Image */}
+              <PropertyImageComponent 
+                projectId={projectId as string} 
+                unitCode={order.unit_code || ""} 
+                className={styles.newOrderImage} 
+              />
+
+              {/* Right Column: Content */}
+              <Box className={styles.newOrderContent}>
+                <Box>
+                  <Text className={styles.newOrderTitle}>{order.unit_code || "SH4.3"}</Text>
+                  {/* <Text className={styles.newOrderSubtitle}>Dự án khu dân cư Phước Thọ</Text> */}
+                </Box>
+                
+                <Badge
+                  className={`${styles.newOrderStatusBadge} ${order.status === 'approved' ? styles.badgeApproved : styles.badgePending}`}
+                  variant="light"
+                  radius="xl"
+                >
+                   {order.status === 'approved' ? 'Đơn đã duyệt' : 'Chờ thanh toán'}
+                </Badge>
+
+                {/* Content Body */}
+                {/* <Box mt={10}>
+                  <Text className={styles.newOrderPrice}>
+                    {order.total_price_at_sale_vi ? order.total_price_at_sale_vi.toLocaleString() : "8.900.000.000"}
+                  </Text>
+                  <Text className={styles.newOrderDesc}>Shophouse, Đa Lộc</Text>
+                </Box> */}
+
+                {/* Folder Icon Shadow Box */}
+                {/* <Box className={styles.folderIconGhost}>
+                  <IconFolder size={55} stroke={1.5} />
+                </Box> */}
+
+                {/* Footer Section */}
+                <Box className={styles.newOrderFooter}>
+                  <Box className={styles.footerGroup}>
+                    <Text className={styles.footerLabel}>Mã đơn hàng:</Text>
+                    <Box className={styles.footerCode}>
+                      {order.contract_code || "#845790"}
+                    </Box>
+                  </Box>
+                  <Text className={styles.footerDate}>
+                    {order.requested_at ? new Date(order.requested_at).toLocaleString('vi-VN', { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true 
+                    }) : "02/01/2026, 9:30 AM"}
+                  </Text>
+                </Box>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
     </Box>
+
   );
 }
