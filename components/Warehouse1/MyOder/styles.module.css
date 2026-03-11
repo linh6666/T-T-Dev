@@ -341,3 +341,25 @@
     pointer-events: none;
     user-select: none;
 }
+
+.rejectedMessage {
+    background-color: #fff0f0;
+    color: #ff5b5b;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    width: 100%;
+}
+
+.approvedMessage {
+    background-color: #f6ffed;
+    color: #52c41a;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    width: 100%;
+}

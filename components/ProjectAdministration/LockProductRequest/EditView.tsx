@@ -93,7 +93,7 @@ const EditView = ({ id }: EditViewProps) => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const handleStatusUpdate = async (request_id: string, status: "granted" | "rejected", message: string = "") => {
+  const handleStatusUpdate = async (request_id: string, status: "approved" | "rejected", message: string = "") => {
     try {
       setLoading(true);
       const res = await updateRequest(request_id, id, { 
@@ -104,7 +104,7 @@ const EditView = ({ id }: EditViewProps) => {
         response_message_en: message
       });
       
-      NotificationExtension.Success(res?.message || `Đã ${status === "granted" ? "duyệt" : "từ chối"} yêu cầu thành công.`);
+      NotificationExtension.Success(res?.message || `Đã ${status === "approved" ? "duyệt" : "từ chối"} yêu cầu thành công.`);
       fetchOrders(); // Refresh table
     } catch (error: unknown) {
       console.error("Lỗi khi cập nhật trạng thái:", error);
@@ -166,8 +166,9 @@ const EditView = ({ id }: EditViewProps) => {
       render: (status: string) => {
         const statusConfig: Record<string, { label: string; color: string }> = {
           pending: { label: "Chờ duyệt", color: "yellow" },
-          granted: { label: "Đã duyệt", color: "green" },
+          approved: { label: "Đã duyệt", color: "green" },
           rejected: { label: "Từ chối", color: "red" },
+          expired: { label: "Đã hết hạn", color: "gray" },
         };
         const config = statusConfig[status] || { label: status || "N/A", color: "gray" };
         return <Badge color={config.color} variant="filled">{config.label}</Badge>;
@@ -186,7 +187,7 @@ const EditView = ({ id }: EditViewProps) => {
                 <ActionIcon 
                   color="green" 
                   variant="light" 
-                  onClick={() => handleStatusUpdate(record.id, "granted")}
+                  onClick={() => handleStatusUpdate(record.id, "approved")}
                 >
                   <IconCheck size={18} />
                 </ActionIcon>

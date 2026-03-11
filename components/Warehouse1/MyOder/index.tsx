@@ -13,14 +13,14 @@ import {
 } from "@mantine/core";
 import {
   IconSearch,
-  IconFolder,
   IconChevronDown,
   IconChevronUp,
 } from "@tabler/icons-react";
 import styles from "./styles.module.css";
-import { getListOrder } from "../../../api/apiGetlistOrder";
+import { getListOrder } from "../../../api/apiGetlistRequest";
 import { Getlisthome } from "../../../api/apiGetListHome";
-import { updateOrderPayment } from "../../../api/apiUpdateOrderPayment";
+import { updateRequest } from "../../../api/apiLockRequest";
+import { getCurrentUser } from "../../../api/apiProfile";
 
 interface MyOderProps {
   projectId?: string;
@@ -28,14 +28,14 @@ interface MyOderProps {
 
 export interface OrderItem {
   id?: string;
-  seller_name?: string;
-  seller_email?: string;
-  seller_phone?: string;
+  requester_name?: string
+  requester_email?: string;
+  requester_phone?: string;
   unit_code?: string;
-  order_status?: string;
+  status?: string;
   total_price_at_sale_vi?: number;
   contract_code?: string;
-  order_date?: string;
+  requested_at?: string;
   contract_url?: string;
   customer_name?: string;
   customer_email?: string;
@@ -43,16 +43,11 @@ export interface OrderItem {
   id_cccd?: string;
 }
 
-const getOrderStatusText = (status?: string) => {
-  switch (status) {
-    case 'pending': return 'Đang chờ manager khóa căn hộ';
-    case 'pending_deposit': return 'Đang chờ đơn thanh toán';
-    case 'paying': return 'Đang thanh toán';
-    case 'completed': return 'Đã thanh toán hoàn tất';
-    case 'cancelled': return 'Đã hủy đơn hàng';
-    case 'expired': return 'Đơn thanh toán chưa được tạo hoặc hết hạn';
-    default: return status || 'Chờ khóa căn hộ';
-  }
+const statusConfig: Record<string, { label: string; color: string }> = {
+  pending: { label: "Chờ khóa căn hộ ", color: "yellow" },
+  approved: { label: "Đã duyệt", color: "green" },
+  rejected: { label: "Đơn đã hủy", color: "red" },
+  expired: { label: "Đã hết hạn", color: "gray" },
 };
 
 const PropertyImageComponent = ({ projectId, unitCode }: { projectId: string; unitCode: string }) => {
@@ -87,6 +82,19 @@ const PropertyImageComponent = ({ projectId, unitCode }: { projectId: string; un
 export default function MyOder({ projectId }: MyOderProps) {
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(1);
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Lỗi lấy thông tin user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -135,18 +143,28 @@ export default function MyOder({ projectId }: MyOderProps) {
       {/* 3. Main Content Row */}
       <Box className={`${styles.ordersListWrapper} ${visibleCount > 1 ? styles.expanded : ''}`}>
         {orders.map((order, index) => {
-          const handleUpdatePayment = async (status: "granted" | "rejected") => {
+          const handleUpdatePayment = async (status: "approved" | "rejected") => {
             if (!order.id || !projectId) return;
             try {
-              await updateOrderPayment(order.id, projectId, { status });
+              await updateRequest(order.id, projectId, {
+                status,
+                approver_id: currentUser?.id,
+                approver_at: new Date().toISOString(),
+                response_message_vi: "", // Có thể bổ sung input nếu cần
+                response_message_en: ""
+              });
               // Refresh orders list
               const response = await getListOrder(projectId);
               if (response && response.items) {
                 setOrders(response.items);
               }
             } catch (error) {
-              console.error(`Lỗi cập nhật đơn hàng (${status}):`, error);
-              alert(`Có lỗi xảy ra khi ${status === "granted" ? "duyệt" : "từ chối"} đơn hàng.`);
+              console.error(`Lỗi cập nhật yêu cầu (${status}):`, error);
+              alert(
+                `Có lỗi xảy ra khi ${
+                  status === "approved" ? "duyệt" : "từ chối"
+                } yêu cầu.`
+              );
             }
           };
 
@@ -172,14 +190,14 @@ export default function MyOder({ projectId }: MyOderProps) {
                 {/* Bottom Content: Name and Info */}
                 <Stack gap={0} mt="auto" mb={4}>
                   <Text className={styles.salesName}>
-                    {order.seller_name || "Nguyễn Văn A"}
+                    {order.requester_name || "Nguyễn Văn A"}
                   </Text>
                   <Text className={styles.salesInfo}>
-                    {order.seller_email || "nguyenvana@gmail.com"}
+                    {order.requester_email|| "nguyenvana@gmail.com"}
                   </Text>
-                  <Text className={styles.salesInfo}>
-                    {order.seller_phone || "0987654321"}
-                  </Text>
+                  {/* <Text className={styles.salesInfo}>
+                    {order.requester_phone || "0987654321"}
+                  </Text> */}
                 </Stack>
               </Box>
 
@@ -199,16 +217,18 @@ export default function MyOder({ projectId }: MyOderProps) {
                       <Badge
                         className={styles.propertyBadge}
                         radius="xl"
+                        color={statusConfig[order.status || ""]?.color || "gray"}
+                        variant="light"
                       >
-                        {getOrderStatusText(order.order_status)}
+                        {statusConfig[order.status || ""]?.label || order.status || "Chờ khóa căn hộ"}
                       </Badge>
                     </Flex>
 
-                    <Box mt="sm">
+                    {/* <Box mt="sm">
                       <Text className={styles.price}>
                         {order.total_price_at_sale_vi ? order.total_price_at_sale_vi.toLocaleString() : "10.500.000.000"}
                       </Text>
-                    </Box>
+                    </Box> */}
                   </Box>
 
                   {/* Bottom Row inside middle card */}
@@ -224,13 +244,13 @@ export default function MyOder({ projectId }: MyOderProps) {
                       </Box>
                     </Group>
                     <Text className={styles.orderDate}>
-                      {order.order_date ? new Date(order.order_date).toLocaleString('vi-VN') : "19/01/2026, 11:00 PM"}
+                      {order.requested_at ? new Date(order.requested_at).toLocaleString('vi-VN') : "19/01/2026, 11:00 PM"}
                     </Text>
                   </Flex>
                 </Stack>
 
                 {/* Folder Icon Shadow Overlay Rendering */}
-                <Box 
+                {/* <Box 
                   component="a" 
                   href={order.contract_url || "#"} 
                   target="_blank"
@@ -239,7 +259,7 @@ export default function MyOder({ projectId }: MyOderProps) {
                   style={{ cursor: 'pointer' }}
                 >
                   <IconFolder size={100} stroke={1} color="#474645c9" className={styles.folderIcon} />
-                </Box>
+                </Box> */}
               </Box>
 
               {/* Column 3: Customer Info & Buttons Container */}
@@ -259,40 +279,50 @@ export default function MyOder({ projectId }: MyOderProps) {
                       <Text className={styles.infoLabel}>Email khách hàng:</Text>
                       <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.customer_email || "nguyenthib@gmail.com"}</Text>
                     </Flex>
-                    <Flex>
+                    {/* <Flex>
                       <Text className={styles.infoLabel}>SĐT liên hệ:</Text>
                       <Text className={styles.infoValue}>{order.customer_phone || "0987654321"}</Text>
                     </Flex>
                     <Flex>
                       <Text className={styles.infoLabel}>Số CCCD/CMND:</Text>
                       <Text className={styles.infoValue}>{order.id_cccd || "112233445566"}</Text>
-                    </Flex>
+                    </Flex> */}
                   </Stack>
                 </Box>
 
-                {/* Buttons Row */}
-                <Flex gap="sm">
-                  <Button
-                    className={styles.buttonRefuse}
-                    radius="md"
-                    size="md"
-                    variant="filled"
-                    flex={1}
-                    onClick={() => handleUpdatePayment("rejected")}
-                  >
-                    Từ chối xét duyệt
-                  </Button>
-                  <Button
-                    className={styles.buttonApprove}
-                    radius="md"
-                    size="md"
-                    variant="filled"
-                    flex={1}
-                    onClick={() => handleUpdatePayment("granted")}
-                  >
-                    Duyệt đơn hàng
-                  </Button>
-                </Flex>
+                {/* Buttons Row or Status Message */}
+                {order.status === "rejected" ? (
+                  <Box className={styles.rejectedMessage}>
+                    Đơn hàng đã bị từ chối
+                  </Box>
+                ) : order.status === "approved" ? (
+                  <Box className={styles.approvedMessage}>
+                    Đơn hàng đã được duyệt
+                  </Box>
+                ) : (
+                  <Flex gap="sm">
+                    <Button
+                      className={styles.buttonRefuse}
+                      radius="md"
+                      size="md"
+                      variant="filled"
+                      flex={1}
+                      onClick={() => handleUpdatePayment("rejected")}
+                    >
+                      Từ chối xét duyệt
+                    </Button>
+                    <Button
+                      className={styles.buttonApprove}
+                      radius="md"
+                      size="md"
+                      variant="filled"
+                      flex={1}
+                      onClick={() => handleUpdatePayment("approved")}
+                    >
+                      Duyệt đơn hàng
+                    </Button>
+                  </Flex>
+                )}
               </Stack>
 
             </Flex>

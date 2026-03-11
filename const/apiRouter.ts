@@ -155,6 +155,8 @@ DELETE_CONTROL:"/api/v1/control/release_control/{project_id}",
 
 ///lockrequest
 LOCK_REQUEST:"/api/v1/request_lock/{request_id}",
+GET_LOCK_REQUEST:"/api/v1/request_lock/{project_id}",
+
 
 ///Customer
 GET_LIST_CUSTOMER:"/api/v1/users/customer/",

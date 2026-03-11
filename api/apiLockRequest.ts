@@ -2,7 +2,7 @@ import { api } from "../libray/axios";
 import { API_ROUTE } from "../const/apiRouter"; // object chứa hằng số
 
 export interface UpdateRequestPayload {
-  status: "pending" | "granted" | "rejected";
+  status: "pending" | "approved" | "rejected" | "expired";
   approver_id?: string;
   approver_at?: string;
   response_message_vi?: string;
