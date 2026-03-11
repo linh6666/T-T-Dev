@@ -281,3 +281,39 @@
     font-size: 14px !important;
     font-weight: 500 !important;
 }
+
+.loadMoreButtonCustom {
+    background-color: white;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 28px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.loadMoreButtonCustom:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    background-color: #fdfdfd;
+}
+
+.loadMoreText {
+    font-size: 13px;
+    font-weight: 500;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.previewItem {
+    max-height: 110px;
+    overflow: hidden;
+    opacity: 0.6;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+    user-select: none;
+}

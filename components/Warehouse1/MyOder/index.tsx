@@ -14,6 +14,8 @@ import {
 import {
   IconSearch,
   IconFolder,
+  IconChevronDown,
+  IconChevronUp,
 } from "@tabler/icons-react";
 import styles from "./styles.module.css";
 import { getListOrder } from "../../../api/apiGetlistOrder";
@@ -83,6 +85,7 @@ const PropertyImageComponent = ({ projectId, unitCode }: { projectId: string; un
 
 export default function MyOder({ projectId }: MyOderProps) {
   const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [visibleCount, setVisibleCount] = useState<number>(1);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -129,7 +132,7 @@ export default function MyOder({ projectId }: MyOderProps) {
       </Box>
 
       {/* 3. Main Content Row */}
-      {orders.map((order, index) => (
+      {orders.slice(0, visibleCount).map((order, index) => (
       <Flex key={order.id || index} className={styles.mainFlex} style={{ marginBottom: 24 }}>
         
         {/* Column 1: Sales Card */}
@@ -280,9 +283,31 @@ export default function MyOder({ projectId }: MyOderProps) {
 
       </Flex>
       ))}
+
+      {/* 4. Load More Button */}
+      {(visibleCount < orders.length || visibleCount > 1) && (
+        <Flex justify="center" gap="md" mt={-18} mb={24} style={{ position: 'relative', zIndex: 2 }}>
+          {visibleCount > 1 && (
+            <Box
+              className={styles.loadMoreButtonCustom}
+              onClick={() => setVisibleCount(1)}
+            >
+              <IconChevronUp size={18} stroke={1.5} color="#495057" />
+              <Text className={styles.loadMoreText} style={{ marginTop: -2 }}>Thu gọn</Text>
+            </Box>
+          )}
+
+          {visibleCount < orders.length && (
+            <Box
+              className={styles.loadMoreButtonCustom}
+              onClick={() => setVisibleCount(orders.length)}
+            >
+              <Text className={styles.loadMoreText} style={{ marginBottom: -2 }}>Xem thêm</Text>
+              <IconChevronDown size={18} stroke={1.5} color="#495057" />
+            </Box>
+          )}
+        </Flex>
+      )}
     </Box>
   );
 }
-
-
-
