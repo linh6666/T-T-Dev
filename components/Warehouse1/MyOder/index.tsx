@@ -20,6 +20,7 @@ import {
 import styles from "./styles.module.css";
 import { getListOrder } from "../../../api/apiGetlistOrder";
 import { Getlisthome } from "../../../api/apiGetListHome";
+import { updateOrderPayment } from "../../../api/apiUpdateOrderPayment";
 
 interface MyOderProps {
   projectId?: string;
@@ -133,151 +134,170 @@ export default function MyOder({ projectId }: MyOderProps) {
 
       {/* 3. Main Content Row */}
       <Box className={`${styles.ordersListWrapper} ${visibleCount > 1 ? styles.expanded : ''}`}>
-        {orders.map((order, index) => (
-          <Flex key={order.id || index} className={styles.mainFlex} style={{ marginBottom: 24 }}>
-            
-            {/* Column 1: Sales Card */}
-            <Box className={styles.salesCard}>
-              {/* Top Row: Avatar and Sales label */}
-              <Flex justify="space-between" align="flex-start" w="100%">
-                {/* White Avatar Circle */}
-                <Box className={styles.avatarCircle}>
-                  {/* Person Icon Silhouette */}
-                  <Box className={styles.avatarHead} />
-                  <Box className={styles.avatarShoulders} />
-                </Box>
+        {orders.map((order, index) => {
+          const handleUpdatePayment = async (status: "granted" | "rejected") => {
+            if (!order.id || !projectId) return;
+            try {
+              await updateOrderPayment(order.id, projectId, { status });
+              // Refresh orders list
+              const response = await getListOrder(projectId);
+              if (response && response.items) {
+                setOrders(response.items);
+              }
+            } catch (error) {
+              console.error(`Lỗi cập nhật đơn hàng (${status}):`, error);
+              alert(`Có lỗi xảy ra khi ${status === "granted" ? "duyệt" : "từ chối"} đơn hàng.`);
+            }
+          };
 
-                <Text className={styles.salesLabel}>
-                  Sales
-                </Text>
-              </Flex>
-
-              {/* Bottom Content: Name and Info */}
-              <Stack gap={0} mt="auto" mb={4}>
-                <Text className={styles.salesName}>
-                  {order.seller_name || "Nguyễn Văn A"}
-                </Text>
-                <Text className={styles.salesInfo}>
-                  {order.seller_email || "nguyenvana@gmail.com"}
-                </Text>
-                <Text className={styles.salesInfo}>
-                  {order.seller_phone || "0987654321"}
-                </Text>
-              </Stack>
-            </Box>
-
-            {/* Column 2: Order Details Card */}
-            <Box className={styles.propertyCard}>
-              {/* Property Image Placeholder or Data */}
-              <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} />
+          return (
+            <Flex key={order.id || index} className={styles.mainFlex} style={{ marginBottom: 24 }}>
               
-              <Stack className={styles.propertyContent} gap={4}>
-                <Box>
-                  <Flex justify="space-between" align="flex-start">
-                    <Box>
-                      <Text className={styles.propertyTitle}>
-                        {order.unit_code || "SH1.7"}
-                      </Text>
-                    </Box>
-                    <Badge
-                      className={styles.propertyBadge}
-                      radius="xl"
-                    >
-                      {getOrderStatusText(order.order_status)}
-                    </Badge>
-                  </Flex>
-
-                  <Box mt="sm">
-                    <Text className={styles.price}>
-                      {order.total_price_at_sale_vi ? order.total_price_at_sale_vi.toLocaleString() : "10.500.000.000"}
-                    </Text>
+              {/* Column 1: Sales Card */}
+              <Box className={styles.salesCard}>
+                {/* Top Row: Avatar and Sales label */}
+                <Flex justify="space-between" align="flex-start" w="100%">
+                  {/* White Avatar Circle */}
+                  <Box className={styles.avatarCircle}>
+                    {/* Person Icon Silhouette */}
+                    <Box className={styles.avatarHead} />
+                    <Box className={styles.avatarShoulders} />
                   </Box>
-                </Box>
 
-                {/* Bottom Row inside middle card */}
-                <Flex justify="space-between" align="flex-end">
-                  <Group gap={8} align="center">
-                    <Text className={styles.orderLabel}>
-                      Mã đơn hàng:
-                    </Text>
-                    <Box className={styles.orderCodeBox}>
-                      <Text className={styles.orderCodeText}>
-                        {order.contract_code || "#865456"}
-                      </Text>
-                    </Box>
-                  </Group>
-                  <Text className={styles.orderDate}>
-                    {order.order_date ? new Date(order.order_date).toLocaleString('vi-VN') : "19/01/2026, 11:00 PM"}
+                  <Text className={styles.salesLabel}>
+                    Sales
                   </Text>
                 </Flex>
-              </Stack>
 
-              {/* Folder Icon Shadow Overlay Rendering */}
-              <Box 
-                component="a" 
-                href={order.contract_url || "#"} 
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.folderIconContainer}
-                style={{ cursor: 'pointer' }}
-              >
-                <IconFolder size={100} stroke={1} color="#474645c9" className={styles.folderIcon} />
-              </Box>
-            </Box>
-
-            {/* Column 3: Customer Info & Buttons Container */}
-            <Stack className={styles.customerStack}>
-              {/* Customer Info Box */}
-              <Box className={styles.customerCard}>
-                <Text className={styles.customerTitle}>
-                  Thông tin khách hàng
-                </Text>
-                
-                <Stack gap={6}>
-                  <Flex>
-                    <Text className={styles.infoLabel}>Tên khách hàng:</Text>
-                    <Text className={styles.infoValue}>{order.customer_name || "Nguyễn Thị B"}</Text>
-                  </Flex>
-                  <Flex>
-                    <Text className={styles.infoLabel}>Email khách hàng:</Text>
-                    <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.customer_email || "nguyenthib@gmail.com"}</Text>
-                  </Flex>
-                  <Flex>
-                    <Text className={styles.infoLabel}>SĐT liên hệ:</Text>
-                    <Text className={styles.infoValue}>{order.customer_phone || "0987654321"}</Text>
-                  </Flex>
-                  <Flex>
-                    <Text className={styles.infoLabel}>Số CCCD/CMND:</Text>
-                    <Text className={styles.infoValue}>{order.id_cccd || "112233445566"}</Text>
-                  </Flex>
+                {/* Bottom Content: Name and Info */}
+                <Stack gap={0} mt="auto" mb={4}>
+                  <Text className={styles.salesName}>
+                    {order.seller_name || "Nguyễn Văn A"}
+                  </Text>
+                  <Text className={styles.salesInfo}>
+                    {order.seller_email || "nguyenvana@gmail.com"}
+                  </Text>
+                  <Text className={styles.salesInfo}>
+                    {order.seller_phone || "0987654321"}
+                  </Text>
                 </Stack>
               </Box>
 
-              {/* Buttons Row */}
-              <Flex gap="sm">
-                <Button
-                  className={styles.buttonRefuse}
-                  radius="md"
-                  size="md"
-                  variant="filled"
-                  flex={1}
-                >
-                  Từ chối xét duyệt
-                </Button>
-                <Button
-                  className={styles.buttonApprove}
-                  radius="md"
-                  size="md"
-                  variant="filled"
-                  flex={1}
-                >
-                  Duyệt đơn hàng
-                </Button>
-              </Flex>
-            </Stack>
+              {/* Column 2: Order Details Card */}
+              <Box className={styles.propertyCard}>
+                {/* Property Image Placeholder or Data */}
+                <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} />
+                
+                <Stack className={styles.propertyContent} gap={4}>
+                  <Box>
+                    <Flex justify="space-between" align="flex-start">
+                      <Box>
+                        <Text className={styles.propertyTitle}>
+                          {order.unit_code || "SH1.7"}
+                        </Text>
+                      </Box>
+                      <Badge
+                        className={styles.propertyBadge}
+                        radius="xl"
+                      >
+                        {getOrderStatusText(order.order_status)}
+                      </Badge>
+                    </Flex>
 
-          </Flex>
-        ))}
+                    <Box mt="sm">
+                      <Text className={styles.price}>
+                        {order.total_price_at_sale_vi ? order.total_price_at_sale_vi.toLocaleString() : "10.500.000.000"}
+                      </Text>
+                    </Box>
+                  </Box>
+
+                  {/* Bottom Row inside middle card */}
+                  <Flex justify="space-between" align="flex-end">
+                    <Group gap={8} align="center">
+                      <Text className={styles.orderLabel}>
+                        Mã đơn hàng:
+                      </Text>
+                      <Box className={styles.orderCodeBox}>
+                        <Text className={styles.orderCodeText}>
+                          {order.contract_code || "#865456"}
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Text className={styles.orderDate}>
+                      {order.order_date ? new Date(order.order_date).toLocaleString('vi-VN') : "19/01/2026, 11:00 PM"}
+                    </Text>
+                  </Flex>
+                </Stack>
+
+                {/* Folder Icon Shadow Overlay Rendering */}
+                <Box 
+                  component="a" 
+                  href={order.contract_url || "#"} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.folderIconContainer}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <IconFolder size={100} stroke={1} color="#474645c9" className={styles.folderIcon} />
+                </Box>
+              </Box>
+
+              {/* Column 3: Customer Info & Buttons Container */}
+              <Stack className={styles.customerStack}>
+                {/* Customer Info Box */}
+                <Box className={styles.customerCard}>
+                  <Text className={styles.customerTitle}>
+                    Thông tin khách hàng
+                  </Text>
+                  
+                  <Stack gap={6}>
+                    <Flex>
+                      <Text className={styles.infoLabel}>Tên khách hàng:</Text>
+                      <Text className={styles.infoValue}>{order.customer_name || "Nguyễn Thị B"}</Text>
+                    </Flex>
+                    <Flex>
+                      <Text className={styles.infoLabel}>Email khách hàng:</Text>
+                      <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.customer_email || "nguyenthib@gmail.com"}</Text>
+                    </Flex>
+                    <Flex>
+                      <Text className={styles.infoLabel}>SĐT liên hệ:</Text>
+                      <Text className={styles.infoValue}>{order.customer_phone || "0987654321"}</Text>
+                    </Flex>
+                    <Flex>
+                      <Text className={styles.infoLabel}>Số CCCD/CMND:</Text>
+                      <Text className={styles.infoValue}>{order.id_cccd || "112233445566"}</Text>
+                    </Flex>
+                  </Stack>
+                </Box>
+
+                {/* Buttons Row */}
+                <Flex gap="sm">
+                  <Button
+                    className={styles.buttonRefuse}
+                    radius="md"
+                    size="md"
+                    variant="filled"
+                    flex={1}
+                    onClick={() => handleUpdatePayment("rejected")}
+                  >
+                    Từ chối xét duyệt
+                  </Button>
+                  <Button
+                    className={styles.buttonApprove}
+                    radius="md"
+                    size="md"
+                    variant="filled"
+                    flex={1}
+                    onClick={() => handleUpdatePayment("granted")}
+                  >
+                    Duyệt đơn hàng
+                  </Button>
+                </Flex>
+              </Stack>
+
+            </Flex>
+          );
+        })}
       </Box>
 
       {/* 4. Load More Button - Logic updated to expand the scrollable view */}
@@ -304,6 +324,19 @@ export default function MyOder({ projectId }: MyOderProps) {
           )}
         </Flex>
       )}
+
+        <Flex className={styles.header}>
+          <Text className={styles.title}>
+            Quản lí đơn hàng 
+          </Text>
+          <Badge
+            className={styles.headerBadge}
+            variant="filled"
+            radius="lg"
+          >
+            {`Có ${orders.length < 10 ? '0' + orders.length : orders.length} đơn hàng chờ phê duyệt`}
+          </Badge>
+        </Flex>
     </Box>
   );
 }
