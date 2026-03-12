@@ -308,63 +308,41 @@
     line-height: 1.2;
 }
 
+/* Section Headers Sticky logic */
+.stickyHeader {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 5;
+    padding-bottom: 15px;
+    margin-bottom: 0px !important; /* Managed by scroll wrapper padding */
+}
+
 .ordersListWrapper {
-    max-height: 350px;
-    overflow: hidden;
+    max-height: 450px;
+    overflow-y: auto;
     position: relative;
-    transition: max-height 0.5s ease;
+    padding-right: 8px;
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbar but maintain functionality */
+.ordersListWrapper,
+.orderGridWrapper {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.ordersListWrapper::-webkit-scrollbar,
+.orderGridWrapper::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 .ordersListWrapper.expanded {
-    max-height: 5000px;
-    /* Large enough to show all */
+    max-height: none;
+    overflow: visible;
 }
 
-/* Optional: add a subtle fade to the bottom item when collapsed */
-.ordersListWrapper:not(.expanded)::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 100px;
-    background: linear-gradient(to bottom, transparent, white);
-    pointer-events: none;
-}
-
-.previewItem {
-    max-height: 110px;
-    overflow: hidden;
-    opacity: 0.6;
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
-    pointer-events: none;
-    user-select: none;
-}
-
-.rejectedMessage {
-    background-color: #fff0f0;
-    color: #ff5b5b;
-    padding: 12px;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 16px;
-    width: 100%;
-}
-
-.approvedMessage {
-    background-color: #f6ffed;
-    color: #52c41a;
-    padding: 12px;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 16px;
-    width: 100%;
-}
-
-/* New Managed Orders Section */
 .newOrdersSection {
     margin-top: 40px;
     padding-bottom: 50px;
@@ -381,11 +359,16 @@
     padding-right: 20px !important;
 }
 
+.orderGridWrapper {
+    max-height: 700px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
 .orderGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
-    margin-top: 10px;
 }
 
 .newOrderCard {
@@ -528,4 +511,26 @@
     padding: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.06);
 }
-
+
+.rejectedMessage {
+    background-color: #fff0f0;
+    color: #ff5b5b;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    width: 100%;
+}
+
+.approvedMessage {
+    background-color: #f6ffed;
+    color: #52c41a;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    width: 100%;
+}
+

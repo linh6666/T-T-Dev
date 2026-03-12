@@ -15,13 +15,13 @@ import {
   IconSearch,
   IconChevronDown,
   IconChevronUp,
-  // IconFolder,
 } from "@tabler/icons-react";
 import styles from "./styles.module.css";
 import { getListOrder } from "../../../api/apiGetlistRequest";
 import { Getlisthome } from "../../../api/apiGetListHome";
 import { updateRequest } from "../../../api/apiLockRequest";
 import { getCurrentUser } from "../../../api/apiProfile";
+import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface MyOderProps {
   projectId?: string;
@@ -115,19 +115,20 @@ export default function MyOder({ projectId }: MyOderProps) {
 
   return (
     <Box className={styles.container} style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* 1. Search Bar and Header wrapper for sticky effect */}
-      <Box className={styles.stickyTop}>
-        <Box className={styles.searchBox}>
-          <TextInput
-            placeholder="Tìm kiếm..."
-            leftSection={<IconSearch size={20} stroke={1.5} color="#8c5b3f" />}
-            radius="xl"
-            classNames={{ input: styles.searchInput }}
-          />
-        </Box>
+      {/* 1. Search Bar */}
+      <Box className={styles.searchBox}>
+        <TextInput
+          placeholder="Tìm kiếm..."
+          leftSection={<IconSearch size={20} stroke={1.5} color="#8c5b3f" />}
+          radius="xl"
+          classNames={{ input: styles.searchInput }}
+        />
+      </Box>
 
-        {/* 2. Header */}
-        <Flex className={styles.header}>
+      {/* 3. Main Content Row - Pending/Rejected orders Scroll Area */}
+      <Box className={`${styles.ordersListWrapper} ${visibleCount > 1 ? styles.expanded : ''}`}>
+        {/* Sticky Header for Pending orders List */}
+        <Flex className={`${styles.header} ${styles.stickyHeader}`}>
           <Text className={styles.title}>
             Danh sách đơn hàng phê duyệt
           </Text>
@@ -136,13 +137,10 @@ export default function MyOder({ projectId }: MyOderProps) {
             variant="filled"
             radius="lg"
           >
-            {`Có ${orders.length < 10 ? '0' + orders.length : orders.length} đơn hàng chờ phê duyệt`}
+            {`Có ${orders.filter(o => o.status !== 'approved').length < 10 ? '0' + orders.filter(o => o.status !== 'approved').length : orders.filter(o => o.status !== 'approved').length} đơn hàng chờ phê duyệt`}
           </Badge>
         </Flex>
-      </Box>
 
-      {/* 3. Main Content Row - Pending/Rejected orders */}
-      <Box className={`${styles.ordersListWrapper} ${visibleCount > 1 ? styles.expanded : ''}`}>
         {orders.filter(o => o.status !== 'approved').map((order, index) => {
           const handleUpdatePayment = async (status: "approved" | "rejected") => {
             if (!order.id || !projectId) return;
@@ -151,65 +149,43 @@ export default function MyOder({ projectId }: MyOderProps) {
                 status,
                 approver_id: currentUser?.id,
                 approver_at: new Date().toISOString(),
-                response_message_vi: "", // Có thể bổ sung input nếu cần
+                response_message_vi: "", 
                 response_message_en: ""
               });
-              // Refresh orders list
+              NotificationExtension.Success(`${status === "approved" ? "Duyệt" : "Từ chối"} yêu cầu thành công`);
               const response = await getListOrder(projectId);
               if (response && response.items) {
                 setOrders(response.items);
               }
             } catch (error) {
               console.error(`Lỗi cập nhật yêu cầu (${status}):`, error);
-              alert(
-                `Có lỗi xảy ra khi ${
-                  status === "approved" ? "duyệt" : "từ chối"
-                } yêu cầu.`
-              );
+              NotificationExtension.Fails(`Có lỗi xảy ra khi ${status === "approved" ? "duyệt" : "từ chối"} yêu cầu.`);
             }
           };
 
           return (
             <Flex key={order.id || index} className={styles.mainFlex} style={{ marginBottom: 24 }}>
-              
-              {/* Column 1: Sales Card */}
               <Box className={styles.salesCard}>
-                {/* Top Row: Avatar and Sales label */}
                 <Flex justify="space-between" align="flex-start" w="100%">
-                  {/* White Avatar Circle */}
                   <Box className={styles.avatarCircle}>
-                    {/* Person Icon Silhouette */}
                     <Box className={styles.avatarHead} />
                     <Box className={styles.avatarShoulders} />
                   </Box>
-
-                  <Text className={styles.salesLabel}>
-                    Sales
-                  </Text>
+                  <Text className={styles.salesLabel}>Sales</Text>
                 </Flex>
-
-                {/* Bottom Content: Name and Info */}
                 <Stack gap={0} mt="auto" mb={4}>
-                  <Text className={styles.salesName}>
-                    {order.requester_name || "Nguyễn Văn A"}
-                  </Text>
-                  <Text className={styles.salesInfo}>
-                    {order.requester_email|| "nguyenvana@gmail.com"}
-                  </Text>
+                  <Text className={styles.salesName}>{order.requester_name || "Nguyễn Văn A"}</Text>
+                  <Text className={styles.salesInfo}>{order.requester_email|| "nguyenvana@gmail.com"}</Text>
                 </Stack>
               </Box>
 
-              {/* Column 2: Order Details Card */}
               <Box className={styles.propertyCard}>
                 <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} />
-                
                 <Stack className={styles.propertyContent} gap={4}>
                   <Box>
                     <Flex justify="space-between" align="flex-start">
                       <Box>
-                        <Text className={styles.propertyTitle}>
-                          {order.unit_code || "SH1.7"}
-                        </Text>
+                        <Text className={styles.propertyTitle}>{order.unit_code || "SH1.7"}</Text>
                       </Box>
                       <Badge
                         className={styles.propertyBadge}
@@ -221,17 +197,11 @@ export default function MyOder({ projectId }: MyOderProps) {
                       </Badge>
                     </Flex>
                   </Box>
-
-                  {/* Bottom Row inside middle card */}
                   <Flex justify="space-between" align="flex-end">
                     <Group gap={8} align="center">
-                      <Text className={styles.orderLabel}>
-                        Mã đơn hàng:
-                      </Text>
+                      <Text className={styles.orderLabel}>Mã đơn hàng:</Text>
                       <Box className={styles.orderCodeBox}>
-                        <Text className={styles.orderCodeText}>
-                          {order.contract_code || "#865456"}
-                        </Text>
+                        <Text className={styles.orderCodeText}>{order.contract_code || "#865456"}</Text>
                       </Box>
                     </Group>
                     <Text className={styles.orderDate}>
@@ -241,13 +211,9 @@ export default function MyOder({ projectId }: MyOderProps) {
                 </Stack>
               </Box>
 
-              {/* Column 3: Customer Info & Buttons Container */}
               <Stack className={styles.customerStack}>
                 <Box className={styles.customerCard}>
-                  <Text className={styles.customerTitle}>
-                    Thông tin khách hàng
-                  </Text>
-                  
+                  <Text className={styles.customerTitle}>Thông tin khách hàng</Text>
                   <Stack gap={6}>
                     <Flex>
                       <Text className={styles.infoLabel}>Tên khách hàng:</Text>
@@ -260,33 +226,12 @@ export default function MyOder({ projectId }: MyOderProps) {
                   </Stack>
                 </Box>
 
-                {/* Buttons Row or Status Message */}
                 {order.status === "rejected" ? (
-                  <Box className={styles.rejectedMessage}>
-                    Đơn hàng đã bị từ chối
-                  </Box>
+                  <Box className={styles.rejectedMessage}>Đơn hàng đã bị từ chối</Box>
                 ) : (
                   <Flex gap="sm">
-                    <Button
-                      className={styles.buttonRefuse}
-                      radius="md"
-                      size="md"
-                      variant="filled"
-                      flex={1}
-                      onClick={() => handleUpdatePayment("rejected")}
-                    >
-                      Từ chối xét duyệt
-                    </Button>
-                    <Button
-                      className={styles.buttonApprove}
-                      radius="md"
-                      size="md"
-                      variant="filled"
-                      flex={1}
-                      onClick={() => handleUpdatePayment("approved")}
-                    >
-                      Duyệt đơn hàng
-                    </Button>
+                    <Button className={styles.buttonRefuse} radius="md" size="md" variant="filled" flex={1} onClick={() => handleUpdatePayment("rejected")}>Từ chối xét duyệt</Button>
+                    <Button className={styles.buttonApprove} radius="md" size="md" variant="filled" flex={1} onClick={() => handleUpdatePayment("approved")}>Duyệt đơn hàng</Button>
                   </Flex>
                 )}
               </Stack>
@@ -298,21 +243,13 @@ export default function MyOder({ projectId }: MyOderProps) {
       {/* 4. Load More Button */}
       {orders.filter(o => o.status !== 'approved').length > 1 && (
         <Flex justify="center" gap="md" mt={-18} mb={24} style={{ position: 'relative', zIndex: 2 }}>
-          {visibleCount > 1 && (
-            <Box
-              className={styles.loadMoreButtonCustom}
-              onClick={() => setVisibleCount(1)}
-            >
+          {visibleCount > 1 ? (
+            <Box className={styles.loadMoreButtonCustom} onClick={() => setVisibleCount(1)}>
               <IconChevronUp size={18} stroke={1.5} color="#495057" />
               <Text className={styles.loadMoreText} style={{ marginTop: -2 }}>Thu gọn</Text>
             </Box>
-          )}
-
-          {visibleCount <= 1 && (
-            <Box
-              className={styles.loadMoreButtonCustom}
-              onClick={() => setVisibleCount(orders.filter(o => o.status !== 'approved').length)}
-            >
+          ) : (
+            <Box className={styles.loadMoreButtonCustom} onClick={() => setVisibleCount(orders.filter(o => o.status !== 'approved').length)}>
               <Text className={styles.loadMoreText} style={{ marginBottom: -2 }}>Xem thêm</Text>
               <IconChevronDown size={18} stroke={1.5} color="#495057" />
             </Box>
@@ -322,93 +259,54 @@ export default function MyOder({ projectId }: MyOderProps) {
 
       {/* 5. New Order Management Section - Only Approved Orders */}
       <Box className={styles.newOrdersSection}>
-        <Flex justify="space-between" align="center" mb="lg">
-          <Flex align="center" gap="md">
-            <Text className={styles.title}>Quản lý đơn hàng</Text>
-            <Badge
-              className={styles.headerBadge}
-              variant="filled"
-              radius="lg"
-            >
-              {`Có ${orders.filter(o => o.status === 'approved').length < 10 ? '0' + orders.filter(o => o.status === 'approved').length : orders.filter(o => o.status === 'approved').length} đơn đã phê duyệt`}
-            </Badge>
+        <Box className={styles.orderGridWrapper}>
+          {/* Sticky Header for Approved orders Grid */}
+          <Flex justify="space-between" align="center" className={styles.stickyHeader} style={{ paddingTop: 10 }}>
+            <Flex align="center" gap="md">
+              <Text className={styles.title}>Quản lý đơn hàng</Text>
+              <Badge
+                className={styles.headerBadge}
+                variant="filled"
+                radius="lg"
+              >
+                {`Có ${orders.filter(o => o.status === 'approved').length < 10 ? '0' + orders.filter(o => o.status === 'approved').length : orders.filter(o => o.status === 'approved').length} đơn đã phê duyệt`}
+              </Badge>
+            </Flex>
+            <Button variant="outline" className={styles.editButton} radius="xl">
+              Chỉnh sửa
+            </Button>
           </Flex>
-          <Button variant="outline" className={styles.editButton} radius="xl">
-            Chỉnh sửa
-          </Button>
-        </Flex>
 
-        <Box className={styles.orderGrid}>
-          {orders.filter(o => o.status === 'approved').map((order, index) => (
-            <Box key={order.id || index} className={styles.newOrderCard}>
-              {/* Notification Dot */}
-              {/* {index === 0 && (
-                <Box className={styles.notificationDot}>
-                  <Box className={styles.dot} />
-                </Box>
-              )} */}
-
-              {/* Left Column: Image */}
-              <PropertyImageComponent 
-                projectId={projectId as string} 
-                unitCode={order.unit_code || ""} 
-                className={styles.newOrderImage} 
-              />
-
-              {/* Right Column: Content */}
-              <Box className={styles.newOrderContent}>
-                <Box>
-                  <Text className={styles.newOrderTitle}>{order.unit_code || "SH4.3"}</Text>
-                  {/* <Text className={styles.newOrderSubtitle}>Dự án khu dân cư Phước Thọ</Text> */}
-                </Box>
-                
-                <Badge
-                  className={`${styles.newOrderStatusBadge} ${order.status === 'approved' ? styles.badgeApproved : styles.badgePending}`}
-                  variant="light"
-                  radius="xl"
-                >
-                   {order.status === 'approved' ? 'Đơn đã duyệt' : 'Chờ thanh toán'}
-                </Badge>
-
-                {/* Content Body */}
-                {/* <Box mt={10}>
-                  <Text className={styles.newOrderPrice}>
-                    {order.total_price_at_sale_vi ? order.total_price_at_sale_vi.toLocaleString() : "8.900.000.000"}
-                  </Text>
-                  <Text className={styles.newOrderDesc}>Shophouse, Đa Lộc</Text>
-                </Box> */}
-
-                {/* Folder Icon Shadow Box */}
-                {/* <Box className={styles.folderIconGhost}>
-                  <IconFolder size={55} stroke={1.5} />
-                </Box> */}
-
-                {/* Footer Section */}
-                <Box className={styles.newOrderFooter}>
-                  <Box className={styles.footerGroup}>
-                    <Text className={styles.footerLabel}>Mã đơn hàng:</Text>
-                    <Box className={styles.footerCode}>
-                      {order.contract_code || "#845790"}
-                    </Box>
+          <Box className={styles.orderGrid}>
+            {orders.filter(o => o.status === 'approved').map((order, index) => (
+              <Box key={order.id || index} className={styles.newOrderCard}>
+                <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} className={styles.newOrderImage} />
+                <Box className={styles.newOrderContent}>
+                  <Box>
+                    <Text className={styles.newOrderTitle}>{order.unit_code || "SH4.3"}</Text>
                   </Box>
-                  <Text className={styles.footerDate}>
-                    {order.requested_at ? new Date(order.requested_at).toLocaleString('vi-VN', { 
-                      day: '2-digit', 
-                      month: '2-digit', 
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true 
-                    }) : "02/01/2026, 9:30 AM"}
-                  </Text>
+                  <Badge
+                    className={`${styles.newOrderStatusBadge} ${order.status === 'approved' ? styles.badgeApproved : styles.badgePending}`}
+                    variant="light"
+                    radius="xl"
+                  >
+                     {order.status === 'approved' ? 'Đơn đã duyệt' : 'Chờ thanh toán'}
+                  </Badge>
+                  <Box className={styles.newOrderFooter}>
+                    <Box className={styles.footerGroup}>
+                      <Text className={styles.footerLabel}>Mã đơn hàng:</Text>
+                      <Box className={styles.footerCode}>{order.contract_code || "#845790"}</Box>
+                    </Box>
+                    <Text className={styles.footerDate}>
+                      {order.requested_at ? new Date(order.requested_at).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : "02/01/2026, 9:30 AM"}
+                    </Text>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
+          </Box>
         </Box>
       </Box>
-
     </Box>
-
   );
 }
