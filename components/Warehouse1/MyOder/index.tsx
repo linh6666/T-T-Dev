@@ -84,6 +84,7 @@ export default function MyOder({ projectId }: MyOderProps) {
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(1);
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -113,15 +114,42 @@ export default function MyOder({ projectId }: MyOderProps) {
     fetchOrders();
   }, [projectId]);
 
+  // Handle Search Filtering
+  const query = searchQuery.toLowerCase().trim();
+  
+  const pendingOrders = orders.filter(o => o.status !== 'approved');
+  const filteredPendingOrders = pendingOrders.filter(o => 
+    o.unit_code?.toLowerCase().includes(query) ||
+    o.customer_name?.toLowerCase().includes(query) ||
+    o.contract_code?.toLowerCase().includes(query) ||
+    o.requester_name?.toLowerCase().includes(query)
+  );
+
+  const approvedOrders = orders.filter(o => o.status === 'approved');
+  const filteredApprovedOrders = approvedOrders.filter(o => 
+    o.unit_code?.toLowerCase().includes(query) ||
+    o.customer_name?.toLowerCase().includes(query) ||
+    o.contract_code?.toLowerCase().includes(query)
+  );
+
   return (
     <Box className={styles.container} style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* 1. Search Bar */}
       <Box className={styles.searchBox}>
         <TextInput
-          placeholder="Tìm kiếm..."
+          placeholder="Tìm kiếm mã căn, khách hàng, mã đơn..."
           leftSection={<IconSearch size={20} stroke={1.5} color="#8c5b3f" />}
           radius="xl"
           classNames={{ input: styles.searchInput }}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              // Optionally trigger search if it were API-based, 
+              // but for client-side, we just ensure it doesn't do anything weird
+              console.log("Searching for:", searchQuery);
+            }
+          }}
         />
       </Box>
 
@@ -137,11 +165,11 @@ export default function MyOder({ projectId }: MyOderProps) {
             variant="filled"
             radius="lg"
           >
-            {`Có ${orders.filter(o => o.status !== 'approved').length < 10 ? '0' + orders.filter(o => o.status !== 'approved').length : orders.filter(o => o.status !== 'approved').length} đơn hàng chờ phê duyệt`}
+            {`Có ${filteredPendingOrders.length < 10 ? '0' + filteredPendingOrders.length : filteredPendingOrders.length} đơn hàng`}
           </Badge>
         </Flex>
 
-        {orders.filter(o => o.status !== 'approved').map((order, index) => {
+        {filteredPendingOrders.map((order, index) => {
           const handleUpdatePayment = async (status: "approved" | "rejected") => {
             if (!order.id || !projectId) return;
             try {
@@ -269,7 +297,7 @@ export default function MyOder({ projectId }: MyOderProps) {
                 variant="filled"
                 radius="lg"
               >
-                {`Có ${orders.filter(o => o.status === 'approved').length < 10 ? '0' + orders.filter(o => o.status === 'approved').length : orders.filter(o => o.status === 'approved').length} đơn đã phê duyệt`}
+                {`Có ${filteredApprovedOrders.length < 10 ? '0' + filteredApprovedOrders.length : filteredApprovedOrders.length} đơn đã phê duyệt`}
               </Badge>
             </Flex>
             <Button variant="outline" className={styles.editButton} radius="xl">
@@ -278,7 +306,7 @@ export default function MyOder({ projectId }: MyOderProps) {
           </Flex>
 
           <Box className={styles.orderGrid}>
-            {orders.filter(o => o.status === 'approved').map((order, index) => (
+            {filteredApprovedOrders.map((order, index) => (
               <Box key={order.id || index} className={styles.newOrderCard}>
                 <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} className={styles.newOrderImage} />
                 <Box className={styles.newOrderContent}>
