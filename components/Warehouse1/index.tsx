@@ -15,7 +15,7 @@ interface AppProps {
 }
 
 // 💡 Nhận props projectId
-export default function Managent({ projectId,target }: AppProps) {
+export default function Managent({ projectId,target, projectName }: AppProps) {
 //   const [activeTab, setActiveTab] = useState<string | null>("all"); 
   const [activeView, setActiveView] = useState<string>("warehouse"); // main view
 
@@ -24,7 +24,9 @@ export default function Managent({ projectId,target }: AppProps) {
 
   return (
     <div className={styles.containerr}>
-      {/* Header view */}
+ <h2 style={{ fontWeight: "bold", color: "#762f0b", fontSize: "25px" }}>
+  Dự án {projectName}
+</h2>
      <div className={styles.headerList}>
   {/* Tabs bên trái */}
   <Group  align="center">
