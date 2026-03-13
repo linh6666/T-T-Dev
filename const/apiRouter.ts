@@ -163,4 +163,7 @@ GET_LIST_CUSTOMER:"/api/v1/users/customer/",
 //Contract
 CREATE_CONTRACT:"/api/v1/contact/",
 
+//MAPPING
+GET_LIST_MAPPING:"/api/v1/midi/{project_id}",
+
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Menu.module.css";
 import { Button, Group, Image, Stack } from "@mantine/core";
 import { useRouter } from "next/navigation";
@@ -8,9 +8,26 @@ import Sun from "./Sun";
 import { IconArrowLeft, IconSearch } from "@tabler/icons-react";
 import FilterMenu from "./FilterMenu";
 import ProjectionModal from "./ProjectionModal";
+import { getListMapping } from "../../../api/apigetlimapping";
 
 interface MenuProps {
   project_id: string | null;
+}
+
+interface MappingItem {
+  id: string;
+  project_id: string;
+  name: string;
+  node_attribute_id: string | null;
+  button_label_vi: string;
+  button_label_en: string;
+}
+
+interface MenuItem {
+  label: string;
+  link?: string;
+  type?: "modal";
+  mappingId?: string;
 }
 
 export default function Menu({ project_id }: MenuProps) {
@@ -18,10 +35,35 @@ export default function Menu({ project_id }: MenuProps) {
 
   const [showFilter, setShowFilter] = useState(false);
   const [openedProjection, setOpenedProjection] = useState(false);
+  const [mappingButtons, setMappingButtons] = useState<MappingItem[]>([]);
+
+  // Call API lấy mapping
+  useEffect(() => {
+    const fetchMapping = async () => {
+      if (!project_id) return;
+
+      try {
+        const res = await getListMapping({
+          token: "",
+          project_id: project_id,
+        });
+
+        setMappingButtons(res.data);
+      } catch (error) {
+        console.error("Lỗi lấy mapping:", error);
+      }
+    };
+
+    fetchMapping();
+  }, [project_id]);
 
   // Menu items
-  const menuItems = [
-    { label: "PROJECTION MAPPING", type: "modal" },
+  const menuItems: MenuItem[] = [
+    ...mappingButtons.map((item) => ({
+      label: item.button_label_vi,
+      type: "modal" as const,
+      mappingId: item.id,
+    })),
 
     {
       label: "GIỚI THIỆU DỰ ÁN",
@@ -80,9 +122,9 @@ export default function Menu({ project_id }: MenuProps) {
       {/* Menu Buttons */}
       <div className={styles.Function}>
         <Stack align="center" style={{ gap: "20px", marginTop: "10px" }}>
-          {menuItems.map((item) => (
+          {menuItems.map((item, index) => (
             <Button
-              key={item.label}
+              key={index}
               className={styles.menuBtn}
               variant="outline"
               onClick={() => {
