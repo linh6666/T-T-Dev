@@ -1,25 +1,70 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Menu.module.css";
 import { Button, Group, Image, Stack } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+
 import Sun from "./Sun";
 import { IconArrowLeft, IconSearch } from "@tabler/icons-react";
 import FilterMenu from "./FilterMenu";
+import ProjectionModal from "./ProjectionModal";
+import { getListMapping } from "../../../api/apigetlimapping";
 
 interface MenuProps {
   project_id: string | null;
 }
+interface MappingItem {
+  id: string;
+  project_id: string;
+  name: string;
+  node_attribute_id: string | null;
+  button_label_vi: string;
+  button_label_en: string;
+}
+interface MenuItem {
+  label: string;
+  link?: string;
+  type?: "modal";
+  mappingId?: string;
+}
+
 
 export default function Menu({ project_id }: MenuProps) {
   const router = useRouter();
     const [showFilter, setShowFilter] = useState(false);
+      const [openedProjection, setOpenedProjection] = useState(false);
+      const [mappingButtons, setMappingButtons] = useState<MappingItem[]>([]);
+        const [selectedMappingId, setSelectedMappingId] = useState<string | null>(
+    null
+  );
   // const [active, setActive] = useState(false);
+  useEffect(() => {
+    const fetchMapping = async () => {
+      if (!project_id) return;
+
+      try {
+        const res = await getListMapping({
+          token: "",
+          project_id: project_id,
+        });
+
+        setMappingButtons(res.data);
+      } catch (error) {
+        console.error("Lỗi lấy mapping:", error);
+      }
+    };
+
+    fetchMapping();
+  }, [project_id]);
 
   // 🧠 Tạo sẵn link kèm project_id (nếu có)
-  const menuItems = [
+ const menuItems: MenuItem[] = [
+    ...mappingButtons.map((item) => ({
+      label: item.button_label_vi,
+      type: "modal" as const,
+      mappingId: item.id,
+    })),
    
       { label: "GIỚI THIỆU DỰ ÁN", link: `/Tuong-tac/Ca-mau/Gioi-thieu-du-an${project_id ? `?id=${project_id}` : ""}` },
     { label: "HỆ THỐNG PHÂN KHU", link: `/Tuong-tac/Ca-mau/Phan-khu${project_id ? `?id=${project_id}` : ""}` },
@@ -50,16 +95,23 @@ export default function Menu({ project_id }: MenuProps) {
       {/* Danh sách nút */}
       <div className={styles.Function}>
      <Stack align="center" style={{ gap: "20px", marginTop: "10px" }}>
-  {menuItems.map((item) => (
-    <Button
-      key={item.link}
-      className={styles.menuBtn}
-      onClick={() => router.push(item.link)}
-      variant="outline"
-    >
-      {item.label}
-    </Button>
-  ))}
+  {menuItems.map((item, index) => (
+            <Button
+              key={index}
+              className={styles.menuBtn}
+              variant="outline"
+              onClick={() => {
+                if (item.type === "modal") {
+                  setSelectedMappingId(item.mappingId || null);
+                  setOpenedProjection(true);
+                } else if (item.link) {
+                  router.push(item.link);
+                }
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
 </Stack>
 
       </div>
@@ -98,6 +150,12 @@ export default function Menu({ project_id }: MenuProps) {
 </Button>
         </Group>
       </div>
+         <ProjectionModal
+        opened={openedProjection}
+        onClose={() => setOpenedProjection(false)}
+          project_id={project_id}
+        mappingId={selectedMappingId}
+      />
     </div>
   );
 }
