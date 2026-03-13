@@ -165,5 +165,6 @@ CREATE_CONTRACT:"/api/v1/contact/",
 
 //MAPPING
 GET_LIST_MAPPING:"/api/v1/midi/{project_id}",
+GET_LIST_DETAIL_MAPPING:"/api/v1/midi/detail/{script_id}",
 
 }

@@ -36,6 +36,9 @@ export default function Menu({ project_id }: MenuProps) {
   const [showFilter, setShowFilter] = useState(false);
   const [openedProjection, setOpenedProjection] = useState(false);
   const [mappingButtons, setMappingButtons] = useState<MappingItem[]>([]);
+  const [selectedMappingId, setSelectedMappingId] = useState<string | null>(
+    null
+  );
 
   // Call API lấy mapping
   useEffect(() => {
@@ -129,6 +132,7 @@ export default function Menu({ project_id }: MenuProps) {
               variant="outline"
               onClick={() => {
                 if (item.type === "modal") {
+                  setSelectedMappingId(item.mappingId || null);
                   setOpenedProjection(true);
                 } else if (item.link) {
                   router.push(item.link);
@@ -192,7 +196,8 @@ export default function Menu({ project_id }: MenuProps) {
       <ProjectionModal
         opened={openedProjection}
         onClose={() => setOpenedProjection(false)}
-        project_id={project_id}
+          project_id={project_id}
+        mappingId={selectedMappingId}
       />
     </div>
   );
