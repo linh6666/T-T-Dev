@@ -315,7 +315,8 @@
     background-color: white;
     z-index: 5;
     padding-bottom: 15px;
-    margin-bottom: 0px !important; /* Managed by scroll wrapper padding */
+    margin-bottom: 0px !important;
+    /* Managed by scroll wrapper padding */
 }
 
 .ordersListWrapper {
@@ -329,13 +330,16 @@
 /* Hide scrollbar but maintain functionality */
 .ordersListWrapper,
 .orderGridWrapper {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
 }
 
 .ordersListWrapper::-webkit-scrollbar,
 .orderGridWrapper::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
+    /* Chrome, Safari, Opera */
 }
 
 .ordersListWrapper.expanded {
@@ -379,6 +383,14 @@
     gap: 24px;
     position: relative;
     border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.newOrderCard:hover {
+    background-color: #f0f0f2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .notificationDot {
@@ -509,7 +521,7 @@
     background-color: #fff;
     border-radius: 12px;
     padding: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
 }
 
 .rejectedMessage {
@@ -533,4 +545,3 @@
     font-size: 16px;
     width: 100%;
 }
-

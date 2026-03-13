@@ -16,6 +16,7 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 import styles from "./styles.module.css";
 import { getListOrder } from "../../../api/apiGetlistRequest";
 import { Getlisthome } from "../../../api/apiGetListHome";
@@ -85,6 +86,7 @@ export default function MyOder({ projectId }: MyOderProps) {
   const [visibleCount, setVisibleCount] = useState<number>(1);
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -307,7 +309,15 @@ export default function MyOder({ projectId }: MyOderProps) {
 
           <Box className={styles.orderGrid}>
             {filteredApprovedOrders.map((order, index) => (
-              <Box key={order.id || index} className={styles.newOrderCard}>
+              <Box 
+                key={order.id || index} 
+                className={styles.newOrderCard}
+                onClick={() => {
+                  if (order.id) {
+                    router.push(`/chi-tiet-don-hang/${order.id}?project_id=${projectId}`);
+                  }
+                }}
+              >
                 <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} className={styles.newOrderImage} />
                 <Box className={styles.newOrderContent}>
                   <Box>
