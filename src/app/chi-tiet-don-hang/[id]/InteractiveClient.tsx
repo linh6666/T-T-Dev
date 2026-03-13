@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import OrderDetailPage from "../../../../components/OrderDetail";
+import OrderDetailPage from "../../../../components/OrderDetail2";
 
 export default function InteractiveClient() {
   const params = useParams();
