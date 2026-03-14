@@ -4,6 +4,8 @@ import { Textarea, TextInput, Button } from "@mantine/core";
 import styles from "./Contact.module.css";
 import useAuth from "../../hook/useAuth";
 import React, { useEffect, useState } from "react";
+import { createContact } from "../../api/apiCreateContact1";
+import { NotificationExtension } from "../../extension/NotificationExtension";
 
 export default function ContactPage() {
   const { user } = useAuth();
@@ -16,7 +18,12 @@ export default function ContactPage() {
     message: "",
   });
 
-  // ⭐ Khi user load xong → fill form
+  const [errors, setErrors] = useState({
+    subject: "",
+    message: "",
+  });
+
+  // Fill user info
   useEffect(() => {
     if (user) {
       setForm((prev) => ({
@@ -29,12 +36,74 @@ export default function ContactPage() {
   }, [user]);
 
   const handleChange =
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (field: string) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = event.target.value;
+
       setForm((prev) => ({
         ...prev,
-        [field]: event.target.value,
+        [field]: value,
+      }));
+
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
       }));
     };
+
+  // Validate form
+  const validateForm = () => {
+    const newErrors = {
+      subject: "",
+      message: "",
+    };
+
+    if (!form.subject.trim()) {
+      newErrors.subject = "Vui lòng nhập chủ đề";
+    }
+
+    if (!form.message.trim()) {
+      newErrors.message = "Vui lòng nhập nội dung";
+    }
+
+    setErrors(newErrors);
+
+    return !newErrors.subject && !newErrors.message;
+  };
+
+  const handleSubmit = async () => {
+    const isValid = validateForm();
+
+    if (!isValid) return;
+
+    try {
+      const payload = {
+        topic: form.subject,
+        message: form.message,
+      };
+
+      const res = await createContact(payload);
+
+      console.log("Create contact success:", res);
+
+      // ⭐ Thông báo thành công
+      NotificationExtension.Success("Gửi liên hệ thành công!");
+
+      // reset form
+      setForm((prev) => ({
+        ...prev,
+        subject: "",
+        message: "",
+      }));
+    } catch (error) {
+      console.error("Create contact error:", error);
+
+      // ⭐ Thông báo lỗi
+      NotificationExtension.Fails("Gửi liên hệ thất bại!");
+    }
+  };
+
+  const isFormValid = form.subject.trim() && form.message.trim();
 
   return (
     <div className={styles.wrapper}>
@@ -44,52 +113,52 @@ export default function ContactPage() {
         <div className={styles.grid}>
           <TextInput
             label="Họ và tên"
-            withAsterisk
             readOnly
             value={form.full_name}
-            onChange={handleChange("full_name")}
             className={styles.input}
           />
 
           <TextInput
             label="Email"
-            withAsterisk
             readOnly
             value={form.email}
-            onChange={handleChange("email")}
             className={styles.input}
           />
 
           <TextInput
             label="Chủ đề"
-                   placeholder="Nhập chủ đề liên hệ..."
-            withAsterisk
+            placeholder="Nhập chủ đề liên hệ..."
             value={form.subject}
             onChange={handleChange("subject")}
+            error={errors.subject}
             className={styles.input}
           />
 
           <TextInput
             label="Số điện thoại"
-            withAsterisk
-            value={form.phone}
             readOnly
-            onChange={handleChange("phone")}
+            value={form.phone}
             className={styles.input}
           />
         </div>
 
         <Textarea
           label="Nội dung"
-                 placeholder="Nhập nội dung liên hệ..."
-          withAsterisk
+          placeholder="Nhập nội dung liên hệ..."
           minRows={4}
           value={form.message}
           onChange={handleChange("message")}
+          error={errors.message}
           className={styles.textarea}
         />
 
-        <Button className={styles.submitBtn}>Gửi</Button>
+        <Button
+          className={styles.submitBtn}
+          onClick={handleSubmit}
+          disabled={!isFormValid}
+        >
+          Gửi
+        </Button>
       </div>
     </div>
   );
