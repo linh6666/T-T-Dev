@@ -8,6 +8,7 @@ import { getListProject } from "../../api/apigetlistProject";
 import { GetJoinProject } from "../../api/apiGetJoinProject";
 import RequestModal from "./RequestModal";
 import { useRouter } from "next/navigation";
+import { NotificationExtension } from "../../extension/NotificationExtension";
 
 interface Project {
   id: string;
@@ -38,7 +39,16 @@ interface JoinedProject {
   status: string;
 }
 
-function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, joinedProjects: JoinedProject[], onSelect: (p: Project) => void }) {
+function ProjectCard({
+  project,
+  joinedProjects,
+  onSelect
+}: {
+  project: Project;
+  joinedProjects: JoinedProject[];
+  onSelect: (p: Project) => void;
+}) {
+
   const router = useRouter();
   const joinedProject = joinedProjects.find(item => item.project_id === project.id);
   const status = joinedProject?.status;
@@ -61,7 +71,6 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
     color: getStatusColor(item.status_name)
   })) || [];
 
-  // ✅ MẶC ĐỊNH HIỂN THỊ "Đang bán" KHI LOAD
   useEffect(() => {
     if (!project.unit_status_summary?.statuses?.length) return;
 
@@ -106,6 +115,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
 
   return (
     <Card shadow="sm" radius="md" withBorder padding="0" className={styles.card}>
+
       <Image
         src={project.overview_image || "/placeholder.png"}
         height={160}
@@ -119,6 +129,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
       <Text className={styles.projectName}>{project.name}</Text>
 
       <Group wrap="nowrap" p="md" align="flex-start" style={{ flexGrow: 1 }}>
+
         <Stack gap="xs" style={{ flex: 1 }}>
           <Text size="xs" c="dimmed">Loại dự án: {project.type || "Thông tin chưa có"}</Text>
           <Text size="xs" c="dimmed">Địa chỉ: {project.address || "Địa chỉ chưa có"}</Text>
@@ -127,6 +138,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
         </Stack>
 
         <Stack align="center" gap={0} style={{ minWidth: 100 }}>
+
           <div className={styles.chartContainer}>
             <DonutChart
               size={80}
@@ -160,7 +172,7 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
                   }
                 },
                 onMouseLeave: () => {
-                  resetToDefault(); // 🔥 quay lại "Đang bán"
+                  resetToDefault();
                 },
               } as React.ComponentPropsWithoutRef<typeof DonutChart>['pieProps']}
             />
@@ -182,16 +194,20 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
             }}
           >
             {hoveredStatus?.name ?? '\u00a0'}
-            <span style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              backgroundColor: hoveredStatus?.color ?? 'transparent',
-              display: 'inline-block',
-              flexShrink: 0,
-            }} />
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: hoveredStatus?.color ?? 'transparent',
+                display: 'inline-block',
+                flexShrink: 0,
+              }}
+            />
           </Text>
+
         </Stack>
+
       </Group>
 
       <Button
@@ -209,11 +225,13 @@ function ProjectCard({ project, joinedProjects, onSelect }: { project: Project, 
           ? "Đang chờ phê duyệt"
           : (project.rank_name ? "Đi tới dự án" : "Gửi yêu cầu")}
       </Button>
+
     </Card>
   );
 }
 
 export default function DetailInteractive() {
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [joinedProjects, setJoinedProjects] = useState<JoinedProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -222,6 +240,7 @@ export default function DetailInteractive() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   useEffect(() => {
+
     const token = localStorage.getItem("access_token") ?? "";
 
     if (!token) {
@@ -231,7 +250,9 @@ export default function DetailInteractive() {
     }
 
     async function fetchProjects() {
+
       try {
+
         const [listProjectRes, joinedProjectRes] = await Promise.all([
           getListProject({ token, skip: 0, limit: 100 }),
           GetJoinProject({ token })
@@ -239,14 +260,39 @@ export default function DetailInteractive() {
 
         setProjects(listProjectRes.data);
         setJoinedProjects(joinedProjectRes.data);
-      } catch (error) {
-        console.error("Failed to fetch:", error);
-      } finally {
+
+      } 
+    catch (error: unknown) {
+
+  console.error("Failed to fetch:", error);
+
+  let errorMessage = "Có lỗi xảy ra khi tải dữ liệu";
+
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const err = error as {
+      response?: {
+        data?: {
+          detail?: string;
+          message?: string;
+        };
+      };
+    };
+
+    errorMessage =
+      err.response?.data?.detail ||
+      err.response?.data?.message ||
+      errorMessage;
+  }
+
+  NotificationExtension.Fails(errorMessage);
+
+} finally {
         setLoading(false);
       }
     }
 
     fetchProjects();
+
   }, []);
 
   if (loading) {
@@ -259,8 +305,10 @@ export default function DetailInteractive() {
 
   return (
     <>
+
       <div className={styles.background}>
         <div className={styles.container}>
+
           <div className={styles.cardGrid}>
             {projects.map((project) => (
               <ProjectCard
@@ -274,6 +322,7 @@ export default function DetailInteractive() {
               />
             ))}
           </div>
+
         </div>
       </div>
 
@@ -294,6 +343,7 @@ export default function DetailInteractive() {
         centered
       >
         <Text>Bạn cần đăng nhập để xem danh sách dự án.</Text>
+
         <Button
           mt="md"
           fullWidth
@@ -307,6 +357,7 @@ export default function DetailInteractive() {
           Đăng nhập ngay
         </Button>
       </Modal>
+
     </>
   );
 }
