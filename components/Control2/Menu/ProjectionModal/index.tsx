@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, Text, Stack, Button, Group } from "@mantine/core";
+import { Modal, Text, Stack, Button, Group, Loader } from "@mantine/core";
 import {
   IconPlayerPlay,
   IconPlayerStop,
   IconPlayerPause,
 } from "@tabler/icons-react";
+
 import { startProjection } from "../../../../api/apimappingstart";
+import { EndProjection } from "../../../../api/apimappingEnd";
 
 interface ProjectionModalProps {
   opened: boolean;
@@ -24,40 +26,74 @@ export default function ProjectionModal({
 }: ProjectionModalProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // loading riêng cho từng API
+  const [loadingStart, setLoadingStart] = useState(false);
+  const [loadingEnd, setLoadingEnd] = useState(false);
+
+  // ================= START =================
   const handleStart = async () => {
-  // Nếu đang chạy rồi thì không gọi API nữa
-  if (isPlaying) {
-    console.log("Projection đang chạy, không call API");
-    return;
-  }
+    if (loadingStart) return;
 
-  if (!mappingId || !project_id) {
-    console.log("Thiếu project_id hoặc mappingId");
-    return;
-  }
+    if (isPlaying) {
+      console.log("Projection đang chạy");
+      return;
+    }
 
-  try {
-    const res = await startProjection({
-      project_id: project_id,
-      script_id: mappingId,
-    });
+    if (!project_id || !mappingId) {
+      console.log("Thiếu project_id hoặc mappingId");
+      return;
+    }
 
-    console.log("Start Projection Success:", res);
+    try {
+      setLoadingStart(true);
 
-    // đổi icon sang Pause
-    setIsPlaying(true);
-  } catch (error) {
-    console.error("Start Projection Error:", error);
-  }
-};
+      const res = await startProjection({
+        project_id: project_id,
+        script_id: mappingId,
+      });
 
-  const handleEnd = () => {
-    console.log("Kết thúc trình chiếu", mappingId);
+      console.log("Start Projection Success:", res);
 
-    // reset icon
-    setIsPlaying(false);
+      setIsPlaying(true);
+    } catch (error) {
+      console.error("Start Projection Error:", error);
+    } finally {
+      setLoadingStart(false);
+    }
+  };
 
-    onClose();
+  // ================= END =================
+  const handleEnd = async () => {
+    if (loadingEnd) return;
+
+    if (!isPlaying) {
+      console.log("Projection chưa chạy");
+      return;
+    }
+
+    if (!project_id || !mappingId) {
+      console.log("Thiếu project_id hoặc mappingId");
+      return;
+    }
+
+    try {
+      setLoadingEnd(true);
+
+      const res = await EndProjection({
+        project_id: project_id,
+        script_id: mappingId,
+      });
+
+      console.log("End Projection Success:", res);
+
+      setIsPlaying(false);
+
+      onClose();
+    } catch (error) {
+      console.error("End Projection Error:", error);
+    } finally {
+      setLoadingEnd(false);
+    }
   };
 
   return (
@@ -71,7 +107,7 @@ export default function ProjectionModal({
       closeOnEscape={false}
       title={
         <Text fw={700} ta="center">
-          PROJECTION MAPPING MÔ HÌNH DỰ ÁN T&T MILLENNIA CITY
+          PROJECTION MAPPING MÔ HÌNH DỰ ÁN T&T CÀ MAU
         </Text>
       }
     >
@@ -85,16 +121,20 @@ export default function ProjectionModal({
         </Text>
 
         <Group mt="md" justify="center">
+          {/* START BUTTON */}
           <Button
             radius="xl"
+            onClick={handleStart}
+            disabled={loadingStart}
             rightSection={
-              isPlaying ? (
+              loadingStart ? (
+                <Loader size={16} />
+              ) : isPlaying ? (
                 <IconPlayerPause size={18} fill="#762f0b" />
               ) : (
                 <IconPlayerPlay size={18} fill="#762f0b" />
               )
             }
-            onClick={handleStart}
             style={{
               backgroundColor: "#fffaee",
               color: "#762f0b",
@@ -104,10 +144,18 @@ export default function ProjectionModal({
             BẮT ĐẦU TRÌNH CHIẾU
           </Button>
 
+          {/* STOP BUTTON */}
           <Button
             radius="xl"
-            rightSection={<IconPlayerStop size={18} fill="#762f0b" />}
             onClick={handleEnd}
+            disabled={loadingEnd}
+            rightSection={
+              loadingEnd ? (
+                <Loader size={16} />
+              ) : (
+                <IconPlayerStop size={18} fill="#762f0b" />
+              )
+            }
             style={{
               backgroundColor: "#fffaee",
               color: "#762f0b",
