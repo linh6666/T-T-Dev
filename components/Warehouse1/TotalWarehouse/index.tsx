@@ -1032,15 +1032,13 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
     ? "Không có"
     : item.bedroom}
 </Text>
-<Text style={{ fontSize: "15px" }}>
-  Phòng tắm: {
-    typeof item.bathroom === "string" &&
-    item.bathroom.trim().toLowerCase() === "skip"
-      ? "Không có"
-      : item.bathroom
-  }
-</Text>
-
+{item.bathroom &&
+  (typeof item.bathroom !== "string" ||
+    item.bathroom.trim().toLowerCase() !== "skip") && (
+    <Text style={{ fontSize: "15px" }}>
+      Phòng tắm: {item.bathroom}
+    </Text>
+)}
               {/* Hướng, cửa chính, ban công */}
               {item.direction && item.direction.trim() !== "" && (
                 <Text style={{ fontSize: "15px" }}>
