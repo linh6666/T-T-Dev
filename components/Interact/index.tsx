@@ -45,18 +45,12 @@ export default function DetailInteractive() {
 
         const data = res?.data || [];
 
-        // Thông báo khi thành công
-        // NotificationExtension.Success("Lấy danh sách dự án thành công");
-
-        // Lưu thứ tự API trả về
         const initialOrder = data.map((p: Project) => p.id);
 
-        // Sắp xếp theo thứ tự API
         const sortedData = [...data].sort(
           (a, b) => initialOrder.indexOf(a.id) - initialOrder.indexOf(b.id)
         );
 
-        // Mapping dự án -> link
         const linkMap: Record<string, string> = {
           "T&T City Millennia": "/Tuong-tac/Millennia-City",
           "T&T Phước Thọ": "/Tuong-tac/Phuoc-tho",
@@ -68,38 +62,36 @@ export default function DetailInteractive() {
           const baseLink =
             linkMap[project.name] || `/Dieu-khien-${project.id}`;
 
-          const link = `${baseLink}?id=${project.id}`;
-
           return {
             ...project,
-            link,
+            link: `${baseLink}?id=${project.id}`,
           };
         });
 
         setProjects(dataWithLink);
       } catch (error: unknown) {
-  console.error("Failed to fetch projects:", error);
+        console.error("Failed to fetch projects:", error);
 
-  let errorMessage = "Không thể tải danh sách dự án";
+        let errorMessage = "Không thể tải danh sách dự án";
 
-  if (typeof error === "object" && error !== null && "response" in error) {
-    const err = error as {
-      response?: {
-        data?: {
-          detail?: string;
-          message?: string;
-        };
-      };
-    };
+        if (typeof error === "object" && error !== null && "response" in error) {
+          const err = error as {
+            response?: {
+              data?: {
+                detail?: string;
+                message?: string;
+              };
+            };
+          };
 
-    errorMessage =
-      err.response?.data?.detail ||
-      err.response?.data?.message ||
-      errorMessage;
-  }
+          errorMessage =
+            err.response?.data?.detail ||
+            err.response?.data?.message ||
+            errorMessage;
+        }
 
-  NotificationExtension.Fails(errorMessage);
-} finally {
+        NotificationExtension.Fails(errorMessage);
+      } finally {
         setLoading(false);
       }
     }
@@ -119,7 +111,12 @@ export default function DetailInteractive() {
     <>
       <div className={styles.background}>
         <div className={styles.container}>
-          <div className={styles.cardGrid}>
+          {/* ✅ SỬA Ở ĐÂY */}
+          <div
+            className={`${styles.cardGrid} ${
+              projects.length <= 3 ? styles.centerGrid : ""
+            }`}
+          >
             {projects.map((project) => (
               <Card
                 key={project.id}

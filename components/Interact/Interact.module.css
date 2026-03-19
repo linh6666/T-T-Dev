@@ -145,3 +145,7 @@
 .footersubtext {
   color: #6b7280; /* text-gray-500 */
 }
+.centerGrid {
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 300px));
+}
