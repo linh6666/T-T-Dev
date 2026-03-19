@@ -66,10 +66,7 @@ export default function ProjectionModal({
   const handleEnd = async () => {
     if (loadingEnd) return;
 
-    if (!isPlaying) {
-      console.log("Projection chưa chạy");
-      return;
-    }
+    // ❌ ĐÃ BỎ check isPlaying → luôn stop được
 
     if (!project_id || !mappingId) {
       console.log("Thiếu project_id hoặc mappingId");
@@ -125,7 +122,7 @@ export default function ProjectionModal({
           <Button
             radius="xl"
             onClick={handleStart}
-            disabled={loadingStart}
+            disabled={loadingStart || isPlaying}
             rightSection={
               loadingStart ? (
                 <Loader size={16} />
@@ -148,7 +145,7 @@ export default function ProjectionModal({
           <Button
             radius="xl"
             onClick={handleEnd}
-            disabled={loadingEnd}
+            disabled={loadingEnd} // ✅ luôn bấm được nếu không loading
             rightSection={
               loadingEnd ? (
                 <Loader size={16} />
