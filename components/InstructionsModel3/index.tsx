@@ -17,11 +17,11 @@ export default function PdfViewer() {
   return (
     <div  className={styles.pdfContainer}>
          <iframe
-      src="/huong-dan/timesquet.pdf"
+           src="https://drive.google.com/file/d/1IoiaS9TLHUhdsVQP-1BupyUEv_KtTqlw/preview"
       width="100%"
       height="700px"
       style={{ border: "none" }}
-    ></iframe>
+    />
       <Group justify="flex-end">
     <Button
         className={styles.backButton}

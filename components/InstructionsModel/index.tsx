@@ -17,11 +17,11 @@ export default function PdfViewer() {
   return (
     <div  className={styles.pdfContainer}>
          <iframe
-      src="/huong-dan/Millennia-City.pdf"
+           src="https://drive.google.com/file/d/1orx56_3MCly3qslEuCECR7mHQo9vw2Bf/preview"
       width="100%"
       height="700px"
       style={{ border: "none" }}
-    ></iframe>
+    />
       <Group justify="flex-end">
     <Button
         className={styles.backButton}

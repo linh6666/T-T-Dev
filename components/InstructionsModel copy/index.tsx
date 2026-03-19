@@ -16,12 +16,12 @@ export default function PdfViewer() {
 
   return (
     <div  className={styles.pdfContainer}>
-         <iframe
-      src="/huong-dan/phuoc tho.pdf"
+        <iframe
+           src="https://drive.google.com/file/d/1jvT-yMHUM5EKDoYi9aeURllofusfIYxM/preview"
       width="100%"
       height="700px"
       style={{ border: "none" }}
-    ></iframe>
+    />
       <Group justify="flex-end">
     <Button
         className={styles.backButton}
