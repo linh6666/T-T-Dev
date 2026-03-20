@@ -5,11 +5,29 @@ import { Modal, Text, Stack, Button, Group, Loader } from "@mantine/core";
 import {
   IconPlayerPlay,
   IconPlayerStop,
-  IconPlayerPause,
+  IconRefresh,
 } from "@tabler/icons-react";
 
 import { startProjection } from "../../../../api/apimappingstart";
 import { EndProjection } from "../../../../api/apimappingEnd";
+import { NotificationExtension } from "../../../../extension/NotificationExtension";
+
+// ✅ TYPE RESPONSE
+interface ProjectionResponse {
+  detail?: string;
+  message?: string;
+}
+
+// ✅ TYPE ERROR (hỗ trợ Axios)
+interface ApiError {
+  response?: {
+    data?: {
+      detail?: string;
+      message?: string;
+    };
+  };
+  message?: string;
+}
 
 interface ProjectionModalProps {
   opened: boolean;
@@ -25,38 +43,65 @@ export default function ProjectionModal({
   mappingId,
 }: ProjectionModalProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-
-  // loading riêng cho từng API
   const [loadingStart, setLoadingStart] = useState(false);
   const [loadingEnd, setLoadingEnd] = useState(false);
 
-  // ================= START =================
+  // ================= START / RESTART =================
   const handleStart = async () => {
     if (loadingStart) return;
 
-    if (isPlaying) {
-      console.log("Projection đang chạy");
-      return;
-    }
-
     if (!project_id || !mappingId) {
-      console.log("Thiếu project_id hoặc mappingId");
+      NotificationExtension.Fails("Thiếu project_id hoặc mappingId");
       return;
     }
 
     try {
       setLoadingStart(true);
 
-      const res = await startProjection({
-        project_id: project_id,
+      if (isPlaying) {
+        NotificationExtension.Warn("Đang chạy, thực hiện chạy lại...");
+      }
+
+      const res: ProjectionResponse = await startProjection({
+        project_id,
         script_id: mappingId,
       });
 
-      console.log("Start Projection Success:", res);
+      console.log("Start Projection:", res);
+
+      const message =
+        res?.detail || res?.message || "Bắt đầu trình chiếu thành công";
+
+      const isError =
+        message.toLowerCase().includes("failed") ||
+        message.toLowerCase().includes("error");
+
+      if (isError) {
+        NotificationExtension.Fails(message);
+        return;
+      }
+
+      NotificationExtension.Success(
+        isPlaying ? "Chạy lại trình chiếu thành công" : message
+      );
 
       setIsPlaying(true);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Start Projection Error:", error);
+
+      let message = "Lỗi khi bắt đầu trình chiếu";
+
+      const err = error as ApiError;
+
+      if (err?.response?.data?.detail) {
+        message = err.response.data.detail;
+      } else if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+
+      NotificationExtension.Fails(message);
     } finally {
       setLoadingStart(false);
     }
@@ -66,28 +111,53 @@ export default function ProjectionModal({
   const handleEnd = async () => {
     if (loadingEnd) return;
 
-    // ❌ ĐÃ BỎ check isPlaying → luôn stop được
-
     if (!project_id || !mappingId) {
-      console.log("Thiếu project_id hoặc mappingId");
+      NotificationExtension.Fails("Thiếu project_id hoặc mappingId");
       return;
     }
 
     try {
       setLoadingEnd(true);
 
-      const res = await EndProjection({
-        project_id: project_id,
+      const res: ProjectionResponse = await EndProjection({
+        project_id,
         script_id: mappingId,
       });
 
-      console.log("End Projection Success:", res);
+      console.log("End Projection:", res);
+
+      const message =
+        res?.detail || res?.message || "Kết thúc trình chiếu thành công";
+
+      const isError =
+        message.toLowerCase().includes("failed") ||
+        message.toLowerCase().includes("error");
+
+      if (isError) {
+        NotificationExtension.Fails(message);
+        return;
+      }
+
+      NotificationExtension.Success(message);
 
       setIsPlaying(false);
-
       onClose();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("End Projection Error:", error);
+
+      let message = "Lỗi khi kết thúc trình chiếu";
+
+      const err = error as ApiError;
+
+      if (err?.response?.data?.detail) {
+        message = err.response.data.detail;
+      } else if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+
+      NotificationExtension.Fails(message);
     } finally {
       setLoadingEnd(false);
     }
@@ -102,8 +172,17 @@ export default function ProjectionModal({
       withCloseButton={false}
       closeOnClickOutside={false}
       closeOnEscape={false}
+      styles={{
+    header: {
+      justifyContent: "center", // ⭐ căn giữa title thật sự
+    },
+    title: {
+      width: "100%",
+      textAlign: "center",
+    },
+  }}
       title={
-        <Text fw={700} ta="center">
+        <Text fw={700} >
           PROJECTION MAPPING MÔ HÌNH DỰ ÁN T&T MILLENNIA CITY
         </Text>
       }
@@ -118,16 +197,16 @@ export default function ProjectionModal({
         </Text>
 
         <Group mt="md" justify="center">
-          {/* START BUTTON */}
+          {/* START / RESTART */}
           <Button
             radius="xl"
             onClick={handleStart}
-            disabled={loadingStart || isPlaying}
+            disabled={loadingStart}
             rightSection={
               loadingStart ? (
                 <Loader size={16} />
               ) : isPlaying ? (
-                <IconPlayerPause size={18} fill="#762f0b" />
+                <IconRefresh size={18} fill="#762f0b" />
               ) : (
                 <IconPlayerPlay size={18} fill="#762f0b" />
               )
@@ -138,14 +217,14 @@ export default function ProjectionModal({
               border: "1px solid #762f0b",
             }}
           >
-            BẮT ĐẦU TRÌNH CHIẾU
+            {isPlaying ? "CHẠY LẠI TRÌNH CHIẾU" : "BẮT ĐẦU TRÌNH CHIẾU"}
           </Button>
 
-          {/* STOP BUTTON */}
+          {/* STOP */}
           <Button
             radius="xl"
             onClick={handleEnd}
-            disabled={loadingEnd} // ✅ luôn bấm được nếu không loading
+            disabled={loadingEnd}
             rightSection={
               loadingEnd ? (
                 <Loader size={16} />
