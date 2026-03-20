@@ -25,3 +25,22 @@ body {
     text-wrap: balance;
   }
 }
+
+/* mới thêm cho tablet */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-width: 1200px;
+}
+/* chỉ áp dụng cho màn lớn */
+@media (min-width: 1400px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-width: 1200px;
+  }
+}

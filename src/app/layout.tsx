@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { MantineProvider } from "@mantine/core";
@@ -17,20 +17,21 @@ import { Nunito_Sans } from "next/font/google";
 
 const nunito = Nunito_Sans({
   subsets: ["latin"],
-  weight: [
-    "200",
-    "300",
-    "400",
-    "500",
-   
-  ],
+  weight: ["200", "300", "400", "500"],
   style: ["normal", "italic"],
   variable: "--font-nunito",
 });
 
+// ✅ Metadata KHÔNG chứa viewport
 export const metadata: Metadata = {
   title: "T&T Group",
   description: "Điều khiển mô hình và quản lý bất động sản",
+};
+
+// ✅ Viewport tách riêng (chuẩn Next.js mới)
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={nunito.variable}>
+    <html lang="vi" className={nunito.variable}>
       <body style={{ fontFamily: "var(--font-nunito), sans-serif" }}>
         <MantineProvider>
           <Notifications position="top-center" />
@@ -52,9 +53,17 @@ export default function RootLayout({
               }}
             >
               <Header />
-              <main style={{ flex: 1, marginTop: "70px", padding: "24px 0" }}>
+
+              <main
+                style={{
+                  flex: 1,
+                  marginTop: "70px",
+                  padding: "24px 0",
+                }}
+              >
                 <AppContainer>{children}</AppContainer>
               </main>
+
               <Footer />
             </div>
           </ModalsProvider>
