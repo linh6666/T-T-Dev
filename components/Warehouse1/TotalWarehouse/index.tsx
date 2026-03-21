@@ -1027,11 +1027,15 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
               </Text>
 
               {/* Phòng ngủ và phòng tắm */}
-         <Text style={{ fontSize: "15px" }}>
-  Phòng ngủ: {typeof item.bedroom === "string" && item.bedroom.trim().toLowerCase() === "skip"
-    ? "Không có"
-    : item.bedroom}
-</Text>
+    {item.bedroom && (
+  <Text style={{ fontSize: "15px" }}>
+    Phòng ngủ:{" "}
+    {typeof item.bedroom === "string" &&
+    item.bedroom.trim().toLowerCase() === "skip"
+      ? "Không có"
+      : item.bedroom}
+  </Text>
+)}
 {item.bathroom &&
   (typeof item.bathroom !== "string" ||
     item.bathroom.trim().toLowerCase() !== "skip") && (
