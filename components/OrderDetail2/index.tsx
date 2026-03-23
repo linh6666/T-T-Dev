@@ -18,7 +18,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Badge, Loader, Center } from "@mantine/core";
 import { getOrderPaymentByOrderId } from "../../api/apiGetlistdetailOder";
-import CreatePaymentModal from "./CreatePaymentModal";
 import { getListOrder } from "../../api/apiGetlistOrder";
 // import { api } from "../../libray/axios";
 // import axios from "axios";
@@ -87,10 +86,6 @@ export default function OrderDetailPage({
   const [orderDetail, setOrderDetail] = useState<OrderPaymentItem | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Form states for inline creation
-  const [isCreating, setIsCreating] = useState(false);
-  const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
-  const [paymentStage, setPaymentStage] = useState("");
   // const [formLoading, setFormLoading] = useState(false);
 
   const downloadContract = async (url: string) => {
@@ -247,151 +242,119 @@ export default function OrderDetailPage({
 
                 </Group>
 
-                {isCreating ? (
-                  <CreatePaymentModal
-                    projectId={projectId}
-                    orderId={orderId}
-                    initialData={{
-                      customer_name: orderInfo?.customer_name,
-                      customer_phone: orderInfo?.customer_phone,
-                      id_cccd: orderInfo?.id_cccd,
-                      customer_email: orderInfo?.customer_email,
-                      invoice_code: orderId,
-                    }}
-                    totalAmount={totalAmount}
-                    setTotalAmount={setTotalAmount}
-                    paymentStage={paymentStage}
-                    setPaymentStage={setPaymentStage}
-                    onSuccess={() => {
-                      setIsCreating(false);
-                      setTotalAmount(undefined);
-                      setPaymentStage("");
-                      fetchOrderDetails();
-                    }}
-                    onCancel={() => {
-                      setIsCreating(false);
-                      setTotalAmount(undefined);
-                      setPaymentStage("");
-                    }}
-                  />
-                ) : (
-                  <>
-                    <Card shadow="xs" radius="lg" p={0}>
-                      <Box p="xl" bg="white">
-                        
-                        <Grid gutter="xs">
-                     <Grid.Col span={9}>
-                        <Text size="xl" fw={700}>
-                          {(
-                            {
-                              pending: "Đang chờ manager khóa căn hộ",
-                              pending_deposit: "Đang chờ đơn thanh toán đầu tiên được duyệt",
-                              paying: "Đang thanh toán",
-                              completed: "Đã thanh toán hoàn tất",
-                              cancelled: "Đã hủy đơn hàng",
-                              expired: "Đơn thanh toán chưa được tạo hoặc không được duyệt - hết hạn",
-                            } as Record<string, string>
-                          )[orderInfo?.manager_status || orderInfo?.accountant_status || ""] || "N/A"}
-                        </Text>
- 
+                <Card shadow="xs" radius="lg" p={0}>
+                  <Box p="xl" bg="white">
+                    
+                    <Grid gutter="xs">
+                 <Grid.Col span={9}>
+                    <Text size="xl" fw={700}>
+                      {(
+                        {
+                          pending: "Đang chờ manager khóa căn hộ",
+                          pending_deposit: "Đang chờ đơn thanh toán đầu tiên được duyệt",
+                          paying: "Đang thanh toán",
+                          completed: "Đã thanh toán hoàn tất",
+                          cancelled: "Đã hủy đơn hàng",
+                          expired: "Đơn thanh toán chưa được tạo hoặc không được duyệt - hết hạn",
+                        } as Record<string, string>
+                      )[orderInfo?.manager_status || orderInfo?.accountant_status || ""] || "N/A"}
+                    </Text>
+
 </Grid.Col>
 
 <Grid.Col span={3}>
- 
+
 </Grid.Col> 
-                            
-                          
-                         <Grid.Col span={3}>
-  <Text size="sm" c="dimmed">
-    Thanh Toán:
-  </Text>
+                        
+                      
+                     <Grid.Col span={3}>
+<Text size="sm" c="dimmed">
+Thanh Toán:
+</Text>
 </Grid.Col>
 
 <Grid.Col span={9}>
-  <Text size="sm">
-    {orderInfo?.total_price_at_sale_vi
-      ? new Intl.NumberFormat("vi-VN").format(
-          Number(orderInfo.total_price_at_sale_vi)
-        ) + " đ"
-      : orderInfo?.order_code || "N/A"}
-  </Text>
+<Text size="sm">
+{orderInfo?.total_price_at_sale_vi
+  ? new Intl.NumberFormat("vi-VN").format(
+      Number(orderInfo.total_price_at_sale_vi)
+    ) + " đ"
+  : orderInfo?.order_code || "N/A"}
+</Text>
 </Grid.Col>
-                          <Grid.Col span={3}>
-                            <Text size="sm" c="dimmed">
-                              Mã đơn hàng:
-                            </Text>
-                          </Grid.Col>
-                          <Grid.Col span={9}>
-                            <Text size="sm">#{orderInfo?.contract_code || orderInfo?.order_code || "N/A"}</Text>
-                          </Grid.Col>
+                      <Grid.Col span={3}>
+                        <Text size="sm" c="dimmed">
+                          Mã đơn hàng:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={9}>
+                        <Text size="sm">#{orderInfo?.contract_code || orderInfo?.order_code || "N/A"}</Text>
+                      </Grid.Col>
 
-                          <Grid.Col span={3}>
-                            <Text size="sm" c="dimmed">
-                              Ngày tạo đơn:
-                            </Text>
-                          </Grid.Col>
-                          <Grid.Col span={9}>
-                            <Text size="sm">{ (orderInfo?.pay_date || orderInfo?.created_at) ? new Date((orderInfo.
+                      <Grid.Col span={3}>
+                        <Text size="sm" c="dimmed">
+                          Ngày tạo đơn:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={9}>
+                        <Text size="sm">{ (orderInfo?.pay_date || orderInfo?.created_at) ? new Date((orderInfo.
 pay_date
- || orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
-                          </Grid.Col>
+|| orderInfo.created_at) as string).toLocaleDateString("vi-VN") : "N/A"}</Text>
+                      </Grid.Col>
 
-                          <Grid.Col span={3}>
-                            <Text size="sm" c="dimmed">
-                              Người tạo đơn:
-                            </Text>
-                          </Grid.Col>
-                          <Grid.Col span={9}>
-                            <Text size="sm">{orderInfo?.seller_name || orderInfo?.seller_id || "N/A"}</Text>
-                          </Grid.Col>
-                        </Grid>
+                      <Grid.Col span={3}>
+                        <Text size="sm" c="dimmed">
+                          Người tạo đơn:
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col span={9}>
+                        <Text size="sm">{orderInfo?.seller_name || orderInfo?.seller_id || "N/A"}</Text>
+                      </Grid.Col>
+                    </Grid>
 
-                        <Group mt="xl" align="flex-start" wrap="nowrap">
-                          <Text size="sm" c="dimmed">
-                            Lời nhắn từ hệ thống:
-                          </Text>
-                          <Text size="sm">
-                            {orderInfo?.sale_note || "Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp theo theo hợp đồng."}
-                          </Text>
-                        </Group>
-                      </Box>
-                    </Card>
+                    <Group mt="xl" align="flex-start" wrap="nowrap">
+                      <Text size="sm" c="dimmed">
+                        Lời nhắn từ hệ thống:
+                      </Text>
+                      <Text size="sm">
+                        {orderInfo?.sale_note || "Đơn hàng đang thanh toán, vui lòng thanh toán kỳ hạn tiếp theo theo hợp đồng."}
+                      </Text>
+                    </Group>
+                  </Box>
+                </Card>
 
-                    <Box mt="auto" pt="xl">
-                    <Group justify="flex-end" gap="xs">
-  <Button
-    variant="filled"
-    radius="xl"
-    size="md"
-    px="xl"
-    onClick={() => router.back()}
-    style={{
-      backgroundColor: "#FFF0F0",
-      color: "#FF5757",
-      fontWeight: 600,
-    }}
-  >
-    Hủy đơn thanh toán
-  </Button>
+                <Box mt="auto" pt="xl">
+                  <Group justify="flex-end" gap="xs">
+                    <Button
+                      variant="filled"
+                      radius="xl"
+                      size="md"
+                      px="xl"
+                      onClick={() => router.back()}
+                      style={{
+                        backgroundColor: "#FFF0F0",
+                        color: "#FF5757",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Hủy đơn thanh toán
+                    </Button>
 
-  <Button
-    variant="filled"
-    radius="xl"
-    size="md"
-    px="xl"
-    onClick={() => setIsCreating(true)}
-    style={{
-      backgroundColor: "#34617A",
-      color: "#ffffff",
-      fontWeight: 600,
-    }}
-  >
-    Xác nhận
-  </Button>
-</Group>
-                    </Box>
-                  </>
-                )}
+                    <Button
+                      variant="filled"
+                      radius="xl"
+                      size="md"
+                      px="xl"
+                      style={{
+                        backgroundColor: "#34617A",
+                        color: "#ffffff",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Xác nhận
+                    </Button>
+                  </Group>
+                </Box>
 
               </Card>
             </Grid.Col>
@@ -480,19 +443,7 @@ customer_name
                         </Group>
                       ))}
 
-                      {isCreating && (paymentStage || totalAmount) && (
-                        <Group justify="space-between" style={{ opacity: 0.6 }}>
-                          <Text fw={600} size="sm">
-                            {paymentStage || "Giai đoạn..."}
-                          </Text>
-                          <Text size="sm">
-                            {new Date().toLocaleDateString("vi-VN")}
-                          </Text>
-                          <Text fw={600} size="sm">
-                            {(totalAmount || 0).toLocaleString("vi-VN")}
-                          </Text>
-                        </Group>
-                      )}
+
                     </Stack>
                     <Divider mt="sm" />
 
