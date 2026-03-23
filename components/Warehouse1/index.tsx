@@ -28,7 +28,7 @@ export default function Managent({ projectId, target, projectName }: AppProps) {
 
   return (
     <div className={styles.containerr}>
-      <h2 style={{ fontWeight: "800", color: "#762f0b", fontSize: "28px", marginBottom: "20px" }}>
+      <h2 style={{ fontWeight: "800", color: "#762f0b", fontSize: "28px", marginBottom: "10px" }}>
         Dự án {projectName}
       </h2>
 

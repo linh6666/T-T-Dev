@@ -5,11 +5,9 @@ export const getListOrder = async (
   projectId: string,
   options?: {
     token?: string;
-    offset?: number;
-    limit?: number;
   }
 ) => {
-  const url = API_ROUTE.GET_LOCK_REQUEST.replace(
+  const url = API_ROUTE.GET_LIST_ORDER.replace(
     "{project_id}",
     projectId
   );
@@ -19,10 +17,6 @@ export const getListOrder = async (
       Authorization: options?.token
         ? `Bearer ${options.token}`
         : undefined,
-    },
-    params: {
-      offset: options?.offset ?? 0,
-      limit: options?.limit ?? 100,
     },
   });
 

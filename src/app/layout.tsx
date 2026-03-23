@@ -58,7 +58,7 @@ export default function RootLayout({
                 style={{
                   flex: 1,
                   marginTop: "70px",
-                  padding: "24px 0",
+                  // padding: "24px 0",
                 }}
               >
                 <AppContainer>{children}</AppContainer>

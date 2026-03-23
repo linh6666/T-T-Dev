@@ -15,6 +15,7 @@ import {
   IconSearch,
   IconChevronDown,
   IconChevronUp,
+  IconFolder,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import styles from "./styles.module.css";
@@ -30,8 +31,9 @@ interface MyOderProps {
 
 export interface OrderItem {
   id?: string;
-  requester_name?: string
+  seller_name?: string
   requester_email?: string;
+  seller_phone?: string;
   requester_phone?: string;
   unit_code?: string;
   status?: string;
@@ -87,6 +89,16 @@ export default function MyOder({ projectId }: MyOderProps) {
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const router = useRouter();
+  
+  const viewContract = (url: string) => {
+    if (!url) {
+      console.warn("No contract URL provided");
+      return;
+    }
+    
+    const finalUrl = url.startsWith("http") ? url : `https://www.vietmodel.com.vn${url}`;
+    window.open(finalUrl, "_blank");
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -124,7 +136,7 @@ export default function MyOder({ projectId }: MyOderProps) {
     o.unit_code?.toLowerCase().includes(query) ||
     o.customer_name?.toLowerCase().includes(query) ||
     o.contract_code?.toLowerCase().includes(query) ||
-    o.requester_name?.toLowerCase().includes(query)
+    o.seller_name?.toLowerCase().includes(query)
   );
 
   const approvedOrders = orders.filter(o => o.status === 'approved');
@@ -204,8 +216,9 @@ export default function MyOder({ projectId }: MyOderProps) {
                   <Text className={styles.salesLabel}>Sales</Text>
                 </Flex>
                 <Stack gap={0} mt="auto" mb={4}>
-                  <Text className={styles.salesName}>{order.requester_name || "Nguyễn Văn A"}</Text>
+                  <Text className={styles.salesName}>{order.seller_name || "Nguyễn Văn A"}</Text>
                   <Text className={styles.salesInfo}>{order.requester_email|| "nguyenvana@gmail.com"}</Text>
+                  <Text className={styles.salesInfo}>{order.seller_phone || "0123456789"}</Text>
                 </Stack>
               </Box>
 
@@ -225,6 +238,18 @@ export default function MyOder({ projectId }: MyOderProps) {
                       >
                         {statusConfig[order.status || ""]?.label || order.status || "Chờ khóa căn hộ"}
                       </Badge>
+
+                      {order.contract_url && (
+                        <Box 
+                          className={styles.folderIconContainer}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            viewContract(order.contract_url!);
+                          }}
+                        >
+                          <IconFolder size={75} color="#8c5b3f" stroke={1.5} />
+                        </Box>
+                      )}
                     </Flex>
                   </Box>
                   <Flex justify="space-between" align="flex-end">
@@ -252,6 +277,14 @@ export default function MyOder({ projectId }: MyOderProps) {
                     <Flex>
                       <Text className={styles.infoLabel}>Email khách hàng:</Text>
                       <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.customer_email || "nguyenthib@gmail.com"}</Text>
+                    </Flex>
+                    <Flex>
+                      <Text className={styles.infoLabel}>SĐT Liên hệ:</Text>
+                      <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.customer_phone || "0123456789"}</Text>
+                    </Flex>
+                      <Flex>
+                      <Text className={styles.infoLabel}>Số CCCD/CMND:</Text>
+                      <Text className={`${styles.infoValue} ${styles.emailValue}`}>{order.id_cccd || "0123456789"}</Text>
                     </Flex>
                   </Stack>
                 </Box>
@@ -328,8 +361,20 @@ export default function MyOder({ projectId }: MyOderProps) {
                     variant="light"
                     radius="xl"
                   >
-                     {order.status === 'approved' ? 'Đơn đã duyệt' : 'Chờ thanh toán'}
+                    {order.status === 'approved' ? 'Đơn đã duyệt' : 'Chờ thanh toán'}
                   </Badge>
+
+                  {order.contract_url && (
+                    <Box 
+                      className={styles.folderIconGhost}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        viewContract(order.contract_url!);
+                      }}
+                    >
+                      <IconFolder size={30} color="#8c5b3f" stroke={1.5} />
+                    </Box>
+                  )}
                   <Box className={styles.newOrderFooter}>
                     <Box className={styles.footerGroup}>
                       <Text className={styles.footerLabel}>Mã đơn hàng:</Text>
