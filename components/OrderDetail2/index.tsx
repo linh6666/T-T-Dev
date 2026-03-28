@@ -12,6 +12,7 @@ import {
   Container,
   Button,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { IconArrowLeft, IconFolder, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +20,8 @@ import { useEffect, useState } from "react";
 import { Badge, Loader, Center } from "@mantine/core";
 import { getOrderPaymentByOrderId } from "../../api/apiGetlistdetailOder";
 import { getListOrder } from "../../api/apiGetlistOrder";
+import { updateOrderPayment } from "../../api/apiUpdateOrderPayment";
+
 // import { api } from "../../libray/axios";
 // import axios from "axios";
 
@@ -86,7 +89,7 @@ export default function OrderDetailPage({
   const [orderDetail, setOrderDetail] = useState<OrderPaymentItem | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // const [formLoading, setFormLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const downloadContract = async (url: string) => {
     if (!url) {
@@ -148,6 +151,44 @@ export default function OrderDetailPage({
     }
   };
 
+  const handleUpdateStatus = async (status: "approved" | "rejected") => {
+    const paymentId = payments[0]?.id;
+    if (!paymentId) {
+      notifications.show({
+        title: "Lỗi",
+        message: "Không tìm thấy thông tin đơn thanh toán để cập nhật",
+        color: "red",
+      });
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      await updateOrderPayment(paymentId, projectId, { 
+        status,
+        note: status === "approved" ? "Xác nhận thanh toán" : "Hủy đơn thanh toán"
+      });
+
+      notifications.show({
+        title: "Thành công",
+        message: `Cập nhật trạng thái ${status === "approved" ? "xác nhận" : "hủy"} thành công`,
+        color: "green",
+      });
+
+      // Refresh data
+      await fetchOrderDetails();
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      notifications.show({
+        title: "Lỗi",
+        message: "Có lỗi xảy ra khi cập nhật trạng thái",
+        color: "red",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   useEffect(() => {
     if (orderId) {
       fetchOrderDetails();
@@ -171,6 +212,8 @@ export default function OrderDetailPage({
     pending: { label: "Đang chờ manager khóa căn hộ", color: "yellow" },
     pending_deposit: { label: "Đang chờ đơn thanh toán đầu tiên được duyệt", color: "orange" },
     paying: { label: "Đang thanh toán", color: "blue" },
+    approved: { label: "Đã xác nhận thanh toán", color: "green" },
+    granted: { label: "Đã duyệt", color: "green" },
     completed: { label: "Đã thanh toán hoàn tất", color: "green" },
     cancelled: { label: "Đã hủy đơn hàng", color: "red" },
     expired: { label: "Đơn thanh toán chưa được tạo hoặc không được duyệt - hết hạn", color: "gray" },
@@ -202,11 +245,11 @@ export default function OrderDetailPage({
                 fontWeight: 600,
               }}
               onClick={() => {
-                // Thêm logic hủy đơn hàng ở đây nếu cần
                 if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) {
-                  console.log("Hủy đơn hàng");
+                  handleUpdateStatus("rejected");
                 }
               }}
+              loading={isUpdating}
             >
               Hủy đơn hàng
             </Button>
@@ -330,7 +373,12 @@ pay_date
                       radius="xl"
                       size="md"
                       px="xl"
-                      onClick={() => router.back()}
+                      loading={isUpdating}
+                      onClick={() => {
+                        if (confirm("Bạn có chắc chắn muốn hủy đơn thanh toán này không?")) {
+                          handleUpdateStatus("rejected");
+                        }
+                      }}
                       style={{
                         backgroundColor: "#FFF0F0",
                         color: "#FF5757",
@@ -345,6 +393,12 @@ pay_date
                       radius="xl"
                       size="md"
                       px="xl"
+                      loading={isUpdating}
+                      onClick={() => {
+                        if (confirm("Bạn có chắc chắn muốn xác nhận đơn thanh toán này không?")) {
+                          handleUpdateStatus("approved");
+                        }
+                      }}
                       style={{
                         backgroundColor: "#34617A",
                         color: "#ffffff",

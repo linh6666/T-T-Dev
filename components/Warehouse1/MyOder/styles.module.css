@@ -1,7 +1,7 @@
 .container {
     padding: var(--mantine-spacing-lg);
     background-color: white;
-    min-height: 100vh;
+    /* min-height: 100vh; */
 }
 
 .searchBox {
@@ -320,7 +320,7 @@
 }
 
 .ordersListWrapper {
-    max-height: 450px;
+    max-height: 620px;
     overflow-y: auto;
     position: relative;
     padding-right: 8px;

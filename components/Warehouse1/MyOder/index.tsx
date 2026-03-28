@@ -7,7 +7,7 @@ import {
   Badge,
   Group,
   Stack,
-  Button,
+  // Button,
   Box,
   Flex,
 } from "@mantine/core";
@@ -21,9 +21,10 @@ import { useRouter } from "next/navigation";
 import styles from "./styles.module.css";
 import { getListOrder } from "../../../api/apiGetlistRequest";
 import { Getlisthome } from "../../../api/apiGetListHome";
-import { updateRequest } from "../../../api/apiLockRequest";
+
+// import { updateRequest } from "../../../api/apiLockRequest";
 import { getCurrentUser } from "../../../api/apiProfile";
-import { NotificationExtension } from "../../../extension/NotificationExtension";
+// import { NotificationExtension } from "../../../extension/NotificationExtension";
 
 interface MyOderProps {
   projectId?: string;
@@ -86,7 +87,7 @@ const PropertyImageComponent = ({ projectId, unitCode, className }: { projectId:
 export default function MyOder({ projectId }: MyOderProps) {
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(1);
-  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const router = useRouter();
   
@@ -139,12 +140,7 @@ export default function MyOder({ projectId }: MyOderProps) {
     o.seller_name?.toLowerCase().includes(query)
   );
 
-  const approvedOrders = orders.filter(o => o.status === 'approved');
-  const filteredApprovedOrders = approvedOrders.filter(o => 
-    o.unit_code?.toLowerCase().includes(query) ||
-    o.customer_name?.toLowerCase().includes(query) ||
-    o.contract_code?.toLowerCase().includes(query)
-  );
+
 
   return (
     <Box className={styles.container} style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -184,29 +180,17 @@ export default function MyOder({ projectId }: MyOderProps) {
         </Flex>
 
         {filteredPendingOrders.map((order, index) => {
-          const handleUpdatePayment = async (status: "approved" | "rejected") => {
-            if (!order.id || !projectId) return;
-            try {
-              await updateRequest(order.id, projectId, {
-                status,
-                approver_id: currentUser?.id,
-                approver_at: new Date().toISOString(),
-                response_message_vi: "", 
-                response_message_en: ""
-              });
-              NotificationExtension.Success(`${status === "approved" ? "Duyệt" : "Từ chối"} yêu cầu thành công`);
-              const response = await getListOrder(projectId);
-              if (response && response.items) {
-                setOrders(response.items);
-              }
-            } catch (error) {
-              console.error(`Lỗi cập nhật yêu cầu (${status}):`, error);
-              NotificationExtension.Fails(`Có lỗi xảy ra khi ${status === "approved" ? "duyệt" : "từ chối"} yêu cầu.`);
-            }
-          };
-
           return (
-            <Flex key={order.id || index} className={styles.mainFlex} style={{ marginBottom: 24 }}>
+            <Flex 
+              key={order.id || index} 
+              className={styles.mainFlex} 
+              style={{ marginBottom: 24, cursor: "pointer" }}
+              onClick={() => {
+                if (order.id) {
+                  router.push(`/chi-tiet-don-hang/${order.id}?project_id=${projectId}`);
+                }
+              }}
+            >
               <Box className={styles.salesCard}>
                 <Flex justify="space-between" align="flex-start" w="100%">
                   <Box className={styles.avatarCircle}>
@@ -289,13 +273,8 @@ export default function MyOder({ projectId }: MyOderProps) {
                   </Stack>
                 </Box>
 
-                {order.status === "rejected" ? (
+                {order.status === "rejected" && (
                   <Box className={styles.rejectedMessage}>Đơn hàng đã bị từ chối</Box>
-                ) : (
-                  <Flex gap="sm">
-                    <Button className={styles.buttonRefuse} radius="md" size="md" variant="filled" flex={1} onClick={() => handleUpdatePayment("rejected")}>Từ chối xét duyệt</Button>
-                    <Button className={styles.buttonApprove} radius="md" size="md" variant="filled" flex={1} onClick={() => handleUpdatePayment("approved")}>Duyệt đơn hàng</Button>
-                  </Flex>
                 )}
               </Stack>
             </Flex>
@@ -320,76 +299,7 @@ export default function MyOder({ projectId }: MyOderProps) {
         </Flex>
       )}
 
-      {/* 5. New Order Management Section - Only Approved Orders */}
-      <Box className={styles.newOrdersSection}>
-        <Box className={styles.orderGridWrapper}>
-          {/* Sticky Header for Approved orders Grid */}
-          <Flex justify="space-between" align="center" className={styles.stickyHeader} style={{ paddingTop: 10 }}>
-            <Flex align="center" gap="md">
-              <Text className={styles.title}>Quản lý đơn hàng</Text>
-              <Badge
-                className={styles.headerBadge}
-                variant="filled"
-                radius="lg"
-              >
-                {`Có ${filteredApprovedOrders.length < 10 ? '0' + filteredApprovedOrders.length : filteredApprovedOrders.length} đơn đã phê duyệt`}
-              </Badge>
-            </Flex>
-            <Button variant="outline" className={styles.editButton} radius="xl">
-              Chỉnh sửa
-            </Button>
-          </Flex>
 
-          <Box className={styles.orderGrid}>
-            {filteredApprovedOrders.map((order, index) => (
-              <Box 
-                key={order.id || index} 
-                className={styles.newOrderCard}
-                onClick={() => {
-                  if (order.id) {
-                    router.push(`/chi-tiet-don-hang/${order.id}?project_id=${projectId}`);
-                  }
-                }}
-              >
-                <PropertyImageComponent projectId={projectId as string} unitCode={order.unit_code || ""} className={styles.newOrderImage} />
-                <Box className={styles.newOrderContent}>
-                  <Box>
-                    <Text className={styles.newOrderTitle}>{order.unit_code || "SH4.3"}</Text>
-                  </Box>
-                  <Badge
-                    className={`${styles.newOrderStatusBadge} ${order.status === 'approved' ? styles.badgeApproved : styles.badgePending}`}
-                    variant="light"
-                    radius="xl"
-                  >
-                    {order.status === 'approved' ? 'Đơn đã duyệt' : 'Chờ thanh toán'}
-                  </Badge>
-
-                  {order.contract_url && (
-                    <Box 
-                      className={styles.folderIconGhost}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        viewContract(order.contract_url!);
-                      }}
-                    >
-                      <IconFolder size={30} color="#8c5b3f" stroke={1.5} />
-                    </Box>
-                  )}
-                  <Box className={styles.newOrderFooter}>
-                    <Box className={styles.footerGroup}>
-                      <Text className={styles.footerLabel}>Mã đơn hàng:</Text>
-                      <Box className={styles.footerCode}>{order.contract_code || "#845790"}</Box>
-                    </Box>
-                    <Text className={styles.footerDate}>
-                      {order.requested_at ? new Date(order.requested_at).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : "02/01/2026, 9:30 AM"}
-                    </Text>
-                  </Box>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Box>
     </Box>
   );
 }

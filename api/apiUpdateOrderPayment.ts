@@ -2,9 +2,8 @@ import { api } from "../libray/axios";
 import { API_ROUTE } from "../const/apiRouter";
 
 export interface UpdateOrderPaymentPayload {
-    status: "pending" | "granted" | "rejected";
+    status: "pending" | "approved" | "rejected" | "expired";
     note?: string;
-
 }
 
 export const updateOrderPayment = async (

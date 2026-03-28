@@ -86,7 +86,7 @@ const EditView = ({ id }: EditViewProps) => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const handleStatusUpdate = async (payment_id: string, status: "granted" | "rejected", message: string = "") => {
+  const handleStatusUpdate = async (payment_id: string, status: "approved" | "rejected", message: string = "") => {
     try {
       setLoading(true);
       const res = await updateOrderPayment(payment_id, id, { 
@@ -94,7 +94,7 @@ const EditView = ({ id }: EditViewProps) => {
         note: message,
       });
       
-      NotificationExtension.Success(res?.message || `Đã ${status === "granted" ? "duyệt" : "từ chối"} yêu cầu thành công.`);
+      NotificationExtension.Success(res?.message || `Đã ${status === "approved" ? "duyệt" : "từ chối"} yêu cầu thành công.`);
       fetchOrders(); // Refresh table
     } catch (error: unknown) {
       console.error("Lỗi khi cập nhật trạng thái:", error);
@@ -105,15 +105,15 @@ const EditView = ({ id }: EditViewProps) => {
     }
   };
 
-  const openConfirmModal = (payment_id: string, status: "granted" | "rejected") => {
+  const openConfirmModal = (payment_id: string, status: "approved" | "rejected") => {
     let messageValue = "";
     
     modals.openConfirmModal({
-      title: <Text fw={700} size="lg">{status === "granted" ? "Duyệt yêu cầu" : "Từ chối yêu cầu"}</Text>,
+      title: <Text fw={700} size="lg">{status === "approved" ? "Duyệt yêu cầu" : "Từ chối yêu cầu"}</Text>,
       children: (
         <Stack gap="sm">
           <Text size="sm">
-            Bạn có chắc chắn muốn {status === "granted" ? "duyệt" : "từ chối"} yêu cầu này không?
+            Bạn có chắc chắn muốn {status === "approved" ? "duyệt" : "từ chối"} yêu cầu này không?
           </Text>
           <Textarea
             label="Phản hồi (không bắt buộc)"
@@ -124,7 +124,7 @@ const EditView = ({ id }: EditViewProps) => {
         </Stack>
       ),
       labels: { confirm: "Xác nhận", cancel: "Hủy bỏ" },
-      confirmProps: { color: status === "granted" ? "green" : "red" },
+      confirmProps: { color: status === "approved" ? "green" : "red" },
       onConfirm: () => handleStatusUpdate(payment_id, status, messageValue),
     });
   };
@@ -180,6 +180,7 @@ const EditView = ({ id }: EditViewProps) => {
       render: (status: string) => {
         const statusConfig: Record<string, { label: string; color: string }> = {
           pending: { label: "Chờ duyệt", color: "yellow" },
+          approved: { label: "Đã duyệt", color: "green" },
           granted: { label: "Đã duyệt", color: "green" },
           rejected: { label: "Từ chối", color: "red" },
         };
@@ -200,7 +201,7 @@ const EditView = ({ id }: EditViewProps) => {
                 <ActionIcon 
                   color="green" 
                   variant="light" 
-                  onClick={() => openConfirmModal(record.payment_id!, "granted")}
+                  onClick={() => openConfirmModal(record.payment_id!, "approved")}
                 >
                   <IconCheck size={18} />
                 </ActionIcon>
