@@ -12,15 +12,17 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+
 import { IconArrowLeft, IconFolder, IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Badge, Loader, Center } from "@mantine/core";
 import { getOrderPaymentByOrderId } from "../../api/apiGetlistdetailOder";
 import { getListOrder } from "../../api/apiGetlistOrder";
 import { updateOrderPayment } from "../../api/apiUpdateOrderPayment";
+import { NotificationExtension } from "../../extension/NotificationExtension";
+
 
 // import { api } from "../../libray/axios";
 // import axios from "axios";
@@ -129,7 +131,7 @@ export default function OrderDetailPage({
     }
   };
 
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getOrderPaymentByOrderId(orderId, projectId);
@@ -149,16 +151,12 @@ export default function OrderDetailPage({
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId, projectId]);
 
   const handleUpdateStatus = async (status: "approved" | "rejected") => {
     const paymentId = payments[0]?.id;
     if (!paymentId) {
-      notifications.show({
-        title: "Lỗi",
-        message: "Không tìm thấy thông tin đơn thanh toán để cập nhật",
-        color: "red",
-      });
+      NotificationExtension.Fails("Không tìm thấy thông tin đơn thanh toán để cập nhật");
       return;
     }
 
@@ -169,21 +167,25 @@ export default function OrderDetailPage({
         note: status === "approved" ? "Xác nhận thanh toán" : "Hủy đơn thanh toán"
       });
 
-      notifications.show({
-        title: "Thành công",
-        message: `Cập nhật trạng thái ${status === "approved" ? "xác nhận" : "hủy"} thành công`,
-        color: "green",
-      });
+      NotificationExtension.Success(
+        `Cập nhật trạng thái ${status === "approved" ? "xác nhận" : "hủy"} thành công`
+      );
 
       // Refresh data
       await fetchOrderDetails();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error updating payment status:", error);
-      notifications.show({
-        title: "Lỗi",
-        message: "Có lỗi xảy ra khi cập nhật trạng thái",
-        color: "red",
-      });
+      const err = error as { response?: { data?: { detail?: string | { msg?: string }[] } } };
+      const detail = err.response?.data?.detail;
+      let message = "Có lỗi xảy ra khi cập nhật trạng thái";
+      
+      if (typeof detail === "string") {
+        message = detail;
+      } else if (Array.isArray(detail) && detail.length > 0) {
+        message = detail[0].msg || "Dữ liệu không hợp lệ";
+      }
+
+      NotificationExtension.Fails(message);
     } finally {
       setIsUpdating(false);
     }
@@ -193,7 +195,7 @@ export default function OrderDetailPage({
     if (orderId) {
       fetchOrderDetails();
     }
-  }, [orderId, projectId]);
+  }, [orderId, fetchOrderDetails]);
 
 
   if (loading) {
