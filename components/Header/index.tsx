@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Group,  Image, Popover, Tooltip } from "@mantine/core";
+import { Group, Image, Popover, Tooltip, Burger, Drawer, Stack, Box } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { jwtDecode } from "jwt-decode";
-import {  IconHeart, IconPhoneCall, } from "@tabler/icons-react";
+import { IconHeart, IconPhoneCall } from "@tabler/icons-react";
 import LoginButton from "./ButtonLogin/index";
 import Notification from "./Notification/index";
 import FavoriteHoverContent from "./favourite";
@@ -35,6 +36,7 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSuperUser, setIsSuperUser] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
 
   useEffect(() => {
     // ✅ thử đọc cả hai tên token
@@ -144,10 +146,7 @@ const isActive = (href: string, highlight?: boolean) => {
         </div>
 
         {/* 📞 ICON + LOGIN */}
-        <div
-          className={`hidden md:flex ${styles.loginLangBlock}`}
-          style={{ display: "flex", gap: "20px" }}
-        >
+        <div className={styles.loginLangBlock}>
        <Link href="/lien-he">
   <Tooltip
     label="Liên Hệ"
@@ -229,6 +228,49 @@ const isActive = (href: string, highlight?: boolean) => {
 
           <LoginButton />
         </div>
+
+        {/* 📱 Nút Hamburger cho Mobile */}
+        <Burger
+          opened={drawerOpened}
+          onClick={toggleDrawer}
+          hiddenFrom="md"
+          size="sm"
+          color="#752E0B"
+        />
+
+        {/* 🎒 Menu Drawer cho Mobile */}
+        <Drawer
+          opened={drawerOpened}
+          onClose={closeDrawer}
+          title="DANH MỤC"
+          padding="md"
+          size="75%"
+          position="right"
+          zIndex={100}
+        >
+          <Stack gap="md" mt="xl">
+            {visibleLinks.map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                onClick={closeDrawer}
+                style={{
+                  textDecoration: "none",
+                  color: "#752E0B",
+                  fontSize: "16px",
+                  fontWeight: 500,
+                  padding: "10px 0",
+                  borderBottom: "1px solid #f2f2f2",
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+            <Box mt="lg">
+              <LoginButton />
+            </Box>
+          </Stack>
+        </Drawer>
       </div>
     </nav>
   );
