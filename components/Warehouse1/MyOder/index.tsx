@@ -10,6 +10,7 @@ import {
   // Button,
   Box,
   Flex,
+  Tabs,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -89,6 +90,7 @@ export default function MyOder({ projectId }: MyOderProps) {
   const [visibleCount, setVisibleCount] = useState<number>(1);
   const [, setCurrentUser] = useState<{ id: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string | null>("pending");
   const router = useRouter();
   
   const viewContract = (url: string) => {
@@ -129,16 +131,22 @@ export default function MyOder({ projectId }: MyOderProps) {
     fetchOrders();
   }, [projectId]);
 
-  // Handle Search Filtering
+  // Handle Filter & Search
   const query = searchQuery.toLowerCase().trim();
-  
-  const pendingOrders = orders.filter(o => o.status !== 'approved');
-  const filteredPendingOrders = pendingOrders.filter(o => 
-    o.unit_code?.toLowerCase().includes(query) ||
-    o.customer_name?.toLowerCase().includes(query) ||
-    o.contract_code?.toLowerCase().includes(query) ||
-    o.seller_name?.toLowerCase().includes(query)
-  );
+  const displayOrders = orders.filter(o => {
+    // 1. Filter by Tab
+    const matchTab = (o.status || "pending") === activeTab;
+    if (!matchTab) return false;
+
+    // 2. Filter by Search Query
+    if (!query) return true;
+    return (
+      o.unit_code?.toLowerCase().includes(query) ||
+      o.customer_name?.toLowerCase().includes(query) ||
+      o.contract_code?.toLowerCase().includes(query) ||
+      o.seller_name?.toLowerCase().includes(query)
+    );
+  });
 
 
 
@@ -163,30 +171,54 @@ export default function MyOder({ projectId }: MyOderProps) {
         />
       </Box>
 
-      {/* 3. Main Content Row - Pending/Rejected orders Scroll Area */}
+      {/* 2. Tabs for filtering */}
+      <Tabs 
+        value={activeTab} 
+        onChange={setActiveTab} 
+        variant="pills" 
+        color="#8c5b3f" 
+        // px="xl" 
+        mb="md"
+        styles={{
+          tab: {
+            // padding: '8px 20px',
+            fontSize: '13px',
+            fontWeight: 500,
+          }
+        }}
+      >
+        <Tabs.List>
+          <Tabs.Tab value="pending">Chờ duyệt</Tabs.Tab>
+          <Tabs.Tab value="approved" color="green">Đã duyệt</Tabs.Tab>
+          <Tabs.Tab value="rejected" color="red">Đã hủy</Tabs.Tab>
+          <Tabs.Tab value="expired" color="gray">Hết hạn</Tabs.Tab>
+        </Tabs.List>
+      </Tabs>
+
+      {/* 3. Main Content Row - Scroll Area */}
       <Box className={`${styles.ordersListWrapper} ${visibleCount > 1 ? styles.expanded : ''}`}>
-        {/* Sticky Header for Pending orders List */}
+        {/* Sticky Header */}
         <Flex className={`${styles.header} ${styles.stickyHeader}`}>
           <Text className={styles.title}>
-            Danh sách đơn hàng phê duyệt
+            {statusConfig[activeTab || ""]?.label || 'Danh sách đơn hàng'}
           </Text>
           <Badge
             className={styles.headerBadge}
             variant="filled"
             radius="lg"
           >
-            {`Có ${filteredPendingOrders.length < 10 ? '0' + filteredPendingOrders.length : filteredPendingOrders.length} đơn hàng`}
+            {`Có ${displayOrders.length < 10 ? '0' + displayOrders.length : displayOrders.length} đơn hàng`}
           </Badge>
         </Flex>
 
-        {filteredPendingOrders.map((order, index) => {
+        {displayOrders.map((order, index) => {
           return (
             <Flex 
               key={order.id || index} 
               className={styles.mainFlex} 
-              style={{ marginBottom: 24, cursor: "pointer" }}
+              style={{ marginBottom: 24, cursor: (order.status || "pending") === "pending" ? "pointer" : "default" }}
               onClick={() => {
-                if (order.id) {
+                if (order.id && (order.status || "pending") === "pending") {
                   router.push(`/chi-tiet-don-hang/${order.id}?project_id=${projectId}`);
                 }
               }}
@@ -226,9 +258,12 @@ export default function MyOder({ projectId }: MyOderProps) {
                       {order.contract_url && (
                         <Box 
                           className={styles.folderIconContainer}
+                          style={{ cursor: (order.status || "pending") === "pending" ? "pointer" : "default" }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            viewContract(order.contract_url!);
+                            if ((order.status || "pending") === "pending") {
+                              viewContract(order.contract_url!);
+                            }
                           }}
                         >
                           <IconFolder size={75} color="#8c5b3f" stroke={1.5} />
@@ -283,7 +318,7 @@ export default function MyOder({ projectId }: MyOderProps) {
       </Box>
 
       {/* 4. Load More Button */}
-      {orders.filter(o => o.status !== 'approved').length > 1 && (
+      {displayOrders.length > 1 && (
         <Flex justify="center" gap="md" mt={-18} mb={24} style={{ position: 'relative', zIndex: 2 }}>
           {visibleCount > 1 ? (
             <Box className={styles.loadMoreButtonCustom} onClick={() => setVisibleCount(1)}>
@@ -291,7 +326,7 @@ export default function MyOder({ projectId }: MyOderProps) {
               <Text className={styles.loadMoreText} style={{ marginTop: -2 }}>Thu gọn</Text>
             </Box>
           ) : (
-            <Box className={styles.loadMoreButtonCustom} onClick={() => setVisibleCount(orders.filter(o => o.status !== 'approved').length)}>
+            <Box className={styles.loadMoreButtonCustom} onClick={() => setVisibleCount(displayOrders.length)}>
               <Text className={styles.loadMoreText} style={{ marginBottom: -2 }}>Xem thêm</Text>
               <IconChevronDown size={18} stroke={1.5} color="#495057" />
             </Box>
