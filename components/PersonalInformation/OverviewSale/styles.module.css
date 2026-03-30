@@ -3,11 +3,23 @@
   background-color: white;
 }
 
+@media (max-width: 600px) {
+  .container {
+    padding: 12px;
+  }
+}
+
 .title {
   font-size: 24px;
   font-weight: 700;
   color: #222;
   margin-bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 20px;
+  }
 }
 
 .statsGrid {
@@ -92,6 +104,14 @@
   justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px solid #f1f1f1;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .activityItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .activityItem:last-child {
