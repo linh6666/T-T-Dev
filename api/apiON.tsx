@@ -8,7 +8,7 @@ interface CreateNodeAttributeBody {
 }
 
 // 🧩 Hàm call API POST
-export const createON = async (body: CreateNodeAttributeBody) => {
+export const createON = async (body: CreateNodeAttributeBody): Promise<unknown> => {
   try {
    const response = await api.post(API_ROUTE.CREATE_NODEATTRIBUTE, body, {
   params: {
