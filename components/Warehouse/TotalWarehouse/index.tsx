@@ -26,12 +26,17 @@ interface TotalWarehouseProps {
 
 export interface WarehouseItem {
   id: string;
+  leaf_id?: string;
   unit_code: string;
   layer6: string;
+  layer7?: string;
+  layer8?: string;
   describe: string;
   layer2: string;
   view: string;
   layer3: string;
+  layer4?: string;
+  layer5?: string;
   color: string;
   zone: string;
   status_unit: string;
@@ -141,14 +146,29 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
                 return normalize(item.zone) === normalize(target);
               }
               if (item.layer3) {
-                return normalize(item.layer3) === normalize(target);
+                if (normalize(item.layer3) === normalize(target)) return true;
+              }
+              if (item.layer4) {
+                if (normalize(item.layer4) === normalize(target)) return true;
+              }
+              if (item.layer5) {
+                if (normalize(item.layer5) === normalize(target)) return true;
+              }
+              if (item.layer6) {
+                if (normalize(item.layer6) === normalize(target)) return true;
               }
               return false;
             })
           : warehouseList;
 
-        setItems(finalList);
-        setFilteredItems(finalList);
+        // Map leaf_id sang id nếu không có id
+        const mappedList = finalList.map((item) => ({
+          ...item,
+          id: item.id || item.leaf_id || Math.random().toString(),
+        }));
+
+        setItems(mappedList);
+        setFilteredItems(mappedList);
         setCurrentPage(1);
       } catch (error) {
         console.error("Failed to fetch warehouse data:", error);
