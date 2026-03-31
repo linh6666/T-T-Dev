@@ -94,6 +94,8 @@ export default function TotalWarehouse({ projectId, target }: TotalWarehouseProp
   const [selectedFloorName, setSelectedFloorName] = useState<string[]>([]);
   const [selectedFloorGroupCode, setSelectedFloorGroupCode] = useState<string[]>([]);
   const [selectedFloorApartmentGroupCode, setSelectedFloorApartmentGroupCode] = useState<string[]>([]);
+  const [selectedLayer3, setSelectedLayer3] = useState<string[]>([]);
+  const [selectedLayer2, setSelectedLayer2] = useState<string[]>([]);
 
 
   const normalize = (value?: string) => value?.trim().toLowerCase();
@@ -200,9 +202,16 @@ useEffect(() => {
     filtered = filtered.filter((item) => item && String(item.bathroom) === activeBathroom);
   }
 
-  // Filter theo phân khu
+  // Filter theo phân khu (zone)
   if (selectedZones.length > 0) {
     filtered = filtered.filter((item) => item && selectedZones.includes(item.zone));
+  }
+
+  // Filter theo tòa (layer3) — chỉ áp dụng cho item không có zone hợp lệ
+  if (selectedLayer3.length > 0) {
+    filtered = filtered.filter(
+      (item) => item && !isValid(item.zone) && selectedLayer3.includes(item.layer3)
+    );
   }
 
   // Filter theo loại building
@@ -210,6 +219,13 @@ useEffect(() => {
     filtered = filtered.filter(
       (item) =>
         item && selectedBuildingTypes.includes(item.building_type)
+    );
+  }
+
+  // Filter theo vị trí (layer2) — chỉ áp dụng cho item không có building_type hợp lệ
+  if (selectedLayer2.length > 0) {
+    filtered = filtered.filter(
+      (item) => item && !isValid(item.building_type) && selectedLayer2.includes(item.layer2)
     );
   }
   // Filter theo hướng 
@@ -274,12 +290,13 @@ useEffect(() => {
   setCurrentPage(1);
 }, [
   items,
-  items,
   selectedStatuses,
   activeBedroom,
   activeBathroom,
   selectedZones,
+  selectedLayer3,
   selectedBuildingTypes,
+  selectedLayer2,
   selectedDirections,
   selectedMainDoorDirections,
   selectedBalconyDirections,
@@ -298,8 +315,10 @@ useEffect(() => {
   const allActiveFilters = useMemo(() => {
     const filters: { label: string; type: string; value: string }[] = [];
 
-    selectedZones.forEach((v) => filters.push({ label: v, type: "zone", value: v }));
-    selectedBuildingTypes.forEach((v) => filters.push({ label: v, type: "buildingType", value: v }));
+    selectedZones.forEach((v) => filters.push({ label: `Phân khu: ${v}`, type: "zone", value: v }));
+    selectedLayer3.forEach((v) => filters.push({ label: `Tòa: ${v}`, type: "layer3", value: v }));
+    selectedBuildingTypes.forEach((v) => filters.push({ label: `Loại CT: ${v}`, type: "buildingType", value: v }));
+    selectedLayer2.forEach((v) => filters.push({ label: `Vị trí: ${v}`, type: "layer2", value: v }));
     selectedDirections.forEach((v) => filters.push({ label: `Hướng ${v}`, type: "direction", value: v }));
     selectedMainDoorDirections.forEach((v) => filters.push({ label: `Hướng cửa ${v}`, type: "mainDoor", value: v }));
     selectedBalconyDirections.forEach((v) => filters.push({ label: `Hướng ban công ${v}`, type: "balcony", value: v }));
@@ -333,7 +352,9 @@ useEffect(() => {
     return filters;
   }, [
     selectedZones,
+    selectedLayer3,
     selectedBuildingTypes,
+    selectedLayer2,
     selectedDirections,
     selectedMainDoorDirections,
     selectedBalconyDirections,
@@ -356,8 +377,14 @@ useEffect(() => {
       case "zone":
         setSelectedZones(selectedZones.filter((v) => v !== value));
         break;
+      case "layer3":
+        setSelectedLayer3(selectedLayer3.filter((v) => v !== value));
+        break;
       case "buildingType":
         setSelectedBuildingTypes(selectedBuildingTypes.filter((v) => v !== value));
+        break;
+      case "layer2":
+        setSelectedLayer2(selectedLayer2.filter((v) => v !== value));
         break;
       case "direction":
         setSelectedDirections(selectedDirections.filter((v) => v !== value));
@@ -500,125 +527,93 @@ useEffect(() => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+const isValid = (v: string | undefined | null) =>
+  v !== undefined && v !== null && v.trim() !== "" && v.trim().toLowerCase() !== "skip";
+
 const uniqueBuildingTypes = Array.from(
-  new Set(
-    items
-      .map((item) => item.building_type)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.building_type).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueDirections = Array.from(
-  new Set(
-    items
-      .map((item) => item.direction)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.direction).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueMainDoorDirections = Array.from(
-  new Set(
-    items
-      .map((item) => item.main_door_direction)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.main_door_direction).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueBalconyDirections = Array.from(
-  new Set(
-    items
-      .map((item) => item.balcony_direction)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.balcony_direction).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature1 = Array.from(
-  new Set(
-    items
-      .map((item) => item.feature_1)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.feature_1).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature2 = Array.from(
-  new Set(
-    items
-      .map((item) => item.feature_2)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.feature_2).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature3 = Array.from(
-  new Set(
-    items
-      .map((item) => item.feature_3)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.feature_3).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFeature4 = Array.from(
-  new Set(
-    items
-      .map((item) => item.feature_4)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.feature_4).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueApartmentType = Array.from(
-  new Set(
-    items
-      .map((item) => item.apartment_type)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.apartment_type).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueApartmentModelCode = Array.from(
-  new Set(
-    items
-      .map((item) => item.apartment_model_code)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.apartment_model_code).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueApartmentNum = Array.from(
-  new Set(
-    items
-      .map((item) => item.apartment_num)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.apartment_num).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFloorName = Array.from(
-  new Set(
-    items
-      .map((item) => item.floor_name)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.floor_name).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFloorGroupCode = Array.from(
-  new Set(
-    items
-      .map((item) => item.floor_group_code)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.floor_group_code).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueZones = Array.from(
-  new Set(
-    items
-      .map((item) => item.zone)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
-  )
+  new Set(items.map((item) => item.zone).filter(isValid))
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
 
 const uniqueFloorApartmentGroupCode = Array.from(
+  new Set(items.map((item) => item.floor_apartment_group_code).filter(isValid))
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+// layer3 chỉ lấy từ items không có zone hợp lệ (khớp với logic hiển thị card)
+const uniqueLayer3 = Array.from(
   new Set(
     items
-      .map((item) => item.floor_apartment_group_code)
-      .filter((type) => type !== undefined && type !== null && type !== "skip")
+      .filter((item) => !isValid(item.zone))
+      .map((item) => item.layer3)
+      .filter(isValid)
   )
 ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+// layer2 chỉ lấy từ items không có building_type hợp lệ (khớp với logic hiển thị card)
+const uniqueLayer2 = Array.from(
+  new Set(
+    items
+      .filter((item) => !isValid(item.building_type))
+      .map((item) => item.layer2)
+      .filter(isValid)
+  )
+).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+
+// Danh sách status hợp lệ (không null/empty/skip)
+const uniqueStatuses = Array.from(
+  new Set(items.map((item) => item.status_unit).filter(isValid))
+);
 
 // Lấy danh sách phòng ngủ duy nhất, ép về string và bỏ "Skip"
 const uniqueBedrooms: string[] = Array.from(
@@ -698,9 +693,15 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
           uniqueZones={uniqueZones}
           selectedZones={selectedZones}
           setSelectedZones={setSelectedZones}
+          uniqueLayer3={uniqueLayer3}
+          selectedLayer3={selectedLayer3}
+          setSelectedLayer3={setSelectedLayer3}
           uniqueBuildingTypes={uniqueBuildingTypes}
           selectedBuildingTypes={selectedBuildingTypes}
           setSelectedBuildingTypes={setSelectedBuildingTypes}
+          uniqueLayer2={uniqueLayer2}
+          selectedLayer2={selectedLayer2}
+          setSelectedLayer2={setSelectedLayer2}
           uniqueDirections={uniqueDirections}
           selectedDirections={selectedDirections}
           setSelectedDirections={setSelectedDirections}
@@ -799,7 +800,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
     meta?.main_door_direction,
     meta?.balcony_direction,
     meta?.status_unit,
-  ].filter(Boolean);
+  ].filter((val) => val && String(val).trim().toLowerCase() !== "skip");
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -842,6 +843,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
           </Group>
 
           {/* Status buttons */}
+          {uniqueStatuses.length > 0 && (
           <Group gap="md" style={{ marginTop: 16 }}>
             <button
               style={{
@@ -856,6 +858,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                 transition: "all 0.3s ease",
                 opacity: selectedStatuses.includes("Quan tâm") ? 1 : (selectedStatuses.length === 0 ? 0.7 : 0.4),
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                display: uniqueStatuses.includes("Quan tâm") ? undefined : "none",
               }}
               onClick={() => {
                 const status = "Quan tâm";
@@ -882,6 +885,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                 transition: "all 0.3s ease",
                 opacity: selectedStatuses.includes("Đang bán") ? 1 : (selectedStatuses.length === 0 ? 0.7 : 0.4),
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                display: uniqueStatuses.includes("Đang bán") ? undefined : "none",
               }}
               onClick={() => {
                 const status = "Đang bán";
@@ -908,6 +912,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                 transition: "all 0.3s ease",
                 opacity: selectedStatuses.includes("Đã đặt cọc") ? 1 : (selectedStatuses.length === 0 ? 0.7 : 0.4),
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                display: uniqueStatuses.includes("Đã đặt cọc") ? undefined : "none",
               }}
               onClick={() => {
                 const status = "Đã đặt cọc";
@@ -934,6 +939,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                 transition: "all 0.3s ease",
                 opacity: selectedStatuses.includes("Đã bán") ? 1 : (selectedStatuses.length === 0 ? 0.7 : 0.4),
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                display: uniqueStatuses.includes("Đã bán") ? undefined : "none",
               }}
               onClick={() => {
                 const status = "Đã bán";
@@ -947,6 +953,7 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
               Đã bán
             </button>
           </Group>
+          )}
 
           {/* <Divider size="xs" style={{ marginTop: 16 }} /> */}
 
@@ -1004,43 +1011,36 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                   <Text fw={700} mb={8} style={{ fontSize: "15px" }} ta="center">
                     {item.unit_code}
                   </Text>
-
-                  {/* Zone / Layer3 */}
                   {item.zone && item.zone.trim().toLowerCase() !== "skip" ? (
                     <Text style={{ fontSize: "15px" }}>Phân khu: {item.zone}</Text>
                   ) : item.layer3 && item.layer3.trim().toLowerCase() !== "skip" ? (
                     <Text style={{ fontSize: "15px" }}>Tòa: {item.layer3}</Text>
                   ) : null}
 
-                  {/* Building type / Layer2 */}
                   {item.building_type && item.building_type.trim().toLowerCase() !== "skip" ? (
                     <Text style={{ fontSize: "15px" }}>Loại công trình: {item.building_type}</Text>
                   ) : item.layer2 && item.layer2.trim().toLowerCase() !== "skip" ? (
                     <Text style={{ fontSize: "15px" }}>Vị trí: {item.layer2}</Text>
                   ) : null}
 
-                  {/* Phòng ngủ */}
                   {item.bedroom != null &&
                     item.bedroom !== "" &&
                     String(item.bedroom).trim().toLowerCase() !== "skip" && (
                       <Text style={{ fontSize: "13px" }}>Phòng ngủ: {item.bedroom}</Text>
                     )}
 
-                  {/* Phòng tắm */}
                   {item.bathroom != null &&
                     item.bathroom !== "" &&
                     String(item.bathroom).trim().toLowerCase() !== "skip" && (
                       <Text style={{ fontSize: "13px" }}>Phòng tắm: {item.bathroom}</Text>
                     )}
 
-                  {/* Hướng */}
                   {item.direction &&
                     item.direction.trim() !== "" &&
                     item.direction.trim().toLowerCase() !== "skip" && (
                       <Text style={{ fontSize: "15px" }}>Hướng: {item.direction}</Text>
                     )}
 
-                  {/* Hướng cửa chính */}
                   {item.main_door_direction &&
                     item.main_door_direction.trim() !== "" &&
                     item.main_door_direction.trim().toLowerCase() !== "skip" && (
@@ -1048,8 +1048,8 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                         Hướng cửa chính: {item.main_door_direction}
                       </Text>
                     )}
+                    
 
-                  {/* Hướng ban công */}
                   {item.balcony_direction &&
                     item.balcony_direction.trim() !== "" &&
                     item.balcony_direction.trim().toLowerCase() !== "skip" && (
@@ -1058,12 +1058,9 @@ const sortedBathrooms = [...uniqueBathrooms].sort((a, b) => {
                       </Text>
                     )}
 
-                  {/* Trạng thái */}
-                  {item.status_unit &&
-                    item.status_unit.trim() !== "" &&
-                    item.status_unit.trim().toLowerCase() !== "skip" && (
-                      <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
-                    )}
+                  {item.status_unit && item.status_unit.trim().toLowerCase() !== "skip" && (
+                    <Text style={{ fontSize: "13px" }}>Trạng thái: {item.status_unit}</Text>
+                  )}
                 </Card>
               ))}
             </SimpleGrid>

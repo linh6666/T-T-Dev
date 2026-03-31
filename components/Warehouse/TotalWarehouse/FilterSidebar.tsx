@@ -8,9 +8,15 @@ interface FilterSidebarProps {
   uniqueZones: string[];
   selectedZones: string[];
   setSelectedZones: (val: string[]) => void;
+  uniqueLayer3: string[];
+  selectedLayer3: string[];
+  setSelectedLayer3: (val: string[]) => void;
   uniqueBuildingTypes: string[];
   selectedBuildingTypes: string[];
   setSelectedBuildingTypes: (val: string[]) => void;
+  uniqueLayer2: string[];
+  selectedLayer2: string[];
+  setSelectedLayer2: (val: string[]) => void;
   uniqueDirections: string[];
   selectedDirections: string[];
   setSelectedDirections: (val: string[]) => void;
@@ -63,9 +69,15 @@ export default function FilterSidebar({
   uniqueZones,
   selectedZones,
   setSelectedZones,
+  uniqueLayer3,
+  selectedLayer3,
+  setSelectedLayer3,
   uniqueBuildingTypes,
   selectedBuildingTypes,
   setSelectedBuildingTypes,
+  uniqueLayer2,
+  selectedLayer2,
+  setSelectedLayer2,
   uniqueDirections,
   selectedDirections,
   setSelectedDirections,
@@ -135,13 +147,22 @@ export default function FilterSidebar({
             value={selectedZones}
             onChange={setSelectedZones}
             maxDropdownHeight={200}
-            styles={{
-              input: {
-                maxHeight: "100px",
-                overflowY: "auto",
-              },
-            }}
+            styles={{ input: { maxHeight: "100px", overflowY: "auto" } }}
           />
+        )}
+
+        {uniqueLayer3.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <MultiSelect
+              label="Tòa"
+              placeholder="Chọn tòa"
+              data={uniqueLayer3}
+              value={selectedLayer3}
+              onChange={setSelectedLayer3}
+              maxDropdownHeight={200}
+              styles={{ input: { maxHeight: "100px", overflowY: "auto" } }}
+            />
+          </div>
         )}
 
         {uniqueBuildingTypes.length > 0 && (
@@ -153,12 +174,21 @@ export default function FilterSidebar({
               value={selectedBuildingTypes}
               onChange={setSelectedBuildingTypes}
               maxDropdownHeight={200}
-              styles={{
-                input: {
-                  maxHeight: "100px",
-                  overflowY: "auto",
-                },
-              }}
+              styles={{ input: { maxHeight: "100px", overflowY: "auto" } }}
+            />
+          </div>
+        )}
+
+        {uniqueLayer2.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <MultiSelect
+              label="Vị trí"
+              placeholder="Chọn vị trí"
+              data={uniqueLayer2}
+              value={selectedLayer2}
+              onChange={setSelectedLayer2}
+              maxDropdownHeight={200}
+              styles={{ input: { maxHeight: "100px", overflowY: "auto" } }}
             />
           </div>
         )}
