@@ -154,8 +154,8 @@ export default function FilterSidebar({
         {uniqueLayer3.length > 0 && (
           <div style={{ marginTop: "20px" }}>
             <MultiSelect
-              label="Tòa"
-              placeholder="Chọn tòa"
+              label="Khu vực/tòa"
+              placeholder="Chọn khu vực/tòa"
               data={uniqueLayer3}
               value={selectedLayer3}
               onChange={setSelectedLayer3}
