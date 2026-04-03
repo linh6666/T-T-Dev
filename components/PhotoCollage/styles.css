@@ -1,0 +1,436 @@
+/* Photo Collage Styles */
+
+.photo-collage-container {
+
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1rem;
+  font-family: var(--font-nunito), sans-serif;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.collage-header {
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.7s ease-out;
+}
+
+.collage-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #ec4899, #d946ef, #6366f1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.collage-subtitle {
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Upload Section */
+.upload-box-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 16/9;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  margin: 0 auto;
+}
+
+.upload-box-glow {
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(90deg, #6366f1, #9333ea);
+  border-radius: 32px;
+  filter: blur(15px);
+  opacity: 0.2;
+  transition: opacity 0.5s ease;
+}
+
+.upload-box-wrapper:hover .upload-box-glow {
+  opacity: 0.4;
+}
+
+.upload-box-border {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed rgba(99, 102, 241, 0.3);
+  border-radius: 32px;
+  transition: all 0.3s ease;
+}
+
+.upload-box-wrapper:hover .upload-box-border {
+  border-color: #6366f1;
+  transform: scale(1.01);
+}
+
+.upload-box-content {
+  position: absolute;
+  inset: 12px;
+  background-color: #0d0d21;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.upload-box-wrapper:hover .upload-box-content {
+  background-color: #12122d;
+}
+
+.upload-icon-container {
+  padding: 1rem;
+  background-color: rgba(99, 102, 241, 0.1);
+  border-radius: 1rem;
+  color: #818cf8;
+  transition: transform 0.3s ease;
+}
+
+.upload-box-wrapper:hover .upload-icon-container {
+  transform: scale(1.1);
+}
+
+.upload-text-main {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.25rem;
+}
+
+.upload-text-sub {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+/* Editor Section */
+.editor-container {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: flex-start;
+  animation: zoomIn 0.5s ease-out;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.canvas-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  padding: 15px; /* Tạo khoảng trống an toàn cho nút bấm */
+  box-sizing: border-box;
+}
+
+.canvas-wrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background-color: #000;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  max-width: 100%; /* Đảm bảo canvas không tràn màn hình */
+  margin: 0 auto;
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;   /* Chuyển vào trong một chút */
+  right: 5px;
+  width: 38px;
+  height: 38px;
+  background: #ef4444;
+  border: 2px solid white; /* Thêm viền để nổi bật khi ở trong canvas */
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 30; /* Đảm bảo nằm trên cùng */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+  background: #dc2626;
+}
+
+.floating-hint {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  pointer-events: none;
+}
+
+.hint-pill {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Controls */
+.controls-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+  width: 100%;
+}
+
+.control-panel {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.panel-title {
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #818cf8;
+  margin-bottom: 1.5rem;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.zoom-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 14px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.range-slider {
+  flex: 1;
+  height: 6px;
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 9999px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.range-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #ec4899;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.btn-secondary, .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.125rem;
+  border-radius: 1.25rem;
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+  border: none;
+}
+
+.btn-secondary {
+  background: linear-gradient(90deg, #db2777, #9333ea);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #db2777, #9333ea);
+  box-shadow: 0 10px 20px rgba(219, 39, 119, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(219, 39, 119, 0.4);
+}
+
+/* responsive @media queries */
+
+/* Màn hình lớn (Desktop HD) */
+@media (min-width: 1200px) {
+  .editor-container {
+    padding: 0 2rem;
+  }
+}
+
+/* Tablet và Màn hình nhỏ (Laptops) */
+@media (max-width: 1024px) {
+  .editor-container {
+    grid-template-columns: 1fr; /* Chuyển sang dạng dọc */
+    max-width: 600px;
+    gap: 2.5rem;
+  }
+  
+  .collage-title {
+    font-size: 2.25rem;
+  }
+}
+
+/* Mobile (Smartphones) */
+@media (max-width: 640px) {
+  .photo-collage-container {
+    padding: 2.5rem 1rem;
+  }
+
+  .collage-header {
+    margin-bottom: 2rem;
+  }
+
+  .collage-title {
+    font-size: 1.85rem;
+  }
+
+  .collage-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .upload-box-wrapper {
+    aspect-ratio: 4/3;
+  }
+
+  .editor-container {
+    gap: 2rem;
+  }
+
+  .control-panel {
+    padding: 1.5rem;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr; /* Nút bấm chồng lên nhau trên mobile */
+    gap: 1rem;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 1rem;
+  }
+
+  .canvas-wrapper {
+    border-radius: 16px;
+  }
+
+  .canvas-area {
+    /* Scale down the entire canvas area on very small screens */
+    transform: scale(1); 
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .canvas-wrapper {
+    /* Đảm bảo canvas không bám sát lề */
+    width: 95% !important;
+    height: auto !important;
+    aspect-ratio: 1/1;
+  }
+
+  .collage-title {
+    font-size: 1.6rem;
+  }
+
+  .zoom-controls {
+    gap: 0.75rem;
+  }
+  
+  .zoom-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hidden {
+  display: none !important;
+}
