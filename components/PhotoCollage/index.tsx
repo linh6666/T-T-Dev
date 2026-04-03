@@ -26,6 +26,7 @@ export default function PhotoCollage() {
   const [zoom, setZoom] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const transformWrapperRef = useRef<ReactZoomPanPinchRef>(null);
+  const canvasWrapperRef = useRef<HTMLDivElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,8 +36,9 @@ export default function PhotoCollage() {
         const src = event.target?.result as string;
         const img = new Image();
         img.onload = () => {
-          const scaleW = CANVAS_SIZE / img.width;
-          const scaleH = CANVAS_SIZE / img.height;
+          const currentCanvasWidth = canvasWrapperRef.current?.getBoundingClientRect().width || CANVAS_SIZE;
+          const scaleW = currentCanvasWidth / img.width;
+          const scaleH = currentCanvasWidth / img.height;
           const initialScale = Math.max(scaleW, scaleH);
           
           setImgDimensions({ width: img.width, height: img.height });
@@ -75,7 +77,8 @@ export default function PhotoCollage() {
         || transformWrapperRef.current.state 
         || { positionX: 0, positionY: 0, scale: 1 };
 
-      const exportScaleRatio = EXPORT_SIZE / CANVAS_SIZE;
+      const currentCanvasWidth = canvasWrapperRef.current?.getBoundingClientRect().width || CANVAS_SIZE;
+      const exportScaleRatio = EXPORT_SIZE / currentCanvasWidth;
 
       // 1. Tải ảnh người dùng
       const img = new Image();
@@ -157,13 +160,8 @@ export default function PhotoCollage() {
               <IconX size={24} stroke={3} />
             </button>
             <div 
+              ref={canvasWrapperRef}
               className="canvas-wrapper" 
-              style={{ 
-                width: "100%", 
-                maxWidth: CANVAS_SIZE, 
-                aspectRatio: "1/1", 
-                background: "#000" 
-              }}
             >
               <TransformWrapper
                 ref={transformWrapperRef}
