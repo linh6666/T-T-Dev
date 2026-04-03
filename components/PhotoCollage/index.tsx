@@ -22,6 +22,7 @@ const EXPORT_SIZE = 1200;
 
 export default function PhotoCollage() {
   const [image, setImage] = useState<string | null>(null);
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
   const [zoom, setZoom] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const transformWrapperRef = useRef<ReactZoomPanPinchRef>(null);
@@ -37,13 +38,17 @@ export default function PhotoCollage() {
           const scaleW = CANVAS_SIZE / img.width;
           const scaleH = CANVAS_SIZE / img.height;
           const initialScale = Math.max(scaleW, scaleH);
+          
+          setImgDimensions({ width: img.width, height: img.height });
           setImage(src);
+          
           setTimeout(() => {
             if (transformWrapperRef.current) {
+              // Reset transform first to avoid cumulative issues
               transformWrapperRef.current.setTransform(0, 0, initialScale, 0);
               transformWrapperRef.current.centerView(initialScale);
             }
-          }, 50);
+          }, 100);
         };
         img.src = src;
       };
@@ -90,7 +95,9 @@ export default function PhotoCollage() {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       
-      ctx.drawImage(img, 0, 0);
+      // Vẽ ảnh với kích thước gốc (vì logic scale/translate của thư viện dựa trên kích thước phần tử trong DOM)
+      // Trong UI, chúng ta đã đổi width/height của NextImage thành imgDimensions.width/height
+      ctx.drawImage(img, 0, 0, imgDimensions.width, imgDimensions.height);
       ctx.restore();
 
       // 2. Tải và vẽ khung ảnh
@@ -173,10 +180,12 @@ export default function PhotoCollage() {
                   <NextImage 
                     src={image} 
                     alt="User" 
-                    width={CANVAS_SIZE}
-                    height={CANVAS_SIZE}
+                    width={imgDimensions.width}
+                    height={imgDimensions.height}
                     unoptimized
                     style={{ 
+                      width: "auto",
+                      height: "auto",
                       maxWidth: "none", 
                       display: "block",
                       userSelect: "none"
