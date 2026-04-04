@@ -297,7 +297,8 @@ export default function PhotoCollage() {
                     color: text.color, 
                     fontSize: `calc(${text.size}px * (var(--canvas-scale, 1)))`, 
                     fontWeight: 800,
-                    zIndex: 20, userSelect: "none", transform: "translate(-50%, -50%)",
+                    zIndex: 20, userSelect: "none", 
+                    transform: `translate(-50%, -50%) rotate(${text.rotation}deg) scale(${text.flipH ? -1 : 1}, ${text.flipV ? -1 : 1})`,
                     textShadow: "2px 2px 8px rgba(0,0,0,0.6)", whiteSpace: "nowrap",
                     fontFamily: "var(--font-nunito), sans-serif",
                     border: activeTextId === text.id ? "2px solid #00a8ff" : "none",
@@ -361,8 +362,8 @@ export default function PhotoCollage() {
 
             <div className="control-panel">
               <h4 className="panel-title">2. Hướng ảnh</h4>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button className="zoom-btn" onClick={() => setRotation(r => (r + 90) % 360)} title="Xoay ảnh 90°">
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button className="zoom-btn" onClick={() => setRotation(r => r + 50)} title="Xoay ảnh 50°">
                   <IconRotateClockwise size={22} />
                 </button>
                 <button className={`zoom-btn ${flipH ? "active" : ""}`} onClick={() => setFlipH(!flipH)} title="Lật ngang ảnh" style={flipH ? { backgroundColor: "rgba(99, 102, 241, 0.4)" } : {}}>
@@ -399,9 +400,15 @@ export default function PhotoCollage() {
                   </div>
                   <input type="range" min="12" max="100" value={activeText?.size || 32} onChange={(e) => updateActiveText({ size: parseInt(e.target.value) })} className="range-slider" />
                   <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                    <button className="zoom-btn" onClick={() => updateActiveText({ rotation: ((activeText?.rotation || 0) + 90) % 360 })} title="Xoay chữ 90°"><IconRotateClockwise size={18} /></button>
-                    <button className={`zoom-btn ${activeText?.flipH ? "active" : ""}`} onClick={() => updateActiveText({ flipH: !activeText?.flipH })} title="Lật ngang chữ" style={activeText?.flipH ? { backgroundColor: "rgba(99, 102, 241, 0.4)" } : {}}><IconFlipHorizontal size={18} /></button>
-                    <button className={`zoom-btn ${activeText?.flipV ? "active" : ""}`} onClick={() => updateActiveText({ flipV: !activeText?.flipV })} title="Lật dọc chữ" style={activeText?.flipV ? { backgroundColor: "rgba(99, 102, 241, 0.4)" } : {}}><IconFlipVertical size={18} /></button>
+                    <button className="zoom-btn" onClick={() => updateActiveText({ rotation: (activeText?.rotation || 0) + 50 })} title="Xoay chữ 50°">
+                      <IconRotateClockwise size={18} />
+                    </button>
+                    <button className={`zoom-btn ${activeText?.flipH ? "active" : ""}`} onClick={() => updateActiveText({ flipH: !activeText?.flipH })} title="Lật ngang chữ" style={activeText?.flipH ? { backgroundColor: "rgba(99, 102, 241, 0.4)" } : {}}>
+                      <IconFlipHorizontal size={18} />
+                    </button>
+                    <button className={`zoom-btn ${activeText?.flipV ? "active" : ""}`} onClick={() => updateActiveText({ flipV: !activeText?.flipV })} title="Lật dọc chữ" style={activeText?.flipV ? { backgroundColor: "rgba(99, 102, 241, 0.4)" } : {}}>
+                      <IconFlipVertical size={18} />
+                    </button>
                     <button onClick={addNewText} style={{ marginLeft: "auto", background: "none", border: "1px dashed #818cf8", color: "#818cf8", padding: "5px 10px", borderRadius: "5px", cursor: "pointer", fontSize: "11px" }}>+ Thêm tiếp</button>
                   </div>
                 </div>
