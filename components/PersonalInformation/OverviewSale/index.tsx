@@ -1,131 +1,159 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Box, 
-  Text, 
-  Flex, 
-  Stack, 
-  Badge, 
-  Progress, 
-  Group, 
+import {
+  Card,
+  Image,
+  Stack,
+  Text,
+  Loader,
   Title,
-  Divider,
+  Button,
 } from "@mantine/core";
-import { 
-  IconShoppingCart, 
-  IconUsers, 
-  IconCheck, 
-  IconFileInvoice,
-} from "@tabler/icons-react";
-import styles from "./styles.module.css";
-import { getCurrentUser } from "../../../api/apiProfile";
+import styles from "./Interact.module.css";
+import { getListProject } from "../../../api/apigetlistProject";
+import ProjectDetail from "./ProjectDetail";
 
-interface User {
-  full_name?: string;
-  email?: string;
-  id?: string;
+/* =======================
+   TYPE
+======================= */
+export interface Project {
+  id: string;
+  name: string;
+  address?: string | null;
+  overview_image?: string | null;
+  investor?: string | null;
+  project_template_id: string;
+  rank?: number;
+  template?: string | null;
+  timeout_minutes?: number;
+  rank_name?: string | null;
+  type?: string | null;
 }
 
-export default function OverviewSale() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  
+/* =======================
+   COMPONENT
+======================= */
+export default function Listcustomer() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  /* =======================
+     FETCH DATA
+  ======================= */
   useEffect(() => {
-    const fetchUser = async () => {
+    const token = localStorage.getItem("access_token") ?? "";
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchProjects() {
       try {
-        const user = await getCurrentUser();
-        setCurrentUser(user);
+        const { data } = await getListProject({
+          token,
+          skip: 0,
+          limit: 100,
+        });
+
+        if (Array.isArray(data)) {
+          setProjects(data);
+        }
       } catch (error) {
-        console.error("Error fetching user info:", error);
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        setLoading(false);
       }
-    };
-    fetchUser();
+    }
+
+    fetchProjects();
   }, []);
 
-  const stats = [
-    { label: "Tổng đơn hàng", value: "142", icon: <IconShoppingCart size={20} /> },
-    { label: "Khách hàng mới", value: "28", icon: <IconUsers size={20} /> },
-    { label: "Số nhà đã chốt", value: "64", icon: <IconCheck size={20} /> },
-    { label: "Dự kiến (tỷ)", value: "4.2", icon: <IconFileInvoice size={20} /> },
-  ];
+  /* =======================
+     LOADING
+  ======================= */
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: 100 }}>
+        <Loader />
+      </div>
+    );
+  }
 
-  const activities = [
-    { unit: "SH1.12", customer: "Nguyễn Văn Tuấn", price: "1.2 tỷ", status: "Chờ duyệt", color: "orange" },
-    { unit: "LK5.08", customer: "Trần Thị Lan", price: "3.5 tỷ", status: "Đã chốt", color: "green" },
-    { unit: "V3.02", customer: "Phạm Minh Hùng", price: "5.8 tỷ", status: "Đã chốt", color: "green" },
-    { unit: "SH2.45", customer: "Lê Hoàng Anh", price: "1.1 tỷ", status: "Đã hủy", color: "red" },
-  ];
-
+  /* =======================
+     RENDER
+  ======================= */
   return (
-    <Box className={styles.container}>
-      {/* Tiêu đề đơn giản */}
-      <Stack gap={0} mb={32}>
-        <Title order={2} className={styles.title}>Tổng quan bán hàng</Title>
-        <Text size="sm" color="dimmed">Chào mừng, {currentUser?.full_name || "Mạnh Hùng"}. Đây là tóm tắt hoạt động của bạn.</Text>
-      </Stack>
+    <div className={styles.background}>
+      <div className={styles.container}>
+     {!selectedProject && (
+      <Title order={2} c="#294b61" ta="center" mb="lg">
+        Dự án
+      </Title>
+    )}
 
-      {/* Dashboard Stats */}
-      <Box className={styles.statsGrid}>
-        {stats.map((stat, i) => (
-          <Box key={i} className={styles.statCard}>
-            <Flex justify="space-between" align="flex-start" mb={12}>
-              <Text className={styles.statLabel}>{stat.label}</Text>
-              <Box 
-                className={styles.iconContainer} 
-                style={{ 
-                  backgroundColor: i === 0 ? '#e7f5ff' : i === 1 ? '#fff9db' : i === 2 ? '#ebfbee' : '#fff4e6',
-                  color: i === 0 ? '#228be6' : i === 1 ? '#fab005' : i === 2 ? '#40c057' : '#8c5b3f'
-                }}
+        {/* ===== DETAIL VIEW ===== */}
+        {selectedProject ? (
+          <>
+            <Button
+              variant="subtle"
+              mb="md"
+              onClick={() => setSelectedProject(null)}
+            >
+              ← Quay lại danh sách
+            </Button>
+
+            <ProjectDetail project={selectedProject} />
+          </>
+        ) : (
+          
+          /* ===== LIST PROJECT ===== */
+          <div className={styles.cardGrid}>
+            {projects.map((project) => (
+              <Card
+                key={project.id}
+                shadow="sm"
+                radius="md"
+                withBorder
+                padding="0"
+                className={styles.card}
+                style={{ cursor: "pointer" }}
+                onClick={() => setSelectedProject(project)}
               >
-                {stat.icon}
-              </Box>
-            </Flex>
-            <Text className={styles.statValue}>{stat.value}</Text>
-          </Box>
-        ))}
-      </Box>
+                <Image
+                  src={project.overview_image || "/placeholder.png"}
+                  height={160}
+                  alt={project.name}
+                  style={{
+                    borderTopLeftRadius: "var(--mantine-radius-md)",
+                    borderTopRightRadius: "var(--mantine-radius-md)",
+                  }}
+                />
 
-      <Flex gap={40} direction={{ base: 'column', md: 'row' }}>
-        {/* Danh sách giao dịch mới */}
-        <Box style={{ flex: 1 }} className={styles.section}>
-          <Text className={styles.sectionTitle}>Giao dịch gần đây</Text>
-          <Box className={styles.activityList}>
-            {activities.map((item, i) => (
-              <Box key={i} className={styles.activityItem}>
-                <Stack gap={0}>
-                  <Text fw={600} size="sm">{item.unit}</Text>
-                  <Text size="xs" color="dimmed">{item.customer}</Text>
+                <Stack gap="xs" p="md">
+                  <Text fw={500} style={{ fontSize: 15 }}>
+                    {project.name}
+                  </Text>
+
+                  <Text size="xs" c="dimmed">
+                    Loại dự án: {project.type || "Thông tin chưa có"}
+                  </Text>
+
+                  <Text size="xs" c="dimmed">
+                    Địa chỉ: {project.address || "Địa chỉ chưa có"}
+                  </Text>
+
+                  <Text size="xs" c="dimmed">
+                    Nhà đầu tư: {project.investor || "Thông tin chưa có"}
+                  </Text>
                 </Stack>
-                <Group gap="xl">
-                  <Text fw={700} size="sm" color="#8c5b3f">{item.price}</Text>
-                  <Badge variant="dot" color={item.color} size="sm">{item.status}</Badge>
-                </Group>
-              </Box>
+              </Card>
             ))}
-          </Box>
-        </Box>
-
-        {/* Mục tiêu đơn giản */}
-        <Box w={{ base: '100%', md: '300px' }} className={styles.section}>
-          <Text className={styles.sectionTitle}>Mục tiêu tháng này</Text>
-          <Box className={styles.targetCard}>
-            <Stack gap="xs">
-              <Flex justify="space-between" align="center">
-                <Text size="sm" fw={600}>Tiến độ</Text>
-                <Text size="sm" fw={700}>75%</Text>
-              </Flex>
-              <Progress value={75} color="#8c5b3f" radius="xs" size="sm" />
-              <Divider my={10} />
-              <Stack gap={4}>
-                <Text size="xs" color="dimmed">Đã chốt: 7.5 tỷ</Text>
-                <Text size="xs" color="dimmed">Chỉ tiêu: 10 tỷ</Text>
-              </Stack>
-            </Stack>
-          </Box>
-        </Box>
-      </Flex>
-    </Box>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
-
-
